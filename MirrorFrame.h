@@ -19,7 +19,7 @@
 #include <QtCore/QtCore>
 #include <QtWidgets/QtWidgets>
 #ifdef __USE_RPI__
-    #include <th02.h>
+#include <th02.h>
 #endif
 #include "CalendarData.h"
 #include "WeatherData.h"
@@ -33,34 +33,34 @@
 #define THIRTY_MINUTES      (1000 * 60 * 30)
 
 class MirrorFrame : public QFrame {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	MirrorFrame(QFrame *parent = 0);
-	virtual ~MirrorFrame();
-	void registerTouchEvent();
+    MirrorFrame(QFrame *parent = 0);
+    virtual ~MirrorFrame();
+    void registerTouchEvent();
 
 public slots:
-	void getEvents();
-	void getForecast();
-	void getCurrentWeather();
-	void calendarEventsDone();
-	void calendarEventsError(QString);
-	void calendarEventsEvent(QString);
-	void weatherDataError(QString);
-	void weatherEventsDone();
-	void currentHumidity(double);
-	void currentSkyConditions(QString);
-	void currentTemperature(double);
-	void currentWindSpeed(double);
-	void sunrise(qint64);
-	void sunset(qint64);
-	void forecastEntry(QJsonObject);
+    void getEvents();
+    void getForecast();
+    void getCurrentWeather();
+    void calendarEventsDone();
+    void calendarEventsError(QString);
+    void calendarEventsEvent(QString);
+    void weatherDataError(QString);
+    void weatherEventsDone();
+    void currentHumidity(double);
+    void currentSkyConditions(QString);
+    void currentTemperature(double);
+    void currentWindSpeed(double);
+    void sunrise(qint64);
+    void sunset(qint64);
+    void forecastEntry(QJsonObject);
     void forecastEntryCount(int);
-	void updateClock();
-	void monitorOn();
-	void monitorOff();
-	void resetMonitorTimer();
-	void updateLocalTemp();
+    void updateClock();
+    void monitorOn();
+    void monitorOff();
+    void resetMonitorTimer();
+    void updateLocalTemp();
     void iconReplyFinished(QNetworkReply*);
     void currentIcon(QString);
     void messageReceivedOnTopic(QString, QString);
@@ -68,71 +68,71 @@ public slots:
     void disconnectedEvent();
     void lightningTimeout();
 
-    
-signals:
-	void touchDetected();
 
-//protected:
-//	void showEvent(QShowEvent*);
+signals:
+    void touchDetected();
+
+    //protected:
+    //	void showEvent(QShowEvent*);
 
 private:
     void deleteCalendarEventsList();
-	void createStateMachine();
-	void enableTimers();
-	void turnMonitorOn();
-	void turnMonitorOff();
+    void createStateMachine();
+    void enableTimers();
+    void turnMonitorOn();
+    void turnMonitorOff();
     void createWeatherSystem();
     void createCalendarSystem();
     void getIcon(QString);
     void setupMqttSubscriber();
 
-	QStateMachine *m_monitorState;
-	QTimer *m_calendarTimer;
-	QTimer *m_forecastTimer;
-	QTimer *m_currentWeatherTimer;
-	QTimer *m_clockTimer;
-	QTimer *m_monitorTimer;
-	QTimer *m_localTempTimer;
+    QStateMachine *m_monitorState;
+    QTimer *m_calendarTimer;
+    QTimer *m_forecastTimer;
+    QTimer *m_currentWeatherTimer;
+    QTimer *m_clockTimer;
+    QTimer *m_monitorTimer;
+    QTimer *m_localTempTimer;
     QTimer *m_lightningTimer;
-	QList<QLabel*> m_calendarEvents;
-	QLabel *m_calLabel;
-	QLabel *m_currentLabel;
-	QLabel *m_forecastLabel;
-	QLabel *m_currentTemp;
-	QLabel *m_currentHumidity;
-	QLabel *m_currentWind;
-	QLabel *m_currentSky;
-	QLabel *m_sunrise;
-	QLabel *m_sunset;
-	QLabel *m_currentTempLabel;
-	QLabel *m_currentHumidityLabel;
-	QLabel *m_currentWindLabel;
-	QLabel *m_currentSkyLabel;
-	QLabel *m_sunriseLabel;
-	QLabel *m_sunsetLabel;
-	QLabel *m_clockLabel;
-	QLabel *m_localTempLabel;
-	QLabel *m_localTemp;
-	QLabel *m_localHumidityLabel;
-	QLabel *m_localHumidity;
+    QList<QLabel*> m_calendarEvents;
+    QLabel *m_calLabel;
+    QLabel *m_currentLabel;
+    QLabel *m_forecastLabel;
+    QLabel *m_currentTemp;
+    QLabel *m_currentHumidity;
+    QLabel *m_currentWind;
+    QLabel *m_currentSky;
+    QLabel *m_sunrise;
+    QLabel *m_sunset;
+    QLabel *m_currentTempLabel;
+    QLabel *m_currentHumidityLabel;
+    QLabel *m_currentWindLabel;
+    QLabel *m_currentSkyLabel;
+    QLabel *m_sunriseLabel;
+    QLabel *m_sunsetLabel;
+    QLabel *m_clockLabel;
+    QLabel *m_localTempLabel;
+    QLabel *m_localTemp;
+    QLabel *m_localHumidityLabel;
+    QLabel *m_localHumidity;
     QLabel *m_currentIcon;
     QLabel *m_lightningLabel;
-    
-	QVector<QLabel*> m_forecastEntries;
+
+    QVector<QLabel*> m_forecastEntries;
     QVector<QLabel*> m_iconEntries;
     QNetworkAccessManager *m_icon;
     QVector<QString> m_icons;
 
     WeatherData *m_weatherEvent;
     CalendarData *m_calendarEvent;
-    
-	int m_calEventsY;
-	int m_forecastIndex;
+
+    int m_calEventsY;
+    int m_forecastIndex;
     int m_forecastEntryCount;
-	bool m_newEventList;
-	bool m_resetForecastTimer;
-	double m_humidity;
-	double m_temperature;
+    bool m_newEventList;
+    bool m_resetForecastTimer;
+    double m_humidity;
+    double m_temperature;
 };
 
 #endif /* __MIRRORFRAME_H__ */

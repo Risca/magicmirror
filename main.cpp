@@ -1,21 +1,21 @@
 /*
-    This file is part of MythClock.
-    MythClock is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    MythClock is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with MythClock.  If not, see <http://www.gnu.org/licenses/>.
+This file is part of MythClock.
+MythClock is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+MythClock is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with MythClock.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <QApplication>
 
 #ifdef __USE_RPI__
-  #include <wiringPi.h>
+#include <wiringPi.h>
 #endif
 
 #include "MirrorFrame.h"
@@ -43,7 +43,7 @@ void touchEvent(void) {
 void setupTouchEvents()
 {
 #ifdef __USE_RPI__
-	qDebug() << __PRETTY_FUNCTION__;
+    qDebug() << __PRETTY_FUNCTION__;
     wiringPiSetupGpio();
     pinMode(12, INPUT);
     wiringPiISR(12, INT_EDGE_FALLING, &touchEvent);
@@ -70,4 +70,3 @@ int main(int argc, char **argv)
 
     return app.exec();
 }
-

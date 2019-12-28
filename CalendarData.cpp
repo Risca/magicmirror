@@ -10,19 +10,19 @@ CalendarData::~CalendarData()
 
 void CalendarData::process()
 {
-	QProcess process;
-	QByteArray results;
+    QProcess process;
+    QByteArray results;
 
-	qDebug() << __PRETTY_FUNCTION__;
-	process.start("python3", QStringList() << "/usr/bin/magicmirror.py");
-	if (!process.waitForFinished(120000)) {
-		qWarning() << __PRETTY_FUNCTION__ << ": Error running magicmirror.py";
-		emit error(QString("Error running magicmirror.py"));
-	}
-	results = process.readAllStandardOutput();
+    qDebug() << __PRETTY_FUNCTION__;
+    process.start("python3", QStringList() << "/usr/bin/magicmirror.py");
+    if (!process.waitForFinished(120000)) {
+        qWarning() << __PRETTY_FUNCTION__ << ": Error running magicmirror.py";
+        emit error(QString("Error running magicmirror.py"));
+    }
+    results = process.readAllStandardOutput();
 
-	processResults(results);
-	emit finished();
+    processResults(results);
+    emit finished();
 }
 
 /*
@@ -39,9 +39,9 @@ void CalendarData::process()
 */
 void CalendarData::processResults(QByteArray &results)
 {
-	QDateTime start;
-	QList<QByteArray> events = results.split('\n');
-	qDebug() << __PRETTY_FUNCTION__;
+    QDateTime start;
+    QList<QByteArray> events = results.split('\n');
+    qDebug() << __PRETTY_FUNCTION__;
     if (results.contains("Go to the following link in your browser")) {
         emit newEvent(QString("Please run from command line to authenticate"));
     }

@@ -18,25 +18,25 @@
 #include <QtCore/QtCore>
 
 class CalendarData : public QObject {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	CalendarData(QObject *parent = 0);
-	virtual ~CalendarData();
+    CalendarData(QObject *parent = 0);
+    virtual ~CalendarData();
 
 public slots:
-	void process();
- 
+    void process();
+
 signals:
-	void newEvent(QString);
-	void finished();
-	void error(QString);
-	void temperature(double);
-	void humidity(double);
-	void windSpeed(double);
-	void skyConditions(QString);
+    void newEvent(QString);
+    void finished();
+    void error(QString);
+    void temperature(double);
+    void humidity(double);
+    void windSpeed(double);
+    void skyConditions(QString);
 
 private:
-	void processResults(QByteArray&);
+    void processResults(QByteArray&);
 };
 
 #endif /* __CALENDARDATA_H__ */
