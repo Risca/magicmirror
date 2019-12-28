@@ -187,7 +187,7 @@ void MirrorFrame::createWeatherSystem()
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
     m_weatherEvent = new WeatherData();
-    m_weatherEvent->addZip(settings.value("zip").toString(), settings.value("country").toString());
+    m_weatherEvent->addTownId(settings.value("townid").toString());
 	m_weatherEvent->addAppID(settings.value("appid").toString());
 
     connect(m_weatherEvent, SIGNAL(temperature(double)), this, SLOT(currentTemperature(double)));

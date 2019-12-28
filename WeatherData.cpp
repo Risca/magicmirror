@@ -13,12 +13,10 @@ WeatherData::~WeatherData()
 {
 }
 
-void WeatherData::addZip(QString z, QString c)
+void WeatherData::addTownId(const QString& townid)
 {
-	m_zip = z;
-	m_zip += ",";
-	m_zip += c;
-	qDebug() << __PRETTY_FUNCTION__ << ":" << m_zip;
+	qDebug() << __PRETTY_FUNCTION__ << ":" << townid;
+	m_townID = townid;
 }
 
 void WeatherData::addAppID(QString a)
@@ -34,22 +32,23 @@ void WeatherData::processCurrentWeather()
 
 	qDebug() << __PRETTY_FUNCTION__;
 	query.addQueryItem("appid", m_appID);
-	query.addQueryItem("zip", m_zip);
-	query.addQueryItem("units", "imperial");
+	query.addQueryItem("id", m_townID);
+	query.addQueryItem("units", "metric");
 	u.setQuery(query);
+
 
 	m_current->get(QNetworkRequest(u));
 }
 
 void WeatherData::processForecast()
 {
-	QUrl u("http://api.openweathermap.org/data/2.5/forecast/daily");
+	QUrl u("http://api.openweathermap.org/data/2.5/forecast");
 	QUrlQuery query;
 
 	qDebug() << __PRETTY_FUNCTION__;
 	query.addQueryItem("appid", m_appID);
-	query.addQueryItem("zip", m_zip);
-	query.addQueryItem("units", "imperial");
+	query.addQueryItem("id", m_townID);
+	query.addQueryItem("units", "metric");
 	query.addQueryItem("cnt", "5");
 	u.setQuery(query);
 

@@ -12,6 +12,7 @@ public:
 	virtual ~WeatherData();
 
 	void addZip(QString, QString);
+	void addTownId(const QString &townid);
 	void addAppID(QString);
     void setThreadPointer(QThread *t) { m_thread = t; }
 
@@ -39,7 +40,7 @@ private:
 	QNetworkAccessManager *m_forecast;
 	QNetworkAccessManager *m_current;
 	QString m_appID;
-	QString m_zip;
+	QString m_townID;
     QThread *m_thread;
 };
 
