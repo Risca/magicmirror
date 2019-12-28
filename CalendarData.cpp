@@ -14,6 +14,7 @@ void CalendarData::process()
     QByteArray results;
 
     qDebug() << __PRETTY_FUNCTION__;
+#if 0
     process.start("python3", QStringList() << "/usr/bin/magicmirror.py");
     if (!process.waitForFinished(120000)) {
         qWarning() << __PRETTY_FUNCTION__ << ": Error running magicmirror.py";
@@ -21,6 +22,13 @@ void CalendarData::process()
     }
     results = process.readAllStandardOutput();
 
+#else
+    const QString fakeData =
+            "2020-01-31 Familjen Frost i Norrköping\n" \
+            "2020-02-03T19:30:00+01:00 Babymetal - VIP\n" \
+            "2020-08-01 RAMMSTEIN - Europe Stadium Tour 2020 - dag 2\n";
+    results = fakeData.toUtf8();
+#endif
     processResults(results);
     emit finished();
 }
