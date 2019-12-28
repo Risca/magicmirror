@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     QCursor cursor(Qt::BlankCursor);
     QApplication::setOverrideCursor(cursor);
     frame = new MirrorFrame();
-    frame->setGeometry(0, 0, 1280, 1920);
+    frame->setGeometry(0, 0, 1680, 1050);
     frame->getEvents();
     frame->getCurrentWeather();
     frame->getForecast();

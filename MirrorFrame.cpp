@@ -24,22 +24,22 @@ MirrorFrame::MirrorFrame(QFrame *parent) : QFrame(parent)
     m_lightningLabel =  new QLabel(this);
 
 	QFont f("Roboto");
-	f.setPixelSize(50);
+	f.setPixelSize(50*2/3);
 	f.setBold(true);
 	m_calLabel->setGeometry(50, 10, 500, 100);
 	m_calLabel->setFont(f);
-    m_lightningLabel->setGeometry(50, 800, 1000, 100);
-    m_lightningLabel->setFont(f);
-	m_currentLabel->setGeometry(50, 900, 600, 100);
+	m_lightningLabel->setGeometry(50, 800 * 1050/1920, 1000, 100);
+	m_lightningLabel->setFont(f);
+	m_currentLabel->setGeometry(50, 900 * 1050/1920, 600, 100);
 	m_currentLabel->setFont(f);
-	m_forecastLabel->setGeometry(50, 1400, 500, 100);
+	m_forecastLabel->setGeometry(50, 1400 * 1050/1920, 500, 100);
 	m_forecastLabel->setFont(f);
-    
+
 	m_clockLabel->setGeometry(700, 10, 650, 100);
-	f.setPixelSize(40);
+	f.setPixelSize(40*2/3);
 	m_clockLabel->setFont(f);
 
-	f.setPixelSize(30);
+	f.setPixelSize(30*2/3);
 	m_currentTempLabel = new QLabel(this);
 	m_currentHumidityLabel = new QLabel(this);
 	m_currentWindLabel = new QLabel(this);
@@ -47,87 +47,87 @@ MirrorFrame::MirrorFrame(QFrame *parent) : QFrame(parent)
 	m_localTempLabel = new QLabel(this);
 	m_localHumidityLabel = new QLabel(this);
 
-	m_localTempLabel->setGeometry(50, 1000, 350, 50);
-	m_localHumidityLabel->setGeometry(400, 1000, 350, 50);
+	m_localTempLabel->setGeometry(50, 1000 * 1050/1920, 350, 50);
+	m_localHumidityLabel->setGeometry(400, 1000 * 1050/1920, 350, 50);
 	m_localTempLabel->setFont(f);
 	m_localHumidityLabel->setFont(f);
 	m_localTempLabel->setText("<center>Inside Temperature</center>");
 	m_localHumidityLabel->setText("<center>Inside Humidity</center>");
 
 	m_currentTempLabel = new QLabel(this);
-	m_currentTempLabel->setGeometry(50, 1100, 350, 50);
+	m_currentTempLabel->setGeometry(50, 1100 * 1050/1920, 350, 50);
 	m_currentTempLabel->setFont(f);
 	m_currentTempLabel->setText("<center>Outside Temperature</center>");
 
 	m_currentHumidityLabel = new QLabel(this);
-	m_currentHumidityLabel->setGeometry(400, 1100, 350, 50);
+	m_currentHumidityLabel->setGeometry(400, 1100 * 1050/1920, 350, 50);
 	m_currentHumidityLabel->setFont(f);
 	m_currentHumidityLabel->setText("<center>Outside Humidity</center>");
 
 	m_sunriseLabel = new QLabel(this);
-	m_sunriseLabel->setGeometry(750, 1000, 350, 50);
+	m_sunriseLabel->setGeometry(750, 1000 * 1050/1920, 350, 50);
 	m_sunriseLabel->setFont(f);
 	m_sunriseLabel->setText("<center>Sunrise</center>");
 
 	m_currentWindLabel = new QLabel(this);
-	m_currentWindLabel->setGeometry(50, 1200, 350, 50);
+	m_currentWindLabel->setGeometry(50, 1200 * 1050/1920, 350, 50);
 	m_currentWindLabel->setFont(f);
 	m_currentWindLabel->setText("<center>Wind Speed</center>");
 
 	m_currentSkyLabel = new QLabel(this);
-	m_currentSkyLabel->setGeometry(400, 1200, 350, 50);
+	m_currentSkyLabel->setGeometry(400, 1200 * 1050/1920, 350, 50);
 	m_currentSkyLabel->setFont(f);
 	m_currentSkyLabel->setText("<center>Sky Conditions</center>");
 
 	m_sunsetLabel = new QLabel(this);
-	m_sunsetLabel->setGeometry(750, 1100, 350, 50);
+	m_sunsetLabel->setGeometry(750, 1100 * 1050/1920, 350, 50);
 	m_sunsetLabel->setFont(f);
 	m_sunsetLabel->setText("<center>Sunset</center>");
 
     m_currentIcon = new QLabel(this);
-    m_currentIcon->setGeometry(750, 1200, 350, 100);
+    m_currentIcon->setGeometry(750, 1200 * 1050/1920, 350, 100);
     m_currentIcon->setAlignment(Qt::AlignCenter);
 
-	f.setPixelSize(25);
+	f.setPixelSize(25*2/3);
 	f.setBold(false);
 
 	m_localTemp = new QLabel(this);
-	m_localTemp->setGeometry(50, 1050, 350, 50);
+	m_localTemp->setGeometry(50, 1050 * 1050/1920, 350, 50);
 	m_localTemp->setFont(f);
 
 	m_localHumidity = new QLabel(this);
-	m_localHumidity->setGeometry(400, 1050, 350, 50);
+	m_localHumidity->setGeometry(400, 1050 * 1050/1920, 350, 50);
 	m_localHumidity->setFont(f);
 
 	m_currentTemp = new QLabel(this);
-	m_currentTemp->setGeometry(50, 1150, 350, 50);
+	m_currentTemp->setGeometry(50, 1150 * 1050/1920, 350, 50);
 	m_currentTemp->setFont(f);
 
 	m_currentHumidity = new QLabel(this);
-	m_currentHumidity->setGeometry(400, 1150, 350, 50);
+	m_currentHumidity->setGeometry(400, 1150 * 1050/1920, 350, 50);
 	m_currentHumidity->setFont(f);
 
 	m_sunrise = new QLabel(this);
-	m_sunrise->setGeometry(750, 1050, 350, 50);
+	m_sunrise->setGeometry(750, 1050 * 1050/1920, 350, 50);
 	m_sunrise->setFont(f);
 
 	m_currentWind = new QLabel(this);
-	m_currentWind->setGeometry(50, 1250, 350, 50);
+	m_currentWind->setGeometry(50, 1250 * 1050/1920, 350, 50);
 	m_currentWind->setFont(f);
 
 	m_currentSky = new QLabel(this);
-	m_currentSky->setGeometry(400, 1250, 350, 50);
+	m_currentSky->setGeometry(400, 1250 * 1050/1920, 350, 50);
 	m_currentSky->setFont(f);
 
 	m_sunset = new QLabel(this);
-	m_sunset->setGeometry(750, 1150, 350, 50);
+	m_sunset->setGeometry(750, 1150 * 1050/1920, 350, 50);
 	m_sunset->setFont(f);
 
 	for (int i = 0; i < 5; i++) {
 		QLabel *forecast = new QLabel(this);
         QLabel *icon = new QLabel(this);
-        icon->setGeometry(50, ((i * 50) + 1500), 100, 50);
-		forecast->setGeometry(150, ((i * 50) + 1500), 1150, 50);
+		icon->setGeometry(50, ((i * 50) + 1500) * 1050/1920, 100, 50);
+		forecast->setGeometry(150, ((i * 50) + 1500) * 1050/1920, 1150, 50);
 		forecast->setFont(f);
 		m_forecastEntries.push_back(forecast);
         m_iconEntries.push_back(icon);
@@ -531,7 +531,7 @@ void MirrorFrame::calendarEventsEvent(QString s)
 
 	QLabel *lb = new QLabel(s, this);
 	QFont f("Roboto");
-	f.setPixelSize(25);
+	f.setPixelSize(25*2/3);
 	lb->setFont(f);
 	lb->setGeometry(100, m_calEventsY + 50, 1000, 50);
 	lb->show();
