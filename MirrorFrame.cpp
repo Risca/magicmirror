@@ -267,10 +267,10 @@ void MirrorFrame::enableTimers()
 
 void MirrorFrame::updateLocalTemp()
 {
+#ifdef __USE_RPI__
     double t = 0.0;
     double h = 0.0;
-    
-#ifdef __USE_RPI__
+
 	if (getValues(&t, &h) == 0) {
 		m_temperature = t;
 		m_humidity = h;
