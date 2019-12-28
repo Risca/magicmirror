@@ -36,8 +36,12 @@ WeatherIcon::WeatherIcon()
     QDir cache(m_path);
 
     if (!cache.exists()) {
-        cache.mkdir(m_path);
-        qDebug() << __PRETTY_FUNCTION__ << ": Created cache dir" << m_path;
+        if (cache.mkpath(m_path)) {
+            qDebug() << __PRETTY_FUNCTION__ << ": Created cache dir" << m_path;
+        }
+        else {
+            qDebug() << __PRETTY_FUNCTION__ << ": Failed to create cache dir" << m_path;
+        }
     }
 }
 
