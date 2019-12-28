@@ -24,7 +24,6 @@
 #include "CalendarData.h"
 #include "WeatherData.h"
 #include "weathericon.h"
-#include "qmqttsubscriber.h"
 
 #define MONITOR_TIMEOUT		(1000 * 60 * 1)
 #define CALEVENTS_TIMEOUT	(1000 * 60 * 60 * 1)
@@ -126,7 +125,6 @@ private:
 
     WeatherData *m_weatherEvent;
     CalendarData *m_calendarEvent;
-    QMqttSubscriber *m_mqttClient;
     
 	int m_calEventsY;
 	int m_forecastIndex;

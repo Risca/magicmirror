@@ -159,6 +159,7 @@ MirrorFrame::~MirrorFrame()
 
 void MirrorFrame::setupMqttSubscriber()
 {
+#if 0
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
     QString hostname = settings.value("mqttserver").toString();
     QHostInfo lookup = QHostInfo::fromName(hostname);
@@ -179,6 +180,7 @@ void MirrorFrame::setupMqttSubscriber()
     m_mqttClient->connectToHost();
     m_lightningTimer = new QTimer();
     connect(m_lightningTimer, SIGNAL(timeout()), this, SLOT(lightningTimeout()));
+#endif
 }
 
 void MirrorFrame::createWeatherSystem()
@@ -587,13 +589,11 @@ void MirrorFrame::iconReplyFinished(QNetworkReply *reply)
 
 void MirrorFrame::connectionComplete()
 {
-    m_mqttClient->subscribe("lightning/#");
     m_lightningLabel->clear();
 }
 
 void MirrorFrame::disconnectedEvent()
 {
-    m_mqttClient->connectToHost();
     m_lightningLabel->setText("Connecting to MQTT server...");
 }
 

@@ -4,7 +4,7 @@ CONFIG += gui network debug core
 
 USE_RPI = FALSE
 
-QT += widgets network qmqtt
+QT += widgets network
 
 OBJECTS_DIR = .obj
 MOC_DIR = .moc
@@ -18,12 +18,10 @@ SOURCES = MirrorFrame.cpp \
 	CalendarData.cpp \
 	WeatherData.cpp \
 	main.cpp \
-	weathericon.cpp \
-	qmqttsubscriber.cpp
+        weathericon.cpp
 		
 HEADERS = MirrorFrame.h \
 	CalendarData.h \
 	WeatherData.h \
-	weathericon.h \
-	qmqttsubscriber.h
+        weathericon.h
 
