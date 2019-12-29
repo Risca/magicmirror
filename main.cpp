@@ -22,6 +22,8 @@ along with MythClock.  If not, see <http://www.gnu.org/licenses/>.
 
 MirrorFrame *frame = NULL;
 
+namespace {
+
 void printFonts()
 {
     QFontDatabase database;
@@ -50,10 +52,19 @@ void setupTouchEvents()
 #endif
 }
 
+void printSettingsFile()
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
+    qDebug() << __PRETTY_FUNCTION__ << "Using" << settings.fileName();
+}
+
+} // anonymous
+
 int main(int argc, char **argv)
 {
     QApplication app (argc, argv);
 
+    printSettingsFile();
 #ifdef __PRINT_FONTS__
     printFonts();
 #endif
