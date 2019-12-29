@@ -1,7 +1,25 @@
 #include "MirrorFrame.h"
 
+namespace {
+
+QString epochToTimeOfDay(const quint64 t)
+{
+    const qint64 timestamp = t*1000 - QDateTime(QDate::currentDate()).toMSecsSinceEpoch();
+    const QTime s = QTime::fromMSecsSinceStartOfDay(timestamp);
+    return s.toString(Qt::DefaultLocaleShortDate);
+}
+
+void setAppLocaleFromSettings()
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
+    QLocale::setDefault(QLocale(settings.value("locale", "en_EN").toString()));
+}
+
+} // anonymous namespace
+
 MirrorFrame::MirrorFrame(QFrame *parent) : QFrame(parent)
 {
+    setAppLocaleFromSettings();
 
     m_calendarTimer = new QTimer();
     m_forecastTimer = new QTimer();
@@ -324,7 +342,7 @@ void MirrorFrame::turnMonitorOn()
 void MirrorFrame::updateClock()
 {
     QDateTime now = QDateTime::currentDateTime();
-    m_clockLabel->setText(now.toString("ddd MMM d h:mm ap"));
+    m_clockLabel->setText(now.toString(Qt::DefaultLocaleShortDate));
 }
 
 void MirrorFrame::getCurrentWeather()
@@ -339,16 +357,12 @@ void MirrorFrame::getForecast()
 
 void MirrorFrame::sunrise(qint64 t)
 {
-    QDateTime s;
-    s.setMSecsSinceEpoch(t * 1000);
-    m_sunrise->setText(QString("<center>%1</center>").arg(s.toString("hh:mm ap")));
+    m_sunrise->setText(QString("<center>%1</center>").arg(epochToTimeOfDay(t)));
 }
 
 void MirrorFrame::sunset(qint64 t)
 {
-    QDateTime s;
-    s.setMSecsSinceEpoch(t * 1000);
-    m_sunset->setText(QString("<center>%1</center>").arg(s.toString("hh:mm ap")));
+    m_sunset->setText(QString("<center>%1</center>").arg(epochToTimeOfDay(t)));
 }
 
 void MirrorFrame::weatherEventsDone()
@@ -392,7 +406,7 @@ void MirrorFrame::currentWindSpeed(double speed)
     speed = speed + 0.5;
     int rounded = (int)speed;
 
-    m_currentWind->setText(QString("<center>%1 mph</center>").arg(rounded));
+    m_currentWind->setText(QString("<center>%1 m/s</center>").arg(rounded));
 }
 
 void MirrorFrame::weatherDataError(QString)
