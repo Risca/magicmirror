@@ -1,6 +1,10 @@
 #include "MirrorFrame.h"
+#include "ui_MirrorFrame.h"
 
 #include "settingsfactory.h"
+
+#include <QLayout>
+#include <QLayoutItem>
 
 namespace {
 
@@ -11,11 +15,35 @@ QString epochToTimeOfDay(const quint64 t)
     return s.toString(Qt::DefaultLocaleShortDate);
 }
 
+void clearLayout(QLayout *layout) {
+    QLayoutItem *item;
+    while((item = layout->takeAt(0))) {
+        if (item->layout()) {
+            clearLayout(item->layout());
+            delete item->layout();
+        }
+        if (item->widget()) {
+           delete item->widget();
+        }
+        delete item;
+    }
+}
+
 } // anonymous namespace
 
-MirrorFrame::MirrorFrame(QFrame *parent) : QFrame(parent), m_weatherEvent(nullptr)
+MirrorFrame::MirrorFrame(QFrame *parent) :
+    QFrame(parent),
+    ui(new Ui::MirrorFrame),
+    m_weatherEvent(nullptr),
+    m_forecastIndex(0),
+    m_forecastEntryCount(0),
+    m_newEventList(false),
+    m_resetForecastTimer(true),
+    m_humidity(0.0),
+    m_temperature(0.0)
 {
     QLocale::setDefault(QLocale(SettingsFactory::Create()->value("locale", "en_EN").toString()));
+    ui->setupUi(this);
 
     m_calendarTimer = new QTimer();
     m_forecastTimer = new QTimer();
@@ -25,145 +53,61 @@ MirrorFrame::MirrorFrame(QFrame *parent) : QFrame(parent), m_weatherEvent(nullpt
     m_monitorTimer = new QTimer();
     m_monitorState = new QStateMachine(this);
 
-    QPalette pal(QColor(0,0,0));
-    setBackgroundRole(QPalette::Window);
-    pal.setColor(QPalette::Window, Qt::black);
-    setAutoFillBackground(true);
-    setPalette(pal);
-
-    m_calLabel = new QLabel("<font color='white'>Upcoming Events", this);
-    m_forecastLabel = new QLabel("<font color='white'>Local Forecast</font>", this);
-    m_currentLabel = new QLabel("<font color='white'>Current Conditions</font>", this);
-    m_clockLabel = new QLabel(this);
-    m_lightningLabel =  new QLabel(this);
-
     QFont f("Roboto");
     f.setPixelSize(50*2/3);
     f.setBold(true);
-    m_calLabel->setGeometry(50, 10, 500, 100);
-    m_calLabel->setFont(f);
-    m_lightningLabel->setGeometry(50, 800 * 1050/1920, 1000, 100);
-    m_lightningLabel->setFont(f);
-    m_currentLabel->setGeometry(50, 900 * 1050/1920, 600, 100);
-    m_currentLabel->setFont(f);
-    m_forecastLabel->setGeometry(50, 1400 * 1050/1920, 500, 100);
-    m_forecastLabel->setFont(f);
+    ui->calLabel->setFont(f);
+    ui->lightningLabel->setFont(f);
+    ui->currentLabel->setFont(f);
+    ui->forecastLabel->setFont(f);
 
-    m_clockLabel->setGeometry(700, 10, 650, 100);
     f.setPixelSize(40*2/3);
-    m_clockLabel->setFont(f);
+    ui->clockLabel->setFont(f);
 
     f.setPixelSize(30*2/3);
-    m_currentTempLabel = new QLabel(this);
-    m_currentHumidityLabel = new QLabel(this);
-    m_currentWindLabel = new QLabel(this);
-    m_currentSkyLabel = new QLabel(this);
-    m_localTempLabel = new QLabel(this);
-    m_localHumidityLabel = new QLabel(this);
 
-    m_localTempLabel->setGeometry(50, 1000 * 1050/1920, 350, 50);
-    m_localHumidityLabel->setGeometry(400, 1000 * 1050/1920, 350, 50);
-    m_localTempLabel->setFont(f);
-    m_localHumidityLabel->setFont(f);
-    m_localTempLabel->setText("<center>Inside Temperature</center>");
-    m_localHumidityLabel->setText("<center>Inside Humidity</center>");
-
-    m_currentTempLabel = new QLabel(this);
-    m_currentTempLabel->setGeometry(50, 1100 * 1050/1920, 350, 50);
-    m_currentTempLabel->setFont(f);
-    m_currentTempLabel->setText("<center>Outside Temperature</center>");
-
-    m_currentHumidityLabel = new QLabel(this);
-    m_currentHumidityLabel->setGeometry(400, 1100 * 1050/1920, 350, 50);
-    m_currentHumidityLabel->setFont(f);
-    m_currentHumidityLabel->setText("<center>Outside Humidity</center>");
-
-    m_sunriseLabel = new QLabel(this);
-    m_sunriseLabel->setGeometry(750, 1000 * 1050/1920, 350, 50);
-    m_sunriseLabel->setFont(f);
-    m_sunriseLabel->setText("<center>Sunrise</center>");
-
-    m_currentWindLabel = new QLabel(this);
-    m_currentWindLabel->setGeometry(50, 1200 * 1050/1920, 350, 50);
-    m_currentWindLabel->setFont(f);
-    m_currentWindLabel->setText("<center>Wind Speed</center>");
-
-    m_currentSkyLabel = new QLabel(this);
-    m_currentSkyLabel->setGeometry(400, 1200 * 1050/1920, 350, 50);
-    m_currentSkyLabel->setFont(f);
-    m_currentSkyLabel->setText("<center>Sky Conditions</center>");
-
-    m_sunsetLabel = new QLabel(this);
-    m_sunsetLabel->setGeometry(750, 1100 * 1050/1920, 350, 50);
-    m_sunsetLabel->setFont(f);
-    m_sunsetLabel->setText("<center>Sunset</center>");
-
-    m_currentIcon = new QLabel(this);
-    m_currentIcon->setGeometry(750, 1200 * 1050/1920, 350, 100);
-    m_currentIcon->setAlignment(Qt::AlignCenter);
+    ui->currentTempLabel->setFont(f);
+    ui->localTempLabel->setFont(f);
+    ui->currentHumidityLabel->setFont(f);
+    ui->localHumidityLabel->setFont(f);
+    ui->currentWindLabel->setFont(f);
+    ui->currentSkyLabel->setFont(f);
+    ui->sunriseLabel->setFont(f);
+    ui->sunsetLabel->setFont(f);
 
     f.setPixelSize(25*2/3);
     f.setBold(false);
 
-    m_localTemp = new QLabel(this);
-    m_localTemp->setGeometry(50, 1050 * 1050/1920, 350, 50);
-    m_localTemp->setFont(f);
-
-    m_localHumidity = new QLabel(this);
-    m_localHumidity->setGeometry(400, 1050 * 1050/1920, 350, 50);
-    m_localHumidity->setFont(f);
-
-    m_currentTemp = new QLabel(this);
-    m_currentTemp->setGeometry(50, 1150 * 1050/1920, 350, 50);
-    m_currentTemp->setFont(f);
-
-    m_currentHumidity = new QLabel(this);
-    m_currentHumidity->setGeometry(400, 1150 * 1050/1920, 350, 50);
-    m_currentHumidity->setFont(f);
-
-    m_sunrise = new QLabel(this);
-    m_sunrise->setGeometry(750, 1050 * 1050/1920, 350, 50);
-    m_sunrise->setFont(f);
-
-    m_currentWind = new QLabel(this);
-    m_currentWind->setGeometry(50, 1250 * 1050/1920, 350, 50);
-    m_currentWind->setFont(f);
-
-    m_currentSky = new QLabel(this);
-    m_currentSky->setGeometry(400, 1250 * 1050/1920, 350, 50);
-    m_currentSky->setFont(f);
-
-    m_sunset = new QLabel(this);
-    m_sunset->setGeometry(750, 1150 * 1050/1920, 350, 50);
-    m_sunset->setFont(f);
+    ui->localTemp->setFont(f);
+    ui->localHumidity->setFont(f);
+    ui->currentTemp->setFont(f);
+    ui->currentHumidity->setFont(f);
+    ui->currentTemp->setFont(f);
+    ui->currentHumidity->setFont(f);
+    ui->sunrise->setFont(f);
+    ui->currentWind->setFont(f);
+    ui->currentSky->setFont(f);
+    ui->sunset->setFont(f);
 
     for (int i = 0; i < 5; i++) {
         QLabel *forecast = new QLabel(this);
-        QLabel *icon = new QLabel(this);
-        icon->setGeometry(50, ((i * 50) + 1500) * 1050/1920, 100, 50);
-        forecast->setGeometry(150, ((i * 50) + 1500) * 1050/1920, 1150, 50);
         forecast->setFont(f);
+        ui->forecastLayout->addWidget(forecast, i, 0);
         m_forecastEntries.push_back(forecast);
+
+        QLabel *icon = new QLabel(this);
+        ui->forecastLayout->addWidget(icon, i, 1);
         m_iconEntries.push_back(icon);
     }
 
     m_icon = new QNetworkAccessManager(this);
     connect(m_icon, SIGNAL(finished(QNetworkReply*)), this, SLOT(iconReplyFinished(QNetworkReply*)));
 
-    m_calEventsY = 110;
-    m_forecastIndex = 0;
-    m_newEventList = false;
-    m_resetForecastTimer = true;
-    m_forecastEntryCount = 0;
-    m_temperature = 0.0;
-    m_humidity = 0.0;
-
     setupMqttSubscriber();
     createWeatherSystem();
     createCalendarSystem();
     createStateMachine();
     enableTimers();
-
     updateLocalTemp();
 }
 
@@ -190,7 +134,7 @@ void MirrorFrame::setupMqttSubscriber()
     connect(m_mqttClient, SIGNAL(connectionComplete()), this, SLOT(connectionComplete()));
     connect(m_mqttClient, SIGNAL(disconnectedEvent()), this, SLOT(disconnectedEvent()));
     connect(m_mqttClient, SIGNAL(messageReceivedOnTopic(QString, QString)), this, SLOT(messageReceivedOnTopic(QString, QString)));
-    m_lightningLabel->setText("Connecting to MQTT server...");
+    ui->lightningLabel->setText("Connecting to MQTT server...");
     m_mqttClient->connectToHost();
     m_lightningTimer = new QTimer();
     connect(m_lightningTimer, SIGNAL(timeout()), this, SLOT(lightningTimeout()));
@@ -283,8 +227,8 @@ void MirrorFrame::updateLocalTemp()
     }
     qDebug() << __PRETTY_FUNCTION__ << ": temp: " << m_temperature << ", humidity:" << m_humidity;
 #endif
-    m_localTemp->setText(QString("<center>%1%2</center>").arg(m_temperature, 0, 'f', 1).arg(QChar(0260)));
-    m_localHumidity->setText(QString("<center>%1%</center>").arg(m_humidity, 0, 'f', 1));
+    ui->localTemp->setText(QString("<center>%1%2</center>").arg(m_temperature, 0, 'f', 1).arg(QChar(0260)));
+    ui->localHumidity->setText(QString("<center>%1%</center>").arg(m_humidity, 0, 'f', 1));
 }
 
 void MirrorFrame::resetMonitorTimer()
@@ -330,7 +274,7 @@ void MirrorFrame::turnMonitorOn()
 void MirrorFrame::updateClock()
 {
     QDateTime now = QDateTime::currentDateTime();
-    m_clockLabel->setText(now.toString(Qt::DefaultLocaleShortDate));
+    ui->clockLabel->setText(now.toString(Qt::DefaultLocaleShortDate));
 }
 
 void MirrorFrame::getCurrentWeather()
@@ -347,12 +291,12 @@ void MirrorFrame::getForecast()
 
 void MirrorFrame::sunrise(qint64 t)
 {
-    m_sunrise->setText(QString("<center>%1</center>").arg(epochToTimeOfDay(t)));
+    ui->sunrise->setText(QString("<center>%1</center>").arg(epochToTimeOfDay(t)));
 }
 
 void MirrorFrame::sunset(qint64 t)
 {
-    m_sunset->setText(QString("<center>%1</center>").arg(epochToTimeOfDay(t)));
+    ui->sunset->setText(QString("<center>%1</center>").arg(epochToTimeOfDay(t)));
 }
 
 void MirrorFrame::weatherEventsDone()
@@ -372,23 +316,23 @@ void MirrorFrame::currentIcon(QString id)
         QPixmap pixmap;
         icon.get(id, &image);
         pixmap.convertFromImage(image.scaledToHeight(100, Qt::SmoothTransformation));
-        m_currentIcon->setPixmap(pixmap);
+        ui->currentIcon->setPixmap(pixmap);
     }
 }
 
 void MirrorFrame::currentTemperature(double temp)
 {
-    m_currentTemp->setText(QString("<center>%1%2</center>").arg(temp, 0, 'f', 1).arg(QChar(0260)));
+    ui->currentTemp->setText(QString("<center>%1%2</center>").arg(temp, 0, 'f', 1).arg(QChar(0260)));
 }
 
 void MirrorFrame::currentSkyConditions(QString sky)
 {
-    m_currentSky->setText(QString("<center>%1</center>").arg(sky));
+    ui->currentSky->setText(QString("<center>%1</center>").arg(sky));
 }
 
 void MirrorFrame::currentHumidity(double humidity)
 {
-    m_currentHumidity->setText(QString("<center>%1%</center>").arg(humidity));
+    ui->currentHumidity->setText(QString("<center>%1%</center>").arg(humidity));
 }
 
 void MirrorFrame::currentWindSpeed(double speed)
@@ -396,7 +340,7 @@ void MirrorFrame::currentWindSpeed(double speed)
     speed = speed + 0.5;
     int rounded = (int)speed;
 
-    m_currentWind->setText(QString("<center>%1 m/s</center>").arg(rounded));
+    ui->currentWind->setText(QString("<center>%1 m/s</center>").arg(rounded));
 }
 
 void MirrorFrame::weatherDataError(QString)
@@ -536,23 +480,15 @@ void MirrorFrame::calendarEventsEvent(QString s)
     QLabel *lb = new QLabel(s, this);
     QFont f("Roboto");
     f.setPixelSize(25*2/3);
+    f.setBold(false);
     lb->setFont(f);
-    lb->setGeometry(100, m_calEventsY + 50, 1000, 50);
-    lb->show();
-    m_calEventsY += 50;
-    m_calendarEvents.push_back(lb);
+    ui->calendarLayout->addWidget(lb);
 }
 
 void MirrorFrame::deleteCalendarEventsList()
 {
-    for (int i = 0; i < m_calendarEvents.size(); i++) {
-        QLabel *lb = m_calendarEvents.at(i);
-        lb->hide();
-        delete lb;
-    }
-    m_calendarEvents.clear();
+    clearLayout(ui->calendarLayout);
     m_newEventList = false;
-    m_calEventsY = 110;
 }
 
 void MirrorFrame::getIcon(QString icon)
@@ -593,12 +529,12 @@ void MirrorFrame::iconReplyFinished(QNetworkReply *reply)
 
 void MirrorFrame::connectionComplete()
 {
-    m_lightningLabel->clear();
+    ui->lightningLabel->clear();
 }
 
 void MirrorFrame::disconnectedEvent()
 {
-    m_lightningLabel->setText("Connecting to MQTT server...");
+    ui->lightningLabel->setText("Connecting to MQTT server...");
 }
 
 void MirrorFrame::messageReceivedOnTopic(QString t, QString p)
@@ -607,7 +543,7 @@ void MirrorFrame::messageReceivedOnTopic(QString t, QString p)
     double d = p.toDouble();
     double distance = d * .621;
 
-    m_lightningLabel->setText(QString("Lightning detected at %1 miles").arg(distance, 0, 'f', 1));
+    ui->lightningLabel->setText(QString("Lightning detected at %1 miles").arg(distance, 0, 'f', 1));
     m_lightningTimer->stop();
     m_lightningTimer->setInterval(THIRTY_MINUTES);
     m_lightningTimer->start();
@@ -617,6 +553,6 @@ void MirrorFrame::messageReceivedOnTopic(QString t, QString p)
 
 void MirrorFrame::lightningTimeout()
 {
-    m_lightningLabel->setText("");
+    ui->lightningLabel->setText("");
     m_lightningTimer->stop();
 }

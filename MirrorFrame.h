@@ -32,6 +32,10 @@
 #define TWELVE_HOURS        (1000 * 60 * 60 * 12)
 #define THIRTY_MINUTES      (1000 * 60 * 30)
 
+namespace Ui {
+class MirrorFrame;
+}
+
 class MirrorFrame : public QFrame {
     Q_OBJECT
 public:
@@ -86,6 +90,7 @@ private:
     void getIcon(QString);
     void setupMqttSubscriber();
 
+    Ui::MirrorFrame *ui;
     QStateMachine *m_monitorState;
     QTimer *m_calendarTimer;
     QTimer *m_forecastTimer;
@@ -94,29 +99,6 @@ private:
     QTimer *m_monitorTimer;
     QTimer *m_localTempTimer;
     QTimer *m_lightningTimer;
-    QList<QLabel*> m_calendarEvents;
-    QLabel *m_calLabel;
-    QLabel *m_currentLabel;
-    QLabel *m_forecastLabel;
-    QLabel *m_currentTemp;
-    QLabel *m_currentHumidity;
-    QLabel *m_currentWind;
-    QLabel *m_currentSky;
-    QLabel *m_sunrise;
-    QLabel *m_sunset;
-    QLabel *m_currentTempLabel;
-    QLabel *m_currentHumidityLabel;
-    QLabel *m_currentWindLabel;
-    QLabel *m_currentSkyLabel;
-    QLabel *m_sunriseLabel;
-    QLabel *m_sunsetLabel;
-    QLabel *m_clockLabel;
-    QLabel *m_localTempLabel;
-    QLabel *m_localTemp;
-    QLabel *m_localHumidityLabel;
-    QLabel *m_localHumidity;
-    QLabel *m_currentIcon;
-    QLabel *m_lightningLabel;
 
     QVector<QLabel*> m_forecastEntries;
     QVector<QLabel*> m_iconEntries;
@@ -126,7 +108,6 @@ private:
     WeatherData *m_weatherEvent;
     CalendarData *m_calendarEvent;
 
-    int m_calEventsY;
     int m_forecastIndex;
     int m_forecastEntryCount;
     bool m_newEventList;

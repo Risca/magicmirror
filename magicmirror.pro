@@ -36,3 +36,6 @@ HEADERS = MirrorFrame.h \
     settingsfactory.h \
         weathericon.h
 
+FORMS += \
+    MirrorFrame.ui
+
