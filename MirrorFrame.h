@@ -111,9 +111,6 @@ private:
     int m_forecastIndex;
     int m_forecastEntryCount;
     bool m_newEventList;
-    bool m_resetForecastTimer;
-    double m_humidity;
-    double m_temperature;
 };
 
 #endif /* __MIRRORFRAME_H__ */

@@ -37,10 +37,7 @@ MirrorFrame::MirrorFrame(QFrame *parent) :
     m_weatherEvent(nullptr),
     m_forecastIndex(0),
     m_forecastEntryCount(0),
-    m_newEventList(false),
-    m_resetForecastTimer(true),
-    m_humidity(0.0),
-    m_temperature(0.0)
+    m_newEventList(false)
 {
     QLocale::setDefault(QLocale(SettingsFactory::Create()->value("locale", "en_EN").toString()));
     ui->setupUi(this);
@@ -217,18 +214,17 @@ void MirrorFrame::enableTimers()
 
 void MirrorFrame::updateLocalTemp()
 {
-#ifdef __USE_RPI__
-    double t = 0.0;
-    double h = 0.0;
+    double temperature = 0.0;
+    double humidity = 0.0;
 
-    if (getValues(&t, &h) == 0) {
-        m_temperature = t;
-        m_humidity = h;
+#ifdef __USE_RPI__
+    if (getValues(&temperature, &humidity) == 0) {
+        qDebug() << __PRETTY_FUNCTION__ << ": temp: " << temperature << ", humidity:" << humidity;
     }
-    qDebug() << __PRETTY_FUNCTION__ << ": temp: " << m_temperature << ", humidity:" << m_humidity;
 #endif
-    ui->localTemp->setText(QString("<center>%1%2</center>").arg(m_temperature, 0, 'f', 1).arg(QChar(0260)));
-    ui->localHumidity->setText(QString("<center>%1%</center>").arg(m_humidity, 0, 'f', 1));
+
+    ui->localTemp->setText(QString("<center>%1%2</center>").arg(temperature, 0, 'f', 1).arg(QChar(0260)));
+    ui->localHumidity->setText(QString("<center>%1%</center>").arg(humidity, 0, 'f', 1));
 }
 
 void MirrorFrame::resetMonitorTimer()
