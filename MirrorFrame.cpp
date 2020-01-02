@@ -217,8 +217,8 @@ void MirrorFrame::updateLocalTemp()
     }
 #endif
 
-    ui->localTemp->setText(QString("<center>%1%2</center>").arg(temperature, 0, 'f', 1).arg(QChar(0260)));
-    ui->localHumidity->setText(QString("<center>%1%</center>").arg(humidity, 0, 'f', 1));
+    ui->localTemp->setText(QString("%1%2").arg(temperature, 0, 'f', 1).arg(QChar(0260)));
+    ui->localHumidity->setText(QString("%1%").arg(humidity, 0, 'f', 1));
 }
 
 void MirrorFrame::resetMonitorTimer()
@@ -269,12 +269,12 @@ void MirrorFrame::updateClock()
 
 void MirrorFrame::sunrise(qint64 t)
 {
-    ui->sunrise->setText(QString("<center>%1</center>").arg(epochToTimeOfDay(t)));
+    ui->sunrise->setText(QString("%1").arg(epochToTimeOfDay(t)));
 }
 
 void MirrorFrame::sunset(qint64 t)
 {
-    ui->sunset->setText(QString("<center>%1</center>").arg(epochToTimeOfDay(t)));
+    ui->sunset->setText(QString("%1").arg(epochToTimeOfDay(t)));
 }
 
 void MirrorFrame::weatherEventsDone()
@@ -300,17 +300,17 @@ void MirrorFrame::currentIcon(const QString &id)
 
 void MirrorFrame::currentTemperature(double temp)
 {
-    ui->currentTemp->setText(QString("<center>%1%2</center>").arg(temp, 0, 'f', 1).arg(QChar(0260)));
+    ui->currentTemp->setText(QString("%1%2").arg(temp, 0, 'f', 1).arg(QChar(0260)));
 }
 
 void MirrorFrame::currentSkyConditions(QString sky)
 {
-    ui->currentSky->setText(QString("<center>%1</center>").arg(sky));
+    ui->currentSky->setText(QString("%1").arg(sky));
 }
 
 void MirrorFrame::currentHumidity(double humidity)
 {
-    ui->currentHumidity->setText(QString("<center>%1%</center>").arg(humidity));
+    ui->currentHumidity->setText(QString("%1%").arg(humidity));
 }
 
 void MirrorFrame::currentWindSpeed(double speed)
@@ -318,7 +318,7 @@ void MirrorFrame::currentWindSpeed(double speed)
     speed = speed + 0.5;
     int rounded = (int)speed;
 
-    ui->currentWind->setText(QString("<center>%1 m/s</center>").arg(rounded));
+    ui->currentWind->setText(QString("%1 m/s").arg(rounded));
 }
 
 void MirrorFrame::weatherDataError(const QString &error)
