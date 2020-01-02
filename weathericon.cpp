@@ -31,7 +31,7 @@
 
 WeatherIcon::WeatherIcon()
 {
-    m_path = SettingsFactory::Create()->value("cachedir", QStandardPaths::writableLocation(QStandardPaths::CacheLocation)).toString();
+    m_path = SettingsFactory::Create("Weather")->value("cachedir", QStandardPaths::writableLocation(QStandardPaths::CacheLocation)).toString();
 
     QDir cache(m_path);
     if (!cache.exists() && !cache.mkpath(m_path)) {

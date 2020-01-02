@@ -174,17 +174,17 @@ MirrorFrame::~MirrorFrame()
 void MirrorFrame::setupMqttSubscriber()
 {
 #if 0
-    QSharedPointer<QSettings> settings = SettingsFactory::Create();
-    QString hostname = settings->value("mqttserver").toString();
+    QSharedPointer<QSettings> settings = SettingsFactory::Create("Mqtt");
+    QString hostname = settings->value("server").toString();
     QHostInfo lookup = QHostInfo::fromName(hostname);
     QList<QHostAddress> addresses = lookup.addresses();
 
     if (addresses.size() > 0) {
-        m_mqttClient = new QMqttSubscriber(addresses.at(0), settings->value("mqttport").toInt(), this);
+        m_mqttClient = new QMqttSubscriber(addresses.at(0), settings->value("port").toInt(), this);
         qDebug() << __PRETTY_FUNCTION__ << ": setting host address to" << addresses.at(0);
     }
     else {
-        m_mqttClient = new QMqttSubscriber(QHostAddress::LocalHost, settings->value("mqttport").toInt(), this);
+        m_mqttClient = new QMqttSubscriber(QHostAddress::LocalHost, settings->value("port").toInt(), this);
         qDebug() << __PRETTY_FUNCTION__ << ": Using localhost";
     }
     connect(m_mqttClient, SIGNAL(connectionComplete()), this, SLOT(connectionComplete()));
@@ -199,7 +199,7 @@ void MirrorFrame::setupMqttSubscriber()
 
 void MirrorFrame::createWeatherSystem()
 {
-    QSharedPointer<QSettings> settings = SettingsFactory::Create();
+    QSharedPointer<QSettings> settings = SettingsFactory::Create("Weather");
     m_weatherEvent = new WeatherData();
     m_weatherEvent->addTownId(settings->value("townid").toString());
     m_weatherEvent->addAppID(settings->value("appid").toString());
@@ -248,7 +248,7 @@ void MirrorFrame::createStateMachine()
 
 void MirrorFrame::enableTimers()
 {
-    int monitorTimeout = SettingsFactory::Create()->value("screentimeout").toInt();
+    int monitorTimeout = SettingsFactory::Create()->value("screentimeout", MONITOR_TIMEOUT / (1000 * 60)).toInt();
     QDateTime now = QDateTime::currentDateTime();
     QDateTime midnight(QDate(now.date().year(), now.date().month(), now.date().day()), QTime(4, 0, 0));
     midnight = midnight.addDays(1);
@@ -268,11 +268,7 @@ void MirrorFrame::enableTimers()
     connect(m_localTempTimer, SIGNAL(timeout()), this, SLOT(updateLocalTemp()));
     m_localTempTimer->start(1000);        // Get sensor data every second
 
-    if (monitorTimeout == 0)
-        monitorTimeout = MONITOR_TIMEOUT;
-    else
-        monitorTimeout = monitorTimeout * 1000 * 60;
-
+    monitorTimeout = monitorTimeout * 1000 * 60;
     qDebug() << __PRETTY_FUNCTION__ << ": setting monitor timeout to" << monitorTimeout;
     qDebug() << __PRETTY_FUNCTION__ << ": Getting next forecast at" << midnight;
     m_monitorTimer->start(monitorTimeout);
