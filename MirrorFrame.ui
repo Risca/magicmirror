@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1600</width>
-    <height>900</height>
+    <width>1280</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="palette">
@@ -554,246 +554,19 @@
         </font>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="3" column="1">
-         <layout class="QVBoxLayout" name="currentTempLayout">
-          <item>
-           <widget class="QLabel" name="currentTempLabel">
-            <property name="text">
-             <string>Outside Temperature</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="currentTemp">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="4" column="3">
-         <layout class="QVBoxLayout" name="sunsetLayout">
-          <item>
-           <widget class="QLabel" name="sunsetLabel">
-            <property name="text">
-             <string>Sunset</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="sunset">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="3" column="2">
-         <layout class="QVBoxLayout" name="localHumidityLayout">
-          <item>
-           <widget class="QLabel" name="localHumidityLabel">
-            <property name="text">
-             <string>Inside Humidity</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="localHumidity">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="4" column="2">
-         <layout class="QVBoxLayout" name="currentHumidityLayout">
-          <item>
-           <widget class="QLabel" name="currentHumidityLabel">
-            <property name="text">
-             <string>Outside Humidity</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="currentHumidity">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="5" column="2">
-         <layout class="QVBoxLayout" name="currentSkyLayout">
-          <item>
-           <widget class="QLabel" name="currentSkyLabel">
-            <property name="text">
-             <string>Sky Conditions</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="currentSky">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="5" column="3">
-         <widget class="QLabel" name="currentIcon">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="3">
-         <layout class="QVBoxLayout" name="sunriseLayout">
-          <item>
-           <widget class="QLabel" name="sunriseLabel">
-            <property name="text">
-             <string>Sunrise</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="sunrise">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="4" column="1">
-         <layout class="QVBoxLayout" name="localTempLayout">
-          <item>
-           <widget class="QLabel" name="localTempLabel">
-            <property name="text">
-             <string>Inside Temperature</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="localTemp">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="5" column="1">
-         <layout class="QVBoxLayout" name="currentWindLayout">
-          <item>
-           <widget class="QLabel" name="currentWindLabel">
-            <property name="text">
-             <string>Wind Speed</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="currentWind">
-            <property name="font">
-             <font>
-              <pointsize>15</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="3" column="0" rowspan="3">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="4" column="0" rowspan="3">
          <spacer name="conditionsIndentation">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -809,6 +582,52 @@
           </property>
          </spacer>
         </item>
+        <item row="4" column="2">
+         <layout class="QVBoxLayout" name="localHumidityLayout">
+          <item>
+           <widget class="QLabel" name="localHumidityLabel">
+            <property name="text">
+             <string>Inside Humidity</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="localHumidity">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0" colspan="4">
+         <widget class="QLabel" name="currentLabel">
+          <property name="text">
+           <string>Current Conditions</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="3">
+         <widget class="QLabel" name="currentIcon">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0" colspan="4">
          <spacer name="verticalSpacer_3">
           <property name="orientation">
@@ -822,12 +641,208 @@
           </property>
          </spacer>
         </item>
-        <item row="2" column="0" colspan="4">
-         <widget class="QLabel" name="currentLabel">
-          <property name="text">
-           <string>Current Conditions</string>
-          </property>
-         </widget>
+        <item row="4" column="3">
+         <layout class="QVBoxLayout" name="sunriseLayout">
+          <item>
+           <widget class="QLabel" name="sunriseLabel">
+            <property name="text">
+             <string>Sunrise</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="sunrise">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="5" column="2">
+         <layout class="QVBoxLayout" name="currentHumidityLayout">
+          <item>
+           <widget class="QLabel" name="currentHumidityLabel">
+            <property name="text">
+             <string>Outside Humidity</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="currentHumidity">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="5" column="3">
+         <layout class="QVBoxLayout" name="sunsetLayout">
+          <item>
+           <widget class="QLabel" name="sunsetLabel">
+            <property name="text">
+             <string>Sunset</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="sunset">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="6" column="2">
+         <layout class="QVBoxLayout" name="currentSkyLayout">
+          <item>
+           <widget class="QLabel" name="currentSkyLabel">
+            <property name="text">
+             <string>Sky Conditions</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="currentSky">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="6" column="1">
+         <layout class="QVBoxLayout" name="currentWindLayout">
+          <item>
+           <widget class="QLabel" name="currentWindLabel">
+            <property name="text">
+             <string>Wind Speed</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="currentWind">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="5" column="1">
+         <layout class="QVBoxLayout" name="currentTempLayout">
+          <item>
+           <widget class="QLabel" name="currentTempLabel">
+            <property name="text">
+             <string>Outside Temperature</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="currentTemp">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="4" column="1">
+         <layout class="QVBoxLayout" name="localTempLayout">
+          <item>
+           <widget class="QLabel" name="localTempLabel">
+            <property name="text">
+             <string>Inside Temperature</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="localTemp">
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -848,6 +863,18 @@
      <item>
       <widget class="QWidget" name="forecastWidget" native="true">
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <spacer name="verticalSpacer_2">
           <property name="orientation">
