@@ -25,6 +25,7 @@ MirrorFrame *frame = NULL;
 
 namespace {
 
+#ifdef __PRINT_FONTS__
 void printFonts()
 {
     QFontDatabase database;
@@ -36,7 +37,11 @@ void printFonts()
         }
     }
 }
+#else
+#define printFonts()
+#endif
 
+#ifdef __USE_RPI__
 void touchEvent(void) {
     qDebug() << "Touch event registered";
     if (frame)
@@ -45,13 +50,14 @@ void touchEvent(void) {
 
 void setupTouchEvents()
 {
-#ifdef __USE_RPI__
     qDebug() << __PRETTY_FUNCTION__;
     wiringPiSetupGpio();
     pinMode(12, INPUT);
     wiringPiISR(12, INT_EDGE_FALLING, &touchEvent);
-#endif
 }
+#else
+#define setupTouchEvents()
+#endif
 
 void printSettingsFile()
 {
@@ -65,19 +71,16 @@ int main(int argc, char **argv)
     QApplication app (argc, argv);
 
     printSettingsFile();
-#ifdef __PRINT_FONTS__
     printFonts();
-#endif
 
     setupTouchEvents();
     QCursor cursor(Qt::BlankCursor);
     QApplication::setOverrideCursor(cursor);
     frame = new MirrorFrame();
-    frame->setGeometry(0, 0, 1680, 1050);
     frame->getEvents();
     frame->getCurrentWeather();
     frame->getForecast();
-    frame->show();
+    frame->showFullScreen();
 
     return app.exec();
 }
