@@ -34,7 +34,7 @@ void clearLayout(QLayout *layout) {
 MirrorFrame::MirrorFrame(QFrame *parent) :
     QFrame(parent),
     ui(new Ui::MirrorFrame),
-    m_weatherEvent(nullptr),
+    m_weatherEvent(0),
     m_forecastIndex(0),
     m_forecastEntryCount(0),
     m_newEventList(false)
