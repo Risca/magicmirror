@@ -60,6 +60,8 @@ MirrorFrame::MirrorFrame(QFrame *parent) :
 
     f.setPixelSize(40*2/3);
     ui->clockLabel->setFont(f);
+    connect(m_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
+    m_clockTimer->start(500);
 
     f.setPixelSize(30*2/3);
 
@@ -104,8 +106,14 @@ MirrorFrame::MirrorFrame(QFrame *parent) :
     createWeatherSystem();
     createCalendarSystem();
     createStateMachine();
-    enableTimers();
+
+    connect(m_localTempTimer, SIGNAL(timeout()), this, SLOT(updateLocalTemp()));
+    m_localTempTimer->start(1000);        // Get sensor data every second
     updateLocalTemp();
+
+    const int monitorTimeout = SettingsFactory::Create()->value("screentimeout", MONITOR_TIMEOUT / (1000 * 60)).toInt() * 1000 * 60;
+    qDebug() << __PRETTY_FUNCTION__ << ": setting monitor timeout to" << monitorTimeout;
+    m_monitorTimer->start(monitorTimeout);
 }
 
 MirrorFrame::~MirrorFrame()
@@ -152,15 +160,29 @@ void MirrorFrame::createWeatherSystem()
         connect(m_weatherEvent, SIGNAL(error(QString)), this, SLOT(weatherDataError(QString)));
         connect(m_weatherEvent, SIGNAL(forecastEntry(QJsonObject)), this, SLOT(forecastEntry(QJsonObject)));
         connect(m_weatherEvent, SIGNAL(currentIcon(QString)), this, SLOT(currentIcon(QString)));
+
+        connect(m_currentWeatherTimer, SIGNAL(timeout()), m_weatherEvent, SLOT(processCurrentWeather()));
+        m_currentWeatherTimer->start(CURRENT_TIMEOUT);
+        m_weatherEvent->processCurrentWeather();
+
+        connect(m_forecastTimer, SIGNAL(timeout()), m_weatherEvent, SLOT(processForecast()));
+        m_forecastTimer->start(FORECAST_TIMEOUT);
+        m_weatherEvent->processForecast();
     }
 }
 
 void MirrorFrame::createCalendarSystem()
 {
     m_calendarEvent = new CalendarData();
-    connect(m_calendarEvent, SIGNAL(error(QString)), this, SLOT(calendarEventsError(QString)));
-    connect(m_calendarEvent, SIGNAL(newEvent(QString)), this, SLOT(calendarEventsEvent(QString)));
-    connect(m_calendarEvent, SIGNAL(finished()), this, SLOT(calendarEventsDone()));
+    if (m_calendarEvent) {
+        connect(m_calendarEvent, SIGNAL(error(QString)), this, SLOT(calendarEventsError(QString)));
+        connect(m_calendarEvent, SIGNAL(newEvent(QString)), this, SLOT(calendarEventsEvent(QString)));
+        connect(m_calendarEvent, SIGNAL(finished()), this, SLOT(calendarEventsDone()));
+
+        connect(m_calendarTimer, SIGNAL(timeout()), m_calendarEvent, SLOT(process()));
+        m_calendarTimer->start(CALEVENTS_TIMEOUT);
+        m_calendarEvent->process();
+    }
 }
 
 void MirrorFrame::registerTouchEvent()
@@ -182,34 +204,6 @@ void MirrorFrame::createStateMachine()
     m_monitorState->addState(off);
     m_monitorState->setInitialState(on);
     m_monitorState->start();
-}
-
-void MirrorFrame::enableTimers()
-{
-    int monitorTimeout = SettingsFactory::Create()->value("screentimeout", MONITOR_TIMEOUT / (1000 * 60)).toInt();
-    QDateTime now = QDateTime::currentDateTime();
-    QDateTime midnight(QDate(now.date().year(), now.date().month(), now.date().day()), QTime(4, 0, 0));
-    midnight = midnight.addDays(1);
-
-    connect(m_calendarTimer, SIGNAL(timeout()), this, SLOT(getEvents()));
-    m_calendarTimer->start(CALEVENTS_TIMEOUT);		// Get Events once an hour
-
-    connect(m_forecastTimer, SIGNAL(timeout()), this, SLOT(getForecast()));
-    m_forecastTimer->start(FORECAST_TIMEOUT);		// set to timeout at midnight, we reset it to 12 hours later
-
-    connect(m_currentWeatherTimer, SIGNAL(timeout()), this, SLOT(getCurrentWeather()));
-    m_currentWeatherTimer->start(CURRENT_TIMEOUT);	// get current weather conditions once an hour
-
-    connect(m_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
-    m_clockTimer->start(500);					// Update the clock 2x a second
-
-    connect(m_localTempTimer, SIGNAL(timeout()), this, SLOT(updateLocalTemp()));
-    m_localTempTimer->start(1000);        // Get sensor data every second
-
-    monitorTimeout = monitorTimeout * 1000 * 60;
-    qDebug() << __PRETTY_FUNCTION__ << ": setting monitor timeout to" << monitorTimeout;
-    qDebug() << __PRETTY_FUNCTION__ << ": Getting next forecast at" << midnight;
-    m_monitorTimer->start(monitorTimeout);
 }
 
 void MirrorFrame::updateLocalTemp()
@@ -273,18 +267,6 @@ void MirrorFrame::updateClock()
     ui->clockLabel->setText(now.toString(Qt::DefaultLocaleShortDate));
 }
 
-void MirrorFrame::getCurrentWeather()
-{
-    if (m_weatherEvent)
-        m_weatherEvent->processCurrentWeather();
-}
-
-void MirrorFrame::getForecast()
-{
-    if (m_weatherEvent)
-        m_weatherEvent->processForecast();
-}
-
 void MirrorFrame::sunrise(qint64 t)
 {
     ui->sunrise->setText(QString("<center>%1</center>").arg(epochToTimeOfDay(t)));
@@ -300,7 +282,7 @@ void MirrorFrame::weatherEventsDone()
     qDebug() << __PRETTY_FUNCTION__;
 }
 
-void MirrorFrame::currentIcon(QString id)
+void MirrorFrame::currentIcon(const QString &id)
 {
     WeatherIcon icon;
 
@@ -339,9 +321,9 @@ void MirrorFrame::currentWindSpeed(double speed)
     ui->currentWind->setText(QString("<center>%1 m/s</center>").arg(rounded));
 }
 
-void MirrorFrame::weatherDataError(QString)
+void MirrorFrame::weatherDataError(const QString &error)
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    qDebug() << __PRETTY_FUNCTION__ << ":" << error;
 }
 
 void MirrorFrame::forecastEntryCount(int c)
@@ -453,14 +435,9 @@ void MirrorFrame::forecastEntry(QJsonObject jobj)
     }
 }
 
-void MirrorFrame::getEvents()
+void MirrorFrame::calendarEventsError(const QString& error)
 {
-    m_calendarEvent->process();
-}
-
-void MirrorFrame::calendarEventsError(QString)
-{
-    qDebug() << __PRETTY_FUNCTION__ << ": Error trying to talk to the calendar server";
+    qDebug() << __PRETTY_FUNCTION__ << ":" << error;
 }
 
 void MirrorFrame::calendarEventsDone()
@@ -468,7 +445,7 @@ void MirrorFrame::calendarEventsDone()
     m_newEventList = true;
 }
 
-void MirrorFrame::calendarEventsEvent(QString s)
+void MirrorFrame::calendarEventsEvent(const QString &s)
 {
     if (m_newEventList)
         deleteCalendarEventsList();

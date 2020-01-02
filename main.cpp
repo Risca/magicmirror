@@ -77,9 +77,6 @@ int main(int argc, char **argv)
     QCursor cursor(Qt::BlankCursor);
     QApplication::setOverrideCursor(cursor);
     frame = new MirrorFrame();
-    frame->getEvents();
-    frame->getCurrentWeather();
-    frame->getForecast();
     frame->showFullScreen();
 
     return app.exec();

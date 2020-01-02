@@ -44,13 +44,10 @@ public:
     void registerTouchEvent();
 
 public slots:
-    void getEvents();
-    void getForecast();
-    void getCurrentWeather();
     void calendarEventsDone();
-    void calendarEventsError(QString);
-    void calendarEventsEvent(QString);
-    void weatherDataError(QString);
+    void calendarEventsError(const QString &error);
+    void calendarEventsEvent(const QString &s);
+    void weatherDataError(const QString &error);
     void weatherEventsDone();
     void currentHumidity(double);
     void currentSkyConditions(QString);
@@ -66,7 +63,7 @@ public slots:
     void resetMonitorTimer();
     void updateLocalTemp();
     void iconReplyFinished(QNetworkReply*);
-    void currentIcon(QString);
+    void currentIcon(const QString &id);
     void messageReceivedOnTopic(QString, QString);
     void connectionComplete();
     void disconnectedEvent();
@@ -76,13 +73,9 @@ public slots:
 signals:
     void touchDetected();
 
-    //protected:
-    //	void showEvent(QShowEvent*);
-
 private:
     void deleteCalendarEventsList();
     void createStateMachine();
-    void enableTimers();
     void turnMonitorOn();
     void turnMonitorOff();
     void createWeatherSystem();
