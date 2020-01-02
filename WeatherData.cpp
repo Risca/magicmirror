@@ -1,6 +1,9 @@
 #include "WeatherData.h"
 
-WeatherData::WeatherData(QObject *parent) : QObject(parent)
+#include "settingsfactory.h"
+
+WeatherData::WeatherData(const QString &appId, const QString &townId, QObject *parent) :
+    QObject(parent), m_appID(appId), m_townID(townId)
 {
     m_forecast = new QNetworkAccessManager(this);
     m_current = new QNetworkAccessManager(this);
@@ -9,20 +12,20 @@ WeatherData::WeatherData(QObject *parent) : QObject(parent)
     connect(m_current, SIGNAL(finished(QNetworkReply*)), this, SLOT(currentReplyFinished(QNetworkReply*)));
 }
 
+bool WeatherData::Create(WeatherData *&weatherData, QObject *parent)
+{
+    QSharedPointer<QSettings> settings = SettingsFactory::Create("Weather");
+    const QString appId = settings->value("appid").toString();
+    const QString townId = settings->value("townid").toString();
+    if (appId.isEmpty() || townId.isEmpty()) {
+        return false;
+    }
+    weatherData = new WeatherData(appId, townId, parent);
+    return true;
+}
+
 WeatherData::~WeatherData()
 {
-}
-
-void WeatherData::addTownId(const QString& townid)
-{
-    qDebug() << __PRETTY_FUNCTION__;
-    m_townID = townid;
-}
-
-void WeatherData::addAppID(QString a)
-{
-    qDebug() << __PRETTY_FUNCTION__;
-    m_appID = a;
 }
 
 void WeatherData::processCurrentWeather()

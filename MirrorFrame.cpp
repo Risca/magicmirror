@@ -13,7 +13,7 @@ QString epochToTimeOfDay(const quint64 t)
 
 } // anonymous namespace
 
-MirrorFrame::MirrorFrame(QFrame *parent) : QFrame(parent)
+MirrorFrame::MirrorFrame(QFrame *parent) : QFrame(parent), m_weatherEvent(nullptr)
 {
     QLocale::setDefault(QLocale(SettingsFactory::Create()->value("locale", "en_EN").toString()));
 
@@ -199,22 +199,19 @@ void MirrorFrame::setupMqttSubscriber()
 
 void MirrorFrame::createWeatherSystem()
 {
-    QSharedPointer<QSettings> settings = SettingsFactory::Create("Weather");
-    m_weatherEvent = new WeatherData();
-    m_weatherEvent->addTownId(settings->value("townid").toString());
-    m_weatherEvent->addAppID(settings->value("appid").toString());
-
-    connect(m_weatherEvent, SIGNAL(temperature(double)), this, SLOT(currentTemperature(double)));
-    connect(m_weatherEvent, SIGNAL(humidity(double)), this, SLOT(currentHumidity(double)));
-    connect(m_weatherEvent, SIGNAL(windSpeed(double)), this, SLOT(currentWindSpeed(double)));
-    connect(m_weatherEvent, SIGNAL(skyConditions(QString)), this, SLOT(currentSkyConditions(QString)));
-    connect(m_weatherEvent, SIGNAL(sunrise(qint64)), this, SLOT(sunrise(qint64)));
-    connect(m_weatherEvent, SIGNAL(sunset(qint64)), this, SLOT(sunset(qint64)));
-    connect(m_weatherEvent, SIGNAL(forecastEntryCount(int)), this, SLOT(forecastEntryCount(int)));
-    connect(m_weatherEvent, SIGNAL(finished()), this, SLOT(weatherEventsDone()));
-    connect(m_weatherEvent, SIGNAL(error(QString)), this, SLOT(weatherDataError(QString)));
-    connect(m_weatherEvent, SIGNAL(forecastEntry(QJsonObject)), this, SLOT(forecastEntry(QJsonObject)));
-    connect(m_weatherEvent, SIGNAL(currentIcon(QString)), this, SLOT(currentIcon(QString)));
+    if (WeatherData::Create(m_weatherEvent, this)) {
+        connect(m_weatherEvent, SIGNAL(temperature(double)), this, SLOT(currentTemperature(double)));
+        connect(m_weatherEvent, SIGNAL(humidity(double)), this, SLOT(currentHumidity(double)));
+        connect(m_weatherEvent, SIGNAL(windSpeed(double)), this, SLOT(currentWindSpeed(double)));
+        connect(m_weatherEvent, SIGNAL(skyConditions(QString)), this, SLOT(currentSkyConditions(QString)));
+        connect(m_weatherEvent, SIGNAL(sunrise(qint64)), this, SLOT(sunrise(qint64)));
+        connect(m_weatherEvent, SIGNAL(sunset(qint64)), this, SLOT(sunset(qint64)));
+        connect(m_weatherEvent, SIGNAL(forecastEntryCount(int)), this, SLOT(forecastEntryCount(int)));
+        connect(m_weatherEvent, SIGNAL(finished()), this, SLOT(weatherEventsDone()));
+        connect(m_weatherEvent, SIGNAL(error(QString)), this, SLOT(weatherDataError(QString)));
+        connect(m_weatherEvent, SIGNAL(forecastEntry(QJsonObject)), this, SLOT(forecastEntry(QJsonObject)));
+        connect(m_weatherEvent, SIGNAL(currentIcon(QString)), this, SLOT(currentIcon(QString)));
+    }
 }
 
 void MirrorFrame::createCalendarSystem()
@@ -338,12 +335,14 @@ void MirrorFrame::updateClock()
 
 void MirrorFrame::getCurrentWeather()
 {
-    m_weatherEvent->processCurrentWeather();
+    if (m_weatherEvent)
+        m_weatherEvent->processCurrentWeather();
 }
 
 void MirrorFrame::getForecast()
 {
-    m_weatherEvent->processForecast();
+    if (m_weatherEvent)
+        m_weatherEvent->processForecast();
 }
 
 void MirrorFrame::sunrise(qint64 t)

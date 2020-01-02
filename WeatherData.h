@@ -1,6 +1,7 @@
 #ifndef __WEATHERDATA_H__
 #define __WEATHERDATA_H__
 
+#include <QString>
 #include <QtCore/QtCore>
 #include <QtNetwork/QtNetwork>
 
@@ -8,12 +9,9 @@ class WeatherData : public QObject
 {
     Q_OBJECT
 public:
-    WeatherData(QObject *parent = 0);
+    static bool Create(WeatherData*& weatherData, QObject *parent = 0);
     virtual ~WeatherData();
 
-    void addZip(QString, QString);
-    void addTownId(const QString &townid);
-    void addAppID(QString);
     void setThreadPointer(QThread *t) { m_thread = t; }
 
 signals:
@@ -37,10 +35,13 @@ public slots:
     void currentReplyFinished(QNetworkReply*);
 
 private:
+    Q_DISABLE_COPY(WeatherData);
+    WeatherData(const QString& appId, const QString& townId, QObject *parent);
+
     QNetworkAccessManager *m_forecast;
     QNetworkAccessManager *m_current;
-    QString m_appID;
-    QString m_townID;
+    const QString m_appID;
+    const QString m_townID;
     QThread *m_thread;
 };
 
