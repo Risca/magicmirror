@@ -29,8 +29,6 @@
 #include <QtCore/QtCore>
 #include <QtGui/QtGui>
 
-#define ICON_CACHE_PATH     "/home/pi/.config/MagicMirror/cache"
-
 class WeatherIcon
 {
 public:

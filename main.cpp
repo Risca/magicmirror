@@ -19,6 +19,7 @@ along with MythClock.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #include "MirrorFrame.h"
+#include "settingsfactory.h"
 
 MirrorFrame *frame = NULL;
 
@@ -54,8 +55,7 @@ void setupTouchEvents()
 
 void printSettingsFile()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
-    qDebug() << __PRETTY_FUNCTION__ << "Using" << settings.fileName();
+    qDebug() << __PRETTY_FUNCTION__ << "Using" << SettingsFactory::Create()->fileName();
 }
 
 } // anonymous

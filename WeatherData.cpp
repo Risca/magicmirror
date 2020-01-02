@@ -15,13 +15,13 @@ WeatherData::~WeatherData()
 
 void WeatherData::addTownId(const QString& townid)
 {
-    qDebug() << __PRETTY_FUNCTION__ << ":" << townid;
+    qDebug() << __PRETTY_FUNCTION__;
     m_townID = townid;
 }
 
 void WeatherData::addAppID(QString a)
 {
-    qDebug() << __PRETTY_FUNCTION__ << ":" << a;
+    qDebug() << __PRETTY_FUNCTION__;
     m_appID = a;
 }
 

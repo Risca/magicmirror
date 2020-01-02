@@ -25,16 +25,15 @@
 
 #include "weathericon.h"
 
+#include "settingsfactory.h"
+
+#define ICON_CACHE_PATH     "/home/pi/.config/MagicMirror/cache"
+
 WeatherIcon::WeatherIcon()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
-    m_path = settings.value("cachedir").toString();
-
-    if (m_path.length() == 0)
-        m_path = ICON_CACHE_PATH;
+    m_path = SettingsFactory::Create()->value("cachedir", ICON_CACHE_PATH).toString();
 
     QDir cache(m_path);
-
     if (!cache.exists()) {
         if (cache.mkpath(m_path)) {
             qDebug() << __PRETTY_FUNCTION__ << ": Created cache dir" << m_path;

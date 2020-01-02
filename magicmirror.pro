@@ -27,10 +27,12 @@ SOURCES = MirrorFrame.cpp \
 	CalendarData.cpp \
 	WeatherData.cpp \
 	main.cpp \
+    settingsfactory.cpp \
         weathericon.cpp
 		
 HEADERS = MirrorFrame.h \
 	CalendarData.h \
 	WeatherData.h \
+    settingsfactory.h \
         weathericon.h
 

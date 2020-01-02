@@ -1,5 +1,7 @@
 #include "MirrorFrame.h"
 
+#include "settingsfactory.h"
+
 namespace {
 
 QString epochToTimeOfDay(const quint64 t)
@@ -9,17 +11,11 @@ QString epochToTimeOfDay(const quint64 t)
     return s.toString(Qt::DefaultLocaleShortDate);
 }
 
-void setAppLocaleFromSettings()
-{
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
-    QLocale::setDefault(QLocale(settings.value("locale", "en_EN").toString()));
-}
-
 } // anonymous namespace
 
 MirrorFrame::MirrorFrame(QFrame *parent) : QFrame(parent)
 {
-    setAppLocaleFromSettings();
+    QLocale::setDefault(QLocale(SettingsFactory::Create()->value("locale", "en_EN").toString()));
 
     m_calendarTimer = new QTimer();
     m_forecastTimer = new QTimer();
@@ -178,17 +174,17 @@ MirrorFrame::~MirrorFrame()
 void MirrorFrame::setupMqttSubscriber()
 {
 #if 0
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
-    QString hostname = settings.value("mqttserver").toString();
+    QSharedPointer<QSettings> settings = SettingsFactory::Create();
+    QString hostname = settings->value("mqttserver").toString();
     QHostInfo lookup = QHostInfo::fromName(hostname);
     QList<QHostAddress> addresses = lookup.addresses();
 
     if (addresses.size() > 0) {
-        m_mqttClient = new QMqttSubscriber(addresses.at(0), settings.value("mqttport").toInt(), this);
+        m_mqttClient = new QMqttSubscriber(addresses.at(0), settings->value("mqttport").toInt(), this);
         qDebug() << __PRETTY_FUNCTION__ << ": setting host address to" << addresses.at(0);
     }
     else {
-        m_mqttClient = new QMqttSubscriber(QHostAddress::LocalHost, settings.value("mqttport").toInt(), this);
+        m_mqttClient = new QMqttSubscriber(QHostAddress::LocalHost, settings->value("mqttport").toInt(), this);
         qDebug() << __PRETTY_FUNCTION__ << ": Using localhost";
     }
     connect(m_mqttClient, SIGNAL(connectionComplete()), this, SLOT(connectionComplete()));
@@ -203,10 +199,10 @@ void MirrorFrame::setupMqttSubscriber()
 
 void MirrorFrame::createWeatherSystem()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
+    QSharedPointer<QSettings> settings = SettingsFactory::Create();
     m_weatherEvent = new WeatherData();
-    m_weatherEvent->addTownId(settings.value("townid").toString());
-    m_weatherEvent->addAppID(settings.value("appid").toString());
+    m_weatherEvent->addTownId(settings->value("townid").toString());
+    m_weatherEvent->addAppID(settings->value("appid").toString());
 
     connect(m_weatherEvent, SIGNAL(temperature(double)), this, SLOT(currentTemperature(double)));
     connect(m_weatherEvent, SIGNAL(humidity(double)), this, SLOT(currentHumidity(double)));
@@ -252,8 +248,7 @@ void MirrorFrame::createStateMachine()
 
 void MirrorFrame::enableTimers()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MagicMirror", "MagicMirror");
-    int monitorTimeout = settings.value("screentimeout").toInt();
+    int monitorTimeout = SettingsFactory::Create()->value("screentimeout").toInt();
     QDateTime now = QDateTime::currentDateTime();
     QDateTime midnight(QDate(now.date().year(), now.date().month(), now.date().day()), QTime(4, 0, 0));
     midnight = midnight.addDays(1);
