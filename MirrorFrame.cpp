@@ -416,7 +416,8 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
     if (m_forecastIndex < m_forecastEntries.size()) {
         QLabel *lb = m_forecastEntries[m_forecastIndex++];
         if (now.date() == dt.date()) {
-            QString text = QString("Today's high: %1%2, low: %3%4, %5")
+            QString text = QString("Today's (%1) high: %2%3, low: %4%5, %6")
+                    .arg(dt.time().toString(Qt::DefaultLocaleShortDate))
                     .arg((int)high)
                     .arg(QChar(0260))
                     .arg((int)low)
@@ -443,8 +444,9 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
             lb->setText(text);
         }
         else {
-            QString text = QString("%1: high: %2%3, low: %4%5: %6")
+            QString text = QString("%1 (%2): high: %3%4, low: %5%6: %7")
                     .arg(dt.toString("dddd"))
+                    .arg(dt.time().toString(Qt::DefaultLocaleShortDate))
                     .arg((int)high)
                     .arg(QChar(0260))
                     .arg((int)low)
