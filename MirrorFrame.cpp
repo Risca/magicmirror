@@ -43,9 +43,10 @@ void clearLayout(QLayout *layout) {
 
 } // anonymous namespace
 
-MirrorFrame::MirrorFrame() :
+MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     QFrame(0),
     ui(new Ui::MirrorFrame),
+    m_icon(net),
     m_weatherEvent(0),
     m_forecastIndex(0),
     m_forecastEntryCount(0),
@@ -111,8 +112,7 @@ MirrorFrame::MirrorFrame() :
         m_iconEntries.push_back(icon);
     }
 
-    m_icon = new QNetworkAccessManager(this);
-    connect(m_icon, SIGNAL(finished(QNetworkReply*)), this, SLOT(iconReplyFinished(QNetworkReply*)));
+    connect(m_icon.get(), SIGNAL(finished(QNetworkReply*)), this, SLOT(iconReplyFinished(QNetworkReply*)));
 
     setupMqttSubscriber();
     createWeatherSystem();
@@ -130,7 +130,11 @@ MirrorFrame::MirrorFrame() :
 
 MirrorFrame *MirrorFrame::Create()
 {
-    return new MirrorFrame();
+    QSharedPointer<QNetworkAccessManager> net(new QNetworkAccessManager);
+    if (net) {
+        return new MirrorFrame(net);
+    }
+    return 0;
 }
 
 MirrorFrame::~MirrorFrame()

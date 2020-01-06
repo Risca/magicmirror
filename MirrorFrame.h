@@ -16,6 +16,7 @@
 #define __MIRRORFRAME_H__
 
 #include <QFrame>
+#include <QSharedPointer>
 #include <QString>
 #include <QVector>
 
@@ -83,7 +84,7 @@ signals:
     void touchDetected();
 
 private:
-    MirrorFrame();
+    MirrorFrame(QSharedPointer<QNetworkAccessManager> net);
     void deleteCalendarEventsList();
     void createStateMachine();
     void turnMonitorOn();
@@ -105,7 +106,7 @@ private:
 
     QVector<QLabel*> m_forecastEntries;
     QVector<QLabel*> m_iconEntries;
-    QNetworkAccessManager *m_icon;
+    QSharedPointer<QNetworkAccessManager> m_icon;
     QVector<QString> m_icons;
 
     WeatherData *m_weatherEvent;
