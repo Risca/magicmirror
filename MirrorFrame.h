@@ -72,7 +72,7 @@ public slots:
     void monitorOff();
     void resetMonitorTimer();
     void updateLocalTemp();
-    void iconReplyFinished(QNetworkReply*);
+    void iconReplyFinished();
     void currentIcon(const QString &id);
     void messageReceivedOnTopic(const QString &t, const QString &p);
     void connectionComplete();
@@ -93,6 +93,7 @@ private:
     void createCalendarSystem();
     void getIcon(const QString &icon);
     void setupMqttSubscriber();
+    QNetworkReply* FetchNextIcon();
 
     Ui::MirrorFrame *ui;
     QStateMachine *m_monitorState;
@@ -106,8 +107,10 @@ private:
 
     QVector<QLabel*> m_forecastEntries;
     QVector<QLabel*> m_iconEntries;
-    QSharedPointer<QNetworkAccessManager> m_icon;
-    QVector<QString> m_icons;
+    QSharedPointer<QNetworkAccessManager> m_net;
+    QNetworkReply* m_iconReply;
+    QVector<QString> m_icons, m_iconsToFetch;
+    WeatherIcon m_iconCache;
 
     WeatherData *m_weatherEvent;
     CalendarData *m_calendarEvent;

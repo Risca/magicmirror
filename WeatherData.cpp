@@ -11,17 +11,12 @@
 #include <QThread>
 #include <QUrlQuery>
 
-WeatherData::WeatherData(const QString &appId, const QString &townId, QObject *parent) :
-    QObject(parent), m_appID(appId), m_townID(townId)
+WeatherData::WeatherData(const QString &appId, const QString &townId, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
+    QObject(parent), m_net(net), m_forecast(0), m_current(0), m_appID(appId), m_townID(townId)
 {
-    m_forecast = new QNetworkAccessManager(this);
-    m_current = new QNetworkAccessManager(this);
-
-    connect(m_forecast, SIGNAL(finished(QNetworkReply*)), this, SLOT(forecastReplyFinished(QNetworkReply*)));
-    connect(m_current, SIGNAL(finished(QNetworkReply*)), this, SLOT(currentReplyFinished(QNetworkReply*)));
 }
 
-bool WeatherData::Create(WeatherData *&weatherData, QObject *parent)
+bool WeatherData::Create(WeatherData *&weatherData, QSharedPointer<QNetworkAccessManager> net, QObject *parent)
 {
     QSharedPointer<QSettings> settings = SettingsFactory::Create("Weather");
     const QString appId = settings->value("appid").toString();
@@ -29,7 +24,7 @@ bool WeatherData::Create(WeatherData *&weatherData, QObject *parent)
     if (appId.isEmpty() || townId.isEmpty()) {
         return false;
     }
-    weatherData = new WeatherData(appId, townId, parent);
+    weatherData = new WeatherData(appId, townId, net, parent);
     return true;
 }
 
@@ -39,6 +34,11 @@ WeatherData::~WeatherData()
 
 void WeatherData::processCurrentWeather()
 {
+    if (m_current) {
+        qWarning() << __PRETTY_FUNCTION__ << ": current weather update request already in process - aborting";
+        return;
+    }
+
     QUrl u("http://api.openweathermap.org/data/2.5/weather");
     QUrlQuery query;
 
@@ -48,12 +48,17 @@ void WeatherData::processCurrentWeather()
     query.addQueryItem("units", "metric");
     u.setQuery(query);
 
-
-    m_current->get(QNetworkRequest(u));
+    m_current = m_net->get(QNetworkRequest(u));
+    connect(m_current, SIGNAL(finished()), this, SLOT(currentReplyFinished()));
 }
 
 void WeatherData::processForecast()
 {
+    if (m_forecast) {
+        qWarning() << __PRETTY_FUNCTION__ << ": weather forecast request already in process - aborting";
+        return;
+    }
+
     QUrl u("http://api.openweathermap.org/data/2.5/forecast");
     QUrlQuery query;
 
@@ -64,16 +69,17 @@ void WeatherData::processForecast()
     query.addQueryItem("cnt", "5");
     u.setQuery(query);
 
-    m_forecast->get(QNetworkRequest(u));
+    m_forecast = m_net->get(QNetworkRequest(u));
+    connect(m_forecast, SIGNAL(finished()), this, SLOT(forecastReplyFinished()));
 }
 
-void WeatherData::currentReplyFinished(QNetworkReply *reply)
+void WeatherData::currentReplyFinished()
 {
-    if (reply->error()) {
-        qWarning() << __PRETTY_FUNCTION__ << ":" << reply->errorString();
+    if (m_current->error()) {
+        qWarning() << __PRETTY_FUNCTION__ << ":" << m_current->errorString();
     }
     else {
-        QJsonDocument jdoc = QJsonDocument::fromJson(reply->readAll());
+        QJsonDocument jdoc = QJsonDocument::fromJson(m_current->readAll());
         QJsonObject jobj = jdoc.object();
         QJsonObject main = jobj["main"].toObject();
         emit temperature(main["temp"].toDouble());
@@ -92,17 +98,18 @@ void WeatherData::currentReplyFinished(QNetworkReply *reply)
         }
     }
     emit finished();
-    reply->deleteLater();
+    m_current->deleteLater();
+    m_current = 0;
 }
 
-void WeatherData::forecastReplyFinished(QNetworkReply *reply)
+void WeatherData::forecastReplyFinished()
 {
     qDebug() << __PRETTY_FUNCTION__;
-    if (reply->error()) {
-        qWarning() << __PRETTY_FUNCTION__ << ":" << reply->errorString();
+    if (m_forecast->error()) {
+        qWarning() << __PRETTY_FUNCTION__ << ":" << m_forecast->errorString();
     }
     else {
-        QJsonDocument jdoc = QJsonDocument::fromJson(reply->readAll());
+        QJsonDocument jdoc = QJsonDocument::fromJson(m_forecast->readAll());
         QJsonObject jobj = jdoc.object();
         QJsonArray entries = jobj["list"].toArray();
         QJsonArray weather = jobj["weather"].toArray();
@@ -113,5 +120,6 @@ void WeatherData::forecastReplyFinished(QNetworkReply *reply)
         }
     }
     emit finished();
-    reply->deleteLater();
+    m_forecast->deleteLater();
+    m_forecast = 0;
 }

@@ -41,12 +41,18 @@ void clearLayout(QLayout *layout) {
     }
 }
 
+QUrl GetUrlForIcon(const QString &icon)
+{
+    return QUrl("http://openweathermap.org/img/w/" + icon + ".png");
+}
+
 } // anonymous namespace
 
 MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     QFrame(0),
     ui(new Ui::MirrorFrame),
-    m_icon(net),
+    m_net(net),
+    m_iconReply(0),
     m_weatherEvent(0),
     m_forecastIndex(0),
     m_forecastEntryCount(0),
@@ -112,8 +118,6 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
         m_iconEntries.push_back(icon);
     }
 
-    connect(m_icon.get(), SIGNAL(finished(QNetworkReply*)), this, SLOT(iconReplyFinished(QNetworkReply*)));
-
     setupMqttSubscriber();
     createWeatherSystem();
     createCalendarSystem();
@@ -167,9 +171,23 @@ void MirrorFrame::setupMqttSubscriber()
 #endif
 }
 
+QNetworkReply *MirrorFrame::FetchNextIcon()
+{
+    QString icon;
+    do {
+        if (m_iconsToFetch.isEmpty()) {
+            return 0;
+        }
+        icon = m_iconsToFetch.takeFirst();
+    } while(m_iconCache.exists(icon));
+    QNetworkReply* reply = m_net->get(QNetworkRequest(GetUrlForIcon(icon)));
+    connect(reply, SIGNAL(finished()), this, SLOT(iconReplyFinished()));
+    return reply;
+}
+
 void MirrorFrame::createWeatherSystem()
 {
-    if (WeatherData::Create(m_weatherEvent, this)) {
+    if (WeatherData::Create(m_weatherEvent, m_net, this)) {
         connect(m_weatherEvent, SIGNAL(temperature(double)), this, SLOT(currentTemperature(double)));
         connect(m_weatherEvent, SIGNAL(humidity(double)), this, SLOT(currentHumidity(double)));
         connect(m_weatherEvent, SIGNAL(windSpeed(double)), this, SLOT(currentWindSpeed(double)));
@@ -305,14 +323,12 @@ void MirrorFrame::weatherEventsDone()
 
 void MirrorFrame::currentIcon(const QString &id)
 {
-    WeatherIcon icon;
-
-    if (!icon.exists(id)) {
+    if (!m_iconCache.exists(id)) {
         getIcon(id);
     }
     else {
         QImage image;
-        if (icon.get(id, image)) {
+        if (m_iconCache.get(id, image)) {
             QPixmap pixmap;
             pixmap.convertFromImage(image.scaledToHeight(100, Qt::SmoothTransformation));
             ui->currentIcon->setPixmap(pixmap);
@@ -357,7 +373,6 @@ void MirrorFrame::forecastEntryCount(int c)
 
 void MirrorFrame::forecastEntry(const QJsonObject &jobj)
 {
-    WeatherIcon icon;
     QDateTime dt;
     QDateTime now = QDateTime::currentDateTime();
     int humidity;
@@ -383,12 +398,12 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
         QJsonObject obj = weather[i].toObject();
         sky = obj["main"].toString();
         QString j = obj["icon"].toString();
-        if (!icon.exists(j)) {
+        if (!m_iconCache.exists(j)) {
             getIcon(j);
         }
         else {
             QImage image;
-            if (icon.get(j, image)) {
+            if (m_iconCache.get(j, image)) {
                 QPixmap pixmap;
                 pixmap.convertFromImage(image);
                 QLabel *lb = m_iconEntries[m_forecastIndex];
@@ -489,31 +504,31 @@ void MirrorFrame::deleteCalendarEventsList()
 
 void MirrorFrame::getIcon(const QString &icon)
 {
-    WeatherIcon i;
-
-    if (!i.exists(icon) && icon.size() > 0) {
-        QUrl u("http://openweathermap.org/img/w/" + icon + ".png");
-        m_icon->get(QNetworkRequest(u));
+    if (!m_iconCache.exists(icon) && !icon.isEmpty()) {
+        m_iconsToFetch.push_back(icon);
+        if (!m_iconReply) {
+            // No active request, get icon immediately
+            m_iconReply = FetchNextIcon();
+        }
     }
 }
 
-void MirrorFrame::iconReplyFinished(QNetworkReply *reply)
+void MirrorFrame::iconReplyFinished()
 {
-    WeatherIcon icon;
-    if (reply->error()) {
-        qWarning() << __PRETTY_FUNCTION__ << ":" << reply->errorString();
+    if (m_iconReply->error()) {
+        qWarning() << __PRETTY_FUNCTION__ << ":" << m_iconReply->errorString();
     }
     else {
-        QNetworkRequest r = reply->request();
+        QNetworkRequest r = m_iconReply->request();
         QString i = r.url().fileName();
-        if (!icon.exists(i) && i.length() > 0) {
-            icon.store(i, reply->readAll());
+        if (!m_iconCache.exists(i) && i.length() > 0) {
+            m_iconCache.store(i, m_iconReply->readAll());
         }
         for (int j = 0; j < m_icons.size(); j++) {
             if (i.contains(m_icons[j])) {
                 QLabel *lb = m_iconEntries[j];
                 QImage image;
-                if (icon.get(i, image)) {
+                if (m_iconCache.get(i, image)) {
                     QPixmap pixmap;
                     pixmap.convertFromImage(image);
                     lb->setPixmap(pixmap);
@@ -521,7 +536,8 @@ void MirrorFrame::iconReplyFinished(QNetworkReply *reply)
             }
         }
     }
-    reply->deleteLater();
+    m_iconReply->deleteLater();
+    m_iconReply = FetchNextIcon();
 }
 
 void MirrorFrame::connectionComplete()
