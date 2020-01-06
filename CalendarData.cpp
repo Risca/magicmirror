@@ -1,5 +1,12 @@
 #include "CalendarData.h"
 
+#include <QByteArray>
+#include <QDateTime>
+#include <QDebug>
+#include <QProcess>
+#include <QString>
+#include <QTimeZone>
+
 CalendarData::CalendarData(QObject *parent) : QObject(parent)
 {
 }
@@ -45,7 +52,7 @@ void CalendarData::process()
 2017-09-16T08:00:00-05:00 Maddie - Hot Shot Tots
 2017-09-23T08:00:00-05:00 Maddie - Hot Shot Tots
 */
-void CalendarData::processResults(QByteArray &results)
+void CalendarData::processResults(const QByteArray &results)
 {
     QDateTime start;
     QList<QByteArray> events = results.split('\n');

@@ -27,6 +27,10 @@
 
 #include "settingsfactory.h"
 
+#include <QDebug>
+#include <QDir>
+#include <QImageReader>
+#include <QImageWriter>
 #include <QStandardPaths>
 
 WeatherIcon::WeatherIcon()
@@ -42,7 +46,11 @@ WeatherIcon::WeatherIcon()
     }
 }
 
-bool WeatherIcon::exists(QString name)
+WeatherIcon::~WeatherIcon()
+{
+}
+
+bool WeatherIcon::exists(const QString &name) const
 {
     QString fullPath = m_path + "/" + name + ".png";
     QDir cache(m_path);
@@ -50,27 +58,23 @@ bool WeatherIcon::exists(QString name)
     return cache.exists(fullPath);
 }
 
-WeatherIcon::~WeatherIcon()
-{
-}
-
-bool WeatherIcon::get(QString name, QImage *icon)
+bool WeatherIcon::get(const QString &name, QImage &icon)
 {
     QString fullPath = m_path + "/" + name;
     QImageReader image(fullPath);
 
-    if (!name.contains("png"))
+    if (!name.endsWith("png"))
         fullPath += ".png";
 
     if (image.canRead()) {
-        *icon = image.read();
+        icon = image.read();
         return true;
     }
     qDebug() << __PRETTY_FUNCTION__ << ": Unable to read cached icon at" << fullPath;
     return false;
 }
 
-bool WeatherIcon::store(QString name, QByteArray data)
+bool WeatherIcon::store(const QString &name, const QByteArray &data)
 {
     QString fullPath = m_path + "/" + name;
     QImageWriter image(fullPath);

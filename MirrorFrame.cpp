@@ -3,8 +3,20 @@
 
 #include "settingsfactory.h"
 
+#include <QDate>
+#include <QDebug>
+#include <QFont>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QLayout>
 #include <QLayoutItem>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QProcess>
+#include <QStateMachine>
+#include <QtGlobal>
+#include <QTime>
+#include <QTimer>
 
 namespace {
 
@@ -31,8 +43,8 @@ void clearLayout(QLayout *layout) {
 
 } // anonymous namespace
 
-MirrorFrame::MirrorFrame(QFrame *parent) :
-    QFrame(parent),
+MirrorFrame::MirrorFrame() :
+    QFrame(0),
     ui(new Ui::MirrorFrame),
     m_weatherEvent(0),
     m_forecastIndex(0),
@@ -114,6 +126,11 @@ MirrorFrame::MirrorFrame(QFrame *parent) :
     const int monitorTimeout = SettingsFactory::Create()->value("screentimeout", MONITOR_TIMEOUT / (1000 * 60)).toInt() * 1000 * 60;
     qDebug() << __PRETTY_FUNCTION__ << ": setting monitor timeout to" << monitorTimeout;
     m_monitorTimer->start(monitorTimeout);
+}
+
+MirrorFrame *MirrorFrame::Create()
+{
+    return new MirrorFrame();
 }
 
 MirrorFrame::~MirrorFrame()
@@ -291,10 +308,11 @@ void MirrorFrame::currentIcon(const QString &id)
     }
     else {
         QImage image;
-        QPixmap pixmap;
-        icon.get(id, &image);
-        pixmap.convertFromImage(image.scaledToHeight(100, Qt::SmoothTransformation));
-        ui->currentIcon->setPixmap(pixmap);
+        if (icon.get(id, image)) {
+            QPixmap pixmap;
+            pixmap.convertFromImage(image.scaledToHeight(100, Qt::SmoothTransformation));
+            ui->currentIcon->setPixmap(pixmap);
+        }
     }
 }
 
@@ -303,7 +321,7 @@ void MirrorFrame::currentTemperature(double temp)
     ui->currentTemp->setText(QString("%1%2").arg(temp, 0, 'f', 1).arg(QChar(0260)));
 }
 
-void MirrorFrame::currentSkyConditions(QString sky)
+void MirrorFrame::currentSkyConditions(const QString &sky)
 {
     ui->currentSky->setText(QString("%1").arg(sky));
 }
@@ -333,7 +351,7 @@ void MirrorFrame::forecastEntryCount(int c)
     m_icons.clear();
 }
 
-void MirrorFrame::forecastEntry(QJsonObject jobj)
+void MirrorFrame::forecastEntry(const QJsonObject &jobj)
 {
     WeatherIcon icon;
     QDateTime dt;
@@ -366,11 +384,12 @@ void MirrorFrame::forecastEntry(QJsonObject jobj)
         }
         else {
             QImage image;
-            QPixmap pixmap;
-            icon.get(j, &image);
-            pixmap.convertFromImage(image);
-            QLabel *lb = m_iconEntries[m_forecastIndex];
-            lb->setPixmap(pixmap);
+            if (icon.get(j, image)) {
+                QPixmap pixmap;
+                pixmap.convertFromImage(image);
+                QLabel *lb = m_iconEntries[m_forecastIndex];
+                lb->setPixmap(pixmap);
+            }
         }
         m_icons.push_front(j);
     }
@@ -464,7 +483,7 @@ void MirrorFrame::deleteCalendarEventsList()
     m_newEventList = false;
 }
 
-void MirrorFrame::getIcon(QString icon)
+void MirrorFrame::getIcon(const QString &icon)
 {
     WeatherIcon i;
 
@@ -490,10 +509,11 @@ void MirrorFrame::iconReplyFinished(QNetworkReply *reply)
             if (i.contains(m_icons[j])) {
                 QLabel *lb = m_iconEntries[j];
                 QImage image;
-                QPixmap pixmap;
-                icon.get(i, &image);
-                pixmap.convertFromImage(image);
-                lb->setPixmap(pixmap);
+                if (icon.get(i, image)) {
+                    QPixmap pixmap;
+                    pixmap.convertFromImage(image);
+                    lb->setPixmap(pixmap);
+                }
             }
         }
     }
@@ -510,7 +530,7 @@ void MirrorFrame::disconnectedEvent()
     ui->lightningLabel->setText("Connecting to MQTT server...");
 }
 
-void MirrorFrame::messageReceivedOnTopic(QString t, QString p)
+void MirrorFrame::messageReceivedOnTopic(const QString &t, const QString &p)
 {
     qDebug() << __PRETTY_FUNCTION__ << ": Topic:" << t << ", payload: " << p;
     double d = p.toDouble();

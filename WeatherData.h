@@ -1,9 +1,15 @@
 #ifndef __WEATHERDATA_H__
 #define __WEATHERDATA_H__
 
+#include <QJsonObject>
+#include <QMap>
+#include <QObject>
 #include <QString>
-#include <QtCore/QtCore>
-#include <QtNetwork/QtNetwork>
+#include <QtGlobal>
+
+class QNetworkReply;
+class QNetworkAccessManager;
+class QThread;
 
 class WeatherData : public QObject
 {

@@ -26,8 +26,10 @@
 #ifndef WEATHERICON_H
 #define WEATHERICON_H
 
-#include <QtCore/QtCore>
-#include <QtGui/QtGui>
+class QByteArray;
+class QImage;
+
+#include <QString>
 
 class WeatherIcon
 {
@@ -35,9 +37,9 @@ public:
     WeatherIcon();
     ~WeatherIcon();
 
-    bool exists(QString);
-    bool store(QString, QByteArray);
-    bool get(QString, QImage*);
+    bool exists(const QString &name) const;
+    bool store(const QString &name, const QByteArray &data);
+    bool get(const QString &name, QImage &icon);
 
 private:
     QString m_path;

@@ -15,15 +15,27 @@
 #ifndef __MIRRORFRAME_H__
 #define __MIRRORFRAME_H__
 
-#include <QtNetwork/QtNetwork>
-#include <QtCore/QtCore>
-#include <QtWidgets/QtWidgets>
+#include <QFrame>
+#include <QString>
+#include <QVector>
+
 #ifdef __USE_RPI__
 #include <th02.h>
 #endif
 #include "CalendarData.h"
 #include "WeatherData.h"
 #include "weathericon.h"
+
+class QJsonObject;
+class QLabel;
+class QNetworkAccessManager;
+class QNetworkReply;
+class QStateMachine;
+class QTimer;
+
+namespace Ui {
+class MirrorFrame;
+}
 
 #define MONITOR_TIMEOUT		(1000 * 60 * 1)
 #define CALEVENTS_TIMEOUT	(1000 * 60 * 60 * 1)
@@ -32,14 +44,11 @@
 #define TWELVE_HOURS        (1000 * 60 * 60 * 12)
 #define THIRTY_MINUTES      (1000 * 60 * 30)
 
-namespace Ui {
-class MirrorFrame;
-}
-
 class MirrorFrame : public QFrame {
     Q_OBJECT
 public:
-    MirrorFrame(QFrame *parent = 0);
+    static MirrorFrame* Create();
+
     virtual ~MirrorFrame();
     void registerTouchEvent();
 
@@ -50,12 +59,12 @@ public slots:
     void weatherDataError(const QString &error);
     void weatherEventsDone();
     void currentHumidity(double);
-    void currentSkyConditions(QString);
+    void currentSkyConditions(const QString &sky);
     void currentTemperature(double);
     void currentWindSpeed(double);
     void sunrise(qint64);
     void sunset(qint64);
-    void forecastEntry(QJsonObject);
+    void forecastEntry(const QJsonObject &);
     void forecastEntryCount(int);
     void updateClock();
     void monitorOn();
@@ -64,7 +73,7 @@ public slots:
     void updateLocalTemp();
     void iconReplyFinished(QNetworkReply*);
     void currentIcon(const QString &id);
-    void messageReceivedOnTopic(QString, QString);
+    void messageReceivedOnTopic(const QString &t, const QString &p);
     void connectionComplete();
     void disconnectedEvent();
     void lightningTimeout();
@@ -74,13 +83,14 @@ signals:
     void touchDetected();
 
 private:
+    MirrorFrame();
     void deleteCalendarEventsList();
     void createStateMachine();
     void turnMonitorOn();
     void turnMonitorOff();
     void createWeatherSystem();
     void createCalendarSystem();
-    void getIcon(QString);
+    void getIcon(const QString &icon);
     void setupMqttSubscriber();
 
     Ui::MirrorFrame *ui;

@@ -15,7 +15,10 @@
 #ifndef __CALENDARDATA_H__
 #define __CALENDARDATA_H__
 
-#include <QtCore/QtCore>
+#include <QObject>
+
+class QByteArray;
+class QString;
 
 class CalendarData : public QObject {
     Q_OBJECT
@@ -36,7 +39,7 @@ signals:
     void skyConditions(QString);
 
 private:
-    void processResults(QByteArray&);
+    void processResults(const QByteArray &results);
 };
 
 #endif /* __CALENDARDATA_H__ */

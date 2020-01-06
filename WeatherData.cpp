@@ -2,6 +2,15 @@
 
 #include "settingsfactory.h"
 
+#include <QDebug>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QThread>
+#include <QUrlQuery>
+
 WeatherData::WeatherData(const QString &appId, const QString &townId, QObject *parent) :
     QObject(parent), m_appID(appId), m_townID(townId)
 {
