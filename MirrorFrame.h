@@ -18,6 +18,7 @@
 #include <QFrame>
 #include <QSharedPointer>
 #include <QString>
+#include <QTimer>
 #include <QVector>
 
 #ifdef __USE_RPI__
@@ -32,7 +33,6 @@ class QLabel;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QStateMachine;
-class QTimer;
 
 namespace Ui {
 class MirrorFrame;
@@ -97,13 +97,13 @@ private:
 
     Ui::MirrorFrame *ui;
     QStateMachine *m_monitorState;
-    QTimer *m_calendarTimer;
-    QTimer *m_forecastTimer;
-    QTimer *m_currentWeatherTimer;
-    QTimer *m_clockTimer;
-    QTimer *m_monitorTimer;
-    QTimer *m_localTempTimer;
-    QTimer *m_lightningTimer;
+    QTimer m_calendarTimer;
+    QTimer m_forecastTimer;
+    QTimer m_currentWeatherTimer;
+    QTimer m_clockTimer;
+    QTimer m_monitorTimer;
+    QTimer m_localTempTimer;
+    QTimer m_lightningTimer;
 
     QSharedPointer<QNetworkAccessManager> m_net;
     QNetworkReply* m_iconReply;

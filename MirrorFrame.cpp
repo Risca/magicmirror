@@ -6,6 +6,7 @@
 #include <QDate>
 #include <QDebug>
 #include <QFont>
+#include <QHostInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QLayout>
@@ -61,16 +62,10 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     QLocale::setDefault(QLocale(SettingsFactory::Create()->value("locale", "en_EN").toString()));
     ui->setupUi(this);
 
-    m_calendarTimer = new QTimer();
-    m_forecastTimer = new QTimer();
-    m_currentWeatherTimer = new QTimer();
-    m_clockTimer = new QTimer();
-    m_localTempTimer = new QTimer();
-    m_monitorTimer = new QTimer();
     m_monitorState = new QStateMachine(this);
 
-    connect(m_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
-    m_clockTimer->start(500);
+    connect(&m_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
+    m_clockTimer.start(500);
 
     for (int i = 0; i < 5; i++) {
         QLabel *forecast = new QLabel(this);
@@ -89,13 +84,13 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     createCalendarSystem();
     createStateMachine();
 
-    connect(m_localTempTimer, SIGNAL(timeout()), this, SLOT(updateLocalTemp()));
-    m_localTempTimer->start(1000);        // Get sensor data every second
+    connect(&m_localTempTimer, SIGNAL(timeout()), this, SLOT(updateLocalTemp()));
+    m_localTempTimer.start(1000);        // Get sensor data every second
     updateLocalTemp();
 
     const int monitorTimeout = SettingsFactory::Create()->value("screentimeout", MONITOR_TIMEOUT / (1000 * 60)).toInt() * 1000 * 60;
     qDebug() << __PRETTY_FUNCTION__ << ": setting monitor timeout to" << monitorTimeout;
-    m_monitorTimer->start(monitorTimeout);
+    m_monitorTimer.start(monitorTimeout);
 }
 
 MirrorFrame *MirrorFrame::Create()
@@ -132,8 +127,7 @@ void MirrorFrame::setupMqttSubscriber()
     connect(m_mqttClient, SIGNAL(messageReceivedOnTopic(QString, QString)), this, SLOT(messageReceivedOnTopic(QString, QString)));
     ui->lightningLabel->setText("Connecting to MQTT server...");
     m_mqttClient->connectToHost();
-    m_lightningTimer = new QTimer();
-    connect(m_lightningTimer, SIGNAL(timeout()), this, SLOT(lightningTimeout()));
+    connect(&m_lightningTimer, SIGNAL(timeout()), this, SLOT(lightningTimeout()));
 #endif
 }
 
@@ -166,12 +160,12 @@ void MirrorFrame::createWeatherSystem()
         connect(m_weatherEvent, SIGNAL(forecastEntry(QJsonObject)), this, SLOT(forecastEntry(QJsonObject)));
         connect(m_weatherEvent, SIGNAL(currentIcon(QString)), this, SLOT(currentIcon(QString)));
 
-        connect(m_currentWeatherTimer, SIGNAL(timeout()), m_weatherEvent, SLOT(processCurrentWeather()));
-        m_currentWeatherTimer->start(CURRENT_TIMEOUT);
+        connect(&m_currentWeatherTimer, SIGNAL(timeout()), m_weatherEvent, SLOT(processCurrentWeather()));
+        m_currentWeatherTimer.start(CURRENT_TIMEOUT);
         m_weatherEvent->processCurrentWeather();
 
-        connect(m_forecastTimer, SIGNAL(timeout()), m_weatherEvent, SLOT(processForecast()));
-        m_forecastTimer->start(FORECAST_TIMEOUT);
+        connect(&m_forecastTimer, SIGNAL(timeout()), m_weatherEvent, SLOT(processForecast()));
+        m_forecastTimer.start(FORECAST_TIMEOUT);
         m_weatherEvent->processForecast();
     }
 }
@@ -184,8 +178,8 @@ void MirrorFrame::createCalendarSystem()
         connect(m_calendarEvent, SIGNAL(newEvent(QString)), this, SLOT(calendarEventsEvent(QString)));
         connect(m_calendarEvent, SIGNAL(finished()), this, SLOT(calendarEventsDone()));
 
-        connect(m_calendarTimer, SIGNAL(timeout()), m_calendarEvent, SLOT(process()));
-        m_calendarTimer->start(CALEVENTS_TIMEOUT);
+        connect(&m_calendarTimer, SIGNAL(timeout()), m_calendarEvent, SLOT(process()));
+        m_calendarTimer.start(CALEVENTS_TIMEOUT);
         m_calendarEvent->process();
     }
 }
@@ -201,7 +195,7 @@ void MirrorFrame::createStateMachine()
     QState *off = new QState();
 
     off->addTransition(this, SIGNAL(touchDetected()), on);
-    on->addTransition(m_monitorTimer, SIGNAL(timeout()), off);
+    on->addTransition(&m_monitorTimer, SIGNAL(timeout()), off);
     connect(on, SIGNAL(entered()), this, SLOT(monitorOn()));
     connect(off, SIGNAL(entered()), this, SLOT(monitorOff()));
     connect(this, SIGNAL(touchDetected()), this, SLOT(resetMonitorTimer()));
@@ -228,24 +222,24 @@ void MirrorFrame::updateLocalTemp()
 
 void MirrorFrame::resetMonitorTimer()
 {
-    if (m_monitorTimer->isActive())
-        m_monitorTimer->stop();
+    if (m_monitorTimer.isActive())
+        m_monitorTimer.stop();
 
-    m_monitorTimer->start(MONITOR_TIMEOUT);
+    m_monitorTimer.start(MONITOR_TIMEOUT);
 }
 
 void MirrorFrame::monitorOff()
 {
     turnMonitorOff();
-    if (m_monitorTimer->isActive())
-        m_monitorTimer->stop();
+    if (m_monitorTimer.isActive())
+        m_monitorTimer.stop();
 }
 
 void MirrorFrame::monitorOn()
 {
-    if (!m_monitorTimer->isActive()) {
-        m_monitorTimer->setInterval(MONITOR_TIMEOUT);
-        m_monitorTimer->start();
+    if (!m_monitorTimer.isActive()) {
+        m_monitorTimer.setInterval(MONITOR_TIMEOUT);
+        m_monitorTimer.start();
     }
     turnMonitorOn();
 }
@@ -526,9 +520,9 @@ void MirrorFrame::messageReceivedOnTopic(const QString &t, const QString &p)
     double distance = d * .621;
 
     ui->lightningLabel->setText(QString("Lightning detected at %1 miles").arg(distance, 0, 'f', 1));
-    m_lightningTimer->stop();
-    m_lightningTimer->setInterval(THIRTY_MINUTES);
-    m_lightningTimer->start();
+    m_lightningTimer.stop();
+    m_lightningTimer.setInterval(THIRTY_MINUTES);
+    m_lightningTimer.start();
     emit touchDetected();
 
 }
@@ -536,5 +530,5 @@ void MirrorFrame::messageReceivedOnTopic(const QString &t, const QString &p)
 void MirrorFrame::lightningTimeout()
 {
     ui->lightningLabel->setText("");
-    m_lightningTimer->stop();
+    m_lightningTimer.stop();
 }
