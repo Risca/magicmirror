@@ -69,46 +69,14 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     m_monitorTimer = new QTimer();
     m_monitorState = new QStateMachine(this);
 
-    QFont f("Roboto");
-    f.setPixelSize(50*2/3);
-    f.setBold(true);
-    ui->calLabel->setFont(f);
-    ui->lightningLabel->setFont(f);
-    ui->currentLabel->setFont(f);
-    ui->forecastLabel->setFont(f);
-
-    f.setPixelSize(40*2/3);
-    ui->clockLabel->setFont(f);
     connect(m_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
     m_clockTimer->start(500);
 
-    f.setPixelSize(30*2/3);
-
-    ui->currentTempLabel->setFont(f);
-    ui->localTempLabel->setFont(f);
-    ui->currentHumidityLabel->setFont(f);
-    ui->localHumidityLabel->setFont(f);
-    ui->currentWindLabel->setFont(f);
-    ui->currentSkyLabel->setFont(f);
-    ui->sunriseLabel->setFont(f);
-    ui->sunsetLabel->setFont(f);
-
-    f.setPixelSize(25*2/3);
-    f.setBold(false);
-
-    ui->localTemp->setFont(f);
-    ui->localHumidity->setFont(f);
-    ui->currentTemp->setFont(f);
-    ui->currentHumidity->setFont(f);
-    ui->currentTemp->setFont(f);
-    ui->currentHumidity->setFont(f);
-    ui->sunrise->setFont(f);
-    ui->currentWind->setFont(f);
-    ui->currentSky->setFont(f);
-    ui->sunset->setFont(f);
-
     for (int i = 0; i < 5; i++) {
         QLabel *forecast = new QLabel(this);
+        QFont f = forecast->font();
+        f.setBold(true);
+        f.setPointSize(15);
         forecast->setFont(f);
         ui->forecastLayout->addWidget(forecast, i, 0);
         m_forecastEntries.push_back(forecast);
