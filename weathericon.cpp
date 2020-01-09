@@ -58,7 +58,7 @@ bool WeatherIcon::exists(const QString &name) const
     return cache.exists(fullPath);
 }
 
-bool WeatherIcon::get(const QString &name, QImage &icon)
+bool WeatherIcon::get(const QString &name, QImage &icon) const
 {
     QString fullPath = m_path + "/" + name;
     QImageReader image(fullPath);

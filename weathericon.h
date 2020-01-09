@@ -39,7 +39,7 @@ public:
 
     bool exists(const QString &name) const;
     bool store(const QString &name, const QByteArray &data);
-    bool get(const QString &name, QImage &icon);
+    bool get(const QString &name, QImage &icon) const;
 
 private:
     QString m_path;
