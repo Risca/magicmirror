@@ -328,7 +328,7 @@ void MirrorFrame::forecastEntryCount(int c)
 {
     m_forecastEntryCount = c;
     m_forecastIndex = 0;
-    m_icons.clear();
+    m_forecastIcons.clear();
 }
 
 void MirrorFrame::forecastEntry(const QJsonObject &jobj)
@@ -370,7 +370,7 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
                 lb->setPixmap(pixmap);
             }
         }
-        m_icons.push_front(icon);
+        m_forecastIcons.push_front(icon);
     }
 
     if (m_forecastIndex < ui->forecastLayout->rowCount()) {
@@ -487,8 +487,8 @@ void MirrorFrame::iconReplyFinished()
         if (!m_iconCache.exists(icon) && icon.length() > 0) {
             m_iconCache.store(icon, m_iconReply->readAll());
         }
-        for (int i = 0; i < m_icons.size(); i++) {
-            if (icon.contains(m_icons[i])) {
+        for (int i = 0; i < m_forecastIcons.size(); i++) {
+            if (icon.contains(m_forecastIcons[i])) {
                 QLabel *lb = static_cast<QLabel*>(ui->forecastLayout->itemAtPosition(i, 1)->widget());
                 QImage image;
                 if (m_iconCache.get(icon, image)) {

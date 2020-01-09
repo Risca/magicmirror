@@ -107,7 +107,7 @@ private:
 
     QSharedPointer<QNetworkAccessManager> m_net;
     QNetworkReply* m_iconReply;
-    QVector<QString> m_icons, m_iconsToFetch;
+    QVector<QString> m_forecastIcons, m_iconsToFetch;
     WeatherIcon m_iconCache;
 
     WeatherData *m_weatherEvent;
