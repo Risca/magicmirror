@@ -283,6 +283,7 @@ void MirrorFrame::weatherEventsDone()
 
 void MirrorFrame::currentIcon(const QString &id)
 {
+    m_currentIconId = id;
     if (!m_iconCache.exists(id)) {
         getIcon(id);
     }
@@ -486,6 +487,9 @@ void MirrorFrame::iconReplyFinished()
         QString icon = r.url().fileName();
         if (!m_iconCache.exists(icon) && icon.length() > 0) {
             m_iconCache.store(icon, m_iconReply->readAll());
+        }
+        if (icon.contains(m_currentIconId)) {
+            currentIcon(m_currentIconId);
         }
         for (int i = 0; i < m_forecastIcons.size(); i++) {
             if (icon.contains(m_forecastIcons[i])) {
