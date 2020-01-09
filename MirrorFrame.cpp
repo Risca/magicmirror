@@ -56,6 +56,7 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
 {
     QLocale::setDefault(QLocale(SettingsFactory::Create()->value("locale", "en_EN").toString()));
     ui->setupUi(this);
+    ui->versionLabel->setText(QString("Version: %1").arg(GIT_VERSION));
 
     m_monitorState = new QStateMachine(this);
 

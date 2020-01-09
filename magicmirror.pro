@@ -39,3 +39,4 @@ HEADERS = MirrorFrame.h \
 FORMS += \
     MirrorFrame.ui
 
+include(gitversion.pri)
