@@ -29,11 +29,27 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QFileInfo>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QImageReader>
 #include <QImageWriter>
 #include <QStandardPaths>
+#include <QUrl>
 
-WeatherIcon::WeatherIcon()
+namespace {
+
+QUrl GetUrlForIcon(const QString &icon)
+{
+    return QUrl("http://openweathermap.org/img/w/" + icon + ".png");
+}
+
+} // anonymous namespace
+
+WeatherIcon::WeatherIcon(QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
+    QObject(parent),
+    m_net(net),
+    m_iconReply(0)
 {
     m_path = SettingsFactory::Create("Weather")->value("cachedir", QStandardPaths::writableLocation(QStandardPaths::CacheLocation)).toString();
 
@@ -58,13 +74,19 @@ bool WeatherIcon::exists(const QString &name) const
     return cache.exists(fullPath);
 }
 
+void WeatherIcon::download(const QString name)
+{
+    m_iconsToFetch.push_back(name);
+    if (!m_iconReply) {
+        // No active request, get icon immediately
+        m_iconReply = FetchNextIcon();
+    }
+}
+
 bool WeatherIcon::get(const QString &name, QImage &icon) const
 {
-    QString fullPath = m_path + "/" + name;
+    const QString fullPath = GetFullPath(name);
     QImageReader image(fullPath);
-
-    if (!name.endsWith("png"))
-        fullPath += ".png";
 
     if (image.canRead()) {
         icon = image.read();
@@ -74,9 +96,9 @@ bool WeatherIcon::get(const QString &name, QImage &icon) const
     return false;
 }
 
-bool WeatherIcon::store(const QString &name, const QByteArray &data)
+bool WeatherIcon::Store(const QString &name, const QByteArray &data)
 {
-    QString fullPath = m_path + "/" + name;
+    const QString fullPath = GetFullPath(name);
     QImageWriter image(fullPath);
     QImage icon;
 
@@ -89,4 +111,45 @@ bool WeatherIcon::store(const QString &name, const QByteArray &data)
     }
     qDebug() << __PRETTY_FUNCTION__ << ": error storing" << fullPath;
     return false;
+}
+
+void WeatherIcon::iconReplyFinished()
+{
+    if (m_iconReply->error()) {
+        qWarning() << __PRETTY_FUNCTION__ << ":" << m_iconReply->errorString();
+    }
+    else {
+        QNetworkRequest r = m_iconReply->request();
+        QString icon = QFileInfo(r.url().fileName()).baseName();
+        if (!exists(icon) && icon.length() > 0) {
+            Store(icon, m_iconReply->readAll());
+        }
+        emit iconDownloaded(icon);
+    }
+    m_iconReply->deleteLater();
+    m_iconReply = FetchNextIcon();
+}
+
+QNetworkReply *WeatherIcon::FetchNextIcon()
+{
+    QString icon;
+    do {
+        if (m_iconsToFetch.isEmpty()) {
+            return 0;
+        }
+        icon = m_iconsToFetch.takeFirst();
+    } while(exists(icon));
+    QNetworkReply* reply = m_net->get(QNetworkRequest(GetUrlForIcon(icon)));
+    connect(reply, SIGNAL(finished()), this, SLOT(iconReplyFinished()));
+    return reply;
+}
+
+QString WeatherIcon::GetFullPath(const QString &name) const
+{
+    QString fullPath = m_path + "/" + name;
+
+    if (!name.endsWith("png"))
+        fullPath += ".png";
+
+    return fullPath;
 }

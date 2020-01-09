@@ -26,23 +26,43 @@
 #ifndef WEATHERICON_H
 #define WEATHERICON_H
 
+#include <QObject>
+#include <QSharedPointer>
+#include <QString>
+#include <QVector>
+
 class QByteArray;
 class QImage;
+class QNetworkAccessManager;
+class QNetworkReply;
 
-#include <QString>
-
-class WeatherIcon
+class WeatherIcon : public QObject
 {
+    Q_OBJECT
+
 public:
-    WeatherIcon();
+    WeatherIcon(QSharedPointer<QNetworkAccessManager> net, QObject *parent = 0);
     ~WeatherIcon();
 
     bool exists(const QString &name) const;
-    bool store(const QString &name, const QByteArray &data);
+    void download(const QString name);
     bool get(const QString &name, QImage &icon) const;
+
+signals:
+    void iconDownloaded(const QString& icon);
 
 private:
     QString m_path;
+    QSharedPointer<QNetworkAccessManager> m_net;
+    QNetworkReply* m_iconReply;
+    QVector<QString> m_iconsToFetch;
+
+    bool Store(const QString &name, const QByteArray &data);
+    QNetworkReply* FetchNextIcon();
+    QString GetFullPath(const QString &name) const;
+
+private slots:
+    void iconReplyFinished();
 };
 
 #endif // WEATHERICON_H

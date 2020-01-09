@@ -31,7 +31,6 @@
 class QJsonObject;
 class QLabel;
 class QNetworkAccessManager;
-class QNetworkReply;
 class QStateMachine;
 
 namespace Ui {
@@ -72,7 +71,7 @@ public slots:
     void monitorOff();
     void resetMonitorTimer();
     void updateLocalTemp();
-    void iconReplyFinished();
+    void iconDownloaded(const QString &icon);
     void currentIcon(const QString &id);
     void messageReceivedOnTopic(const QString &t, const QString &p);
     void connectionComplete();
@@ -91,9 +90,7 @@ private:
     void turnMonitorOff();
     void createWeatherSystem();
     void createCalendarSystem();
-    void getIcon(const QString &icon);
     void setupMqttSubscriber();
-    QNetworkReply* FetchNextIcon();
 
     Ui::MirrorFrame *ui;
     QStateMachine *m_monitorState;
@@ -106,8 +103,7 @@ private:
     QTimer m_lightningTimer;
 
     QSharedPointer<QNetworkAccessManager> m_net;
-    QNetworkReply* m_iconReply;
-    QVector<QString> m_forecastIcons, m_iconsToFetch;
+    QVector<QString> m_forecastIcons;
     QString m_currentIconId;
     WeatherIcon m_iconCache;
 
