@@ -105,8 +105,6 @@ private:
     QTimer *m_localTempTimer;
     QTimer *m_lightningTimer;
 
-    QVector<QLabel*> m_forecastEntries;
-    QVector<QLabel*> m_iconEntries;
     QSharedPointer<QNetworkAccessManager> m_net;
     QNetworkReply* m_iconReply;
     QVector<QString> m_icons, m_iconsToFetch;

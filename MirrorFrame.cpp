@@ -79,11 +79,9 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
         f.setPointSize(15);
         forecast->setFont(f);
         ui->forecastLayout->addWidget(forecast, i, 0);
-        m_forecastEntries.push_back(forecast);
 
         QLabel *icon = new QLabel(this);
         ui->forecastLayout->addWidget(icon, i, 1);
-        m_iconEntries.push_back(icon);
     }
 
     setupMqttSubscriber();
@@ -365,24 +363,24 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
     for (int i = 0; i < weather.size(); ++i) {
         QJsonObject obj = weather[i].toObject();
         sky = obj["main"].toString();
-        QString j = obj["icon"].toString();
-        if (!m_iconCache.exists(j)) {
-            getIcon(j);
+        QString icon = obj["icon"].toString();
+        if (!m_iconCache.exists(icon)) {
+            getIcon(icon);
         }
         else {
             QImage image;
-            if (m_iconCache.get(j, image)) {
+            if (m_iconCache.get(icon, image)) {
                 QPixmap pixmap;
                 pixmap.convertFromImage(image);
-                QLabel *lb = m_iconEntries[m_forecastIndex];
+                QLabel *lb = static_cast<QLabel*>(ui->forecastLayout->itemAtPosition(m_forecastIndex, 1)->widget());
                 lb->setPixmap(pixmap);
             }
         }
-        m_icons.push_front(j);
+        m_icons.push_front(icon);
     }
 
-    if (m_forecastIndex < m_forecastEntries.size()) {
-        QLabel *lb = m_forecastEntries[m_forecastIndex++];
+    if (m_forecastIndex < ui->forecastLayout->rowCount()) {
+        QLabel *lb = static_cast<QLabel*>(ui->forecastLayout->itemAtPosition(m_forecastIndex, 0)->widget());
         if (now.date() == dt.date()) {
             QString text = QString("Today's (%1) high: %2%3, low: %4%5, %6")
                     .arg(dt.time().toString(Qt::DefaultLocaleShortDate))
@@ -440,6 +438,7 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
             }
             lb->setText(text);
         }
+        m_forecastIndex++;
     }
 }
 
@@ -490,15 +489,15 @@ void MirrorFrame::iconReplyFinished()
     }
     else {
         QNetworkRequest r = m_iconReply->request();
-        QString i = r.url().fileName();
-        if (!m_iconCache.exists(i) && i.length() > 0) {
-            m_iconCache.store(i, m_iconReply->readAll());
+        QString icon = r.url().fileName();
+        if (!m_iconCache.exists(icon) && icon.length() > 0) {
+            m_iconCache.store(icon, m_iconReply->readAll());
         }
-        for (int j = 0; j < m_icons.size(); j++) {
-            if (i.contains(m_icons[j])) {
-                QLabel *lb = m_iconEntries[j];
+        for (int i = 0; i < m_icons.size(); i++) {
+            if (icon.contains(m_icons[i])) {
+                QLabel *lb = static_cast<QLabel*>(ui->forecastLayout->itemAtPosition(i, 1)->widget());
                 QImage image;
-                if (m_iconCache.get(i, image)) {
+                if (m_iconCache.get(icon, image)) {
                     QPixmap pixmap;
                     pixmap.convertFromImage(image);
                     lb->setPixmap(pixmap);
