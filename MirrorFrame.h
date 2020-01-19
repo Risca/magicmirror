@@ -24,7 +24,7 @@
 #ifdef __USE_RPI__
 #include <th02.h>
 #endif
-#include "CalendarData.h"
+#include "calendar/calendarinterface.h"
 #include "WeatherData.h"
 #include "weathericon.h"
 
@@ -108,7 +108,7 @@ private:
     WeatherIcon m_iconCache;
 
     WeatherData *m_weatherEvent;
-    CalendarData *m_calendarEvent;
+    CalendarInterface *m_calendarEvent;
 
     int m_forecastIndex;
     int m_forecastEntryCount;

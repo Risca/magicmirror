@@ -50,6 +50,7 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     m_net(net),
     m_iconCache(net, this),
     m_weatherEvent(0),
+    m_calendarEvent(0),
     m_forecastIndex(0),
     m_forecastEntryCount(0),
     m_newEventList(false)
@@ -156,15 +157,14 @@ void MirrorFrame::createWeatherSystem()
 
 void MirrorFrame::createCalendarSystem()
 {
-    m_calendarEvent = new CalendarData();
-    if (m_calendarEvent) {
+    if (CalendarInterface::Create(m_calendarEvent, this)) {
         connect(m_calendarEvent, SIGNAL(error(QString)), this, SLOT(calendarEventsError(QString)));
         connect(m_calendarEvent, SIGNAL(newEvent(QString)), this, SLOT(calendarEventsEvent(QString)));
         connect(m_calendarEvent, SIGNAL(finished()), this, SLOT(calendarEventsDone()));
 
-        connect(&m_calendarTimer, SIGNAL(timeout()), m_calendarEvent, SLOT(process()));
+        connect(&m_calendarTimer, SIGNAL(timeout()), m_calendarEvent, SLOT(sync()));
         m_calendarTimer.start(CALEVENTS_TIMEOUT);
-        m_calendarEvent->process();
+        m_calendarEvent->sync();
     }
 }
 

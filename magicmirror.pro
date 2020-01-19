@@ -24,15 +24,16 @@ defined (__USE_RPI__, var) {
 }
 
 SOURCES = MirrorFrame.cpp \
-	CalendarData.cpp \
 	WeatherData.cpp \
+    calendar/fakedata.cpp \
 	main.cpp \
     settingsfactory.cpp \
         weathericon.cpp
 		
 HEADERS = MirrorFrame.h \
-	CalendarData.h \
 	WeatherData.h \
+    calendar/calendarinterface.h \
+    calendar/fakedata.h \
     settingsfactory.h \
         weathericon.h
 
