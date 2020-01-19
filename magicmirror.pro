@@ -9,6 +9,9 @@ QT += widgets network
 OBJECTS_DIR = .obj
 MOC_DIR = .moc
 
+VERSION = 1.4.0
+DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
+
 defined (__USE_RPI__, var) {
      LIBS = -lwiringPi -lth02
     QMAKE_CXXFLAGS += -D__USE_RPI__
@@ -39,5 +42,3 @@ HEADERS = MirrorFrame.h \
 
 FORMS += \
     MirrorFrame.ui
-
-include(gitversion.pri)
