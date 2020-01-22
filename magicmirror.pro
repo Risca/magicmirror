@@ -29,6 +29,7 @@ defined (__USE_RPI__, var) {
 SOURCES = MirrorFrame.cpp \
 	WeatherData.cpp \
     calendar/fakedata.cpp \
+    calendar/icscalendar.cpp \
 	main.cpp \
     settingsfactory.cpp \
         weathericon.cpp
@@ -37,8 +38,12 @@ HEADERS = MirrorFrame.h \
 	WeatherData.h \
     calendar/calendarinterface.h \
     calendar/fakedata.h \
+    calendar/icscalendar.h \
     settingsfactory.h \
         weathericon.h
 
 FORMS += \
     MirrorFrame.ui
+
+unix: CONFIG += link_pkgconfig
+unix: PKGCONFIG += libical
