@@ -8,7 +8,7 @@ class FakeData : public CalendarInterface
     Q_OBJECT
 
 public:
-    explicit FakeData(QObject* parent = 0);
+    FakeData(QObject* parent);
     virtual ~FakeData();
 
 public slots:

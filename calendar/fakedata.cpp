@@ -7,8 +7,9 @@
 #include <QString>
 #include <QTimeZone>
 
-bool CalendarInterface::Create(CalendarInterface*& cal, QObject* parent)
+bool CalendarInterface::Create(CalendarInterface*& cal, QSharedPointer<QNetworkAccessManager> net, QObject* parent)
 {
+    Q_UNUSED(net);
     cal = new FakeData(parent);
     return !!cal;
 }

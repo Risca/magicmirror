@@ -157,7 +157,7 @@ void MirrorFrame::createWeatherSystem()
 
 void MirrorFrame::createCalendarSystem()
 {
-    if (CalendarInterface::Create(m_calendarEvent, this)) {
+    if (CalendarInterface::Create(m_calendarEvent, m_net, this)) {
         connect(m_calendarEvent, SIGNAL(error(QString)), this, SLOT(calendarEventsError(QString)));
         connect(m_calendarEvent, SIGNAL(newEvent(QString)), this, SLOT(calendarEventsEvent(QString)));
         connect(m_calendarEvent, SIGNAL(finished()), this, SLOT(calendarEventsDone()));

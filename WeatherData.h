@@ -8,8 +8,8 @@
 #include <QString>
 #include <QtGlobal>
 
-class QNetworkReply;
 class QNetworkAccessManager;
+class QNetworkReply;
 class QThread;
 
 class WeatherData : public QObject

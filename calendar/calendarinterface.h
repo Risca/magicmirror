@@ -2,14 +2,16 @@
 #define CALENDAR_INTERFACE_H
 
 #include <QObject>
+#include <QSharedPointer>
 
+class QNetworkAccessManager;
 class QString;
 
 class CalendarInterface : public QObject {
     Q_OBJECT
 
 public:
-    static bool Create(CalendarInterface*& cal, QObject* parent = 0);
+    static bool Create(CalendarInterface*& cal, QSharedPointer<QNetworkAccessManager> net, QObject* parent = 0);
     virtual ~CalendarInterface() {}
 
 public slots:
