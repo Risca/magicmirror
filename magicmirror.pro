@@ -28,6 +28,7 @@ defined (__USE_RPI__, var) {
 
 SOURCES = MirrorFrame.cpp \
 	WeatherData.cpp \
+    calendar/calendarfactory.cpp \
     calendar/fakedata.cpp \
     calendar/icscalendar.cpp \
 	main.cpp \

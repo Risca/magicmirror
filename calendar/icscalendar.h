@@ -14,7 +14,8 @@ class IcsCalendar : public CalendarInterface
     Q_OBJECT
 
 public:
-    IcsCalendar(const QUrl& url, QSharedPointer<QNetworkAccessManager> net, QObject* parent);
+    static bool Create(CalendarInterface*& cal, QSharedPointer<QNetworkAccessManager> net, QObject* parent);
+    virtual ~IcsCalendar();
 
 public slots:
     void sync();
@@ -22,6 +23,7 @@ public slots:
 protected:
     Q_DISABLE_COPY(IcsCalendar)
 
+    IcsCalendar(const QUrl& url, QSharedPointer<QNetworkAccessManager> net, QObject* parent);
     QSharedPointer<QNetworkAccessManager> m_net;
     QNetworkReply* m_reply;
     const QUrl m_url;

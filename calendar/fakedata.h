@@ -8,13 +8,14 @@ class FakeData : public CalendarInterface
     Q_OBJECT
 
 public:
-    FakeData(QObject* parent);
+    static bool Create(CalendarInterface*& cal, QObject* parent);
     virtual ~FakeData();
 
 public slots:
     void sync();
 
 protected:
+    FakeData(QObject* parent);
     Q_DISABLE_COPY(FakeData)
 };
 

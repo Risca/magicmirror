@@ -66,7 +66,7 @@ QString GetSummary(icalcomponent* c)
 
 } // anonymous namespace
 
-bool CalendarInterface::Create(CalendarInterface*& cal, QSharedPointer<QNetworkAccessManager> net, QObject* parent)
+bool IcsCalendar::Create(CalendarInterface*& cal, QSharedPointer<QNetworkAccessManager> net, QObject* parent)
 {
     QSharedPointer<QSettings> settings = SettingsFactory::Create("Calendar");
     if (settings->value("type").toString() == "ics") {
@@ -84,6 +84,11 @@ IcsCalendar::IcsCalendar(const QUrl &url, QSharedPointer<QNetworkAccessManager> 
     m_net(net),
     m_reply(0),
     m_url(url)
+{
+    // empty
+}
+
+IcsCalendar::~IcsCalendar()
 {
     // empty
 }
