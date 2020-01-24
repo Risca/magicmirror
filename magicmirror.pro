@@ -9,7 +9,7 @@ QT += widgets network
 OBJECTS_DIR = .obj
 MOC_DIR = .moc
 
-VERSION = 1.6.1
+VERSION = 1.6.2
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 
 defined (__USE_RPI__, var) {
