@@ -4,6 +4,7 @@
 #include "calendarinterface.h"
 
 #include <QObject>
+#include <QTimer>
 #include <QUrl>
 
 class QNetworkAccessManager;
@@ -27,6 +28,7 @@ protected:
     QSharedPointer<QNetworkAccessManager> m_net;
     QNetworkReply* m_reply;
     const QUrl m_url;
+    QTimer m_retryTimer;
 
 protected slots:
     void downloadFinished();

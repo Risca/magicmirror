@@ -14,6 +14,8 @@
 
 #include <time.h>
 
+#define DEFAULT_RETRY_TIMEOUT (1000 * 30)
+
 namespace {
 QString IcalDatePropertyToString(icalproperty* prop)
 {
@@ -85,7 +87,9 @@ IcsCalendar::IcsCalendar(const QUrl &url, QSharedPointer<QNetworkAccessManager> 
     m_reply(0),
     m_url(url)
 {
-    // empty
+    m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
+    m_retryTimer.setSingleShot(true);
+    connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(sync()));
 }
 
 IcsCalendar::~IcsCalendar()
@@ -100,6 +104,8 @@ void IcsCalendar::sync()
         return;
     }
 
+    m_retryTimer.stop();
+
     QNetworkRequest req(m_url);
     m_reply = m_net->get(req);
     connect(m_reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
@@ -109,6 +115,7 @@ void IcsCalendar::downloadFinished()
 {
     if (m_reply->error()) {
         qWarning() << __PRETTY_FUNCTION__ << ":" << m_reply->errorString();
+        m_retryTimer.start();
     }
     else {
         icalcomponent* comp = icalparser_parse_string(m_reply->readAll().data());

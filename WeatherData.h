@@ -7,6 +7,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QtGlobal>
+#include <QTimer>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -51,6 +52,9 @@ private:
     const QString m_appID;
     const QString m_townID;
     QThread *m_thread;
+
+    QTimer m_forecastRetryTimer;
+    QTimer m_currentRetryTimer;
 };
 
 #endif
