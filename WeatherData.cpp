@@ -13,6 +13,7 @@
 
 #define DEFAULT_RETRY_TIMEOUT (1000 * 30)
 #define DEFAULT_WEATHER_URL "https://api.openweathermap.org/data/2.5/weather"
+#define DEFAULT_FORECAST_URL "https://api.openweathermap.org/data/2.5/forecast"
 
 WeatherData::WeatherData(const QString &appId, const QString &townId, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
     QObject(parent), m_net(net), m_forecast(0), m_current(0), m_appID(appId), m_townID(townId)
@@ -73,7 +74,7 @@ void WeatherData::processForecast()
 
     m_forecastRetryTimer.stop();
 
-    QUrl u(DEFAULT_WEATHER_URL);
+    QUrl u(DEFAULT_FORECAST_URL);
     QUrlQuery query;
 
     qDebug() << __PRETTY_FUNCTION__;
