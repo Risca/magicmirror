@@ -11,6 +11,8 @@
 #include <QThread>
 #include <QUrlQuery>
 
+#define DEFAULT_WEATHER_URL "https://api.openweathermap.org/data/2.5/weather"
+
 WeatherData::WeatherData(const QString &appId, const QString &townId, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
     QObject(parent), m_net(net), m_forecast(0), m_current(0), m_appID(appId), m_townID(townId)
 {
@@ -39,7 +41,7 @@ void WeatherData::processCurrentWeather()
         return;
     }
 
-    QUrl u("http://api.openweathermap.org/data/2.5/weather");
+    QUrl u(DEFAULT_WEATHER_URL);
     QUrlQuery query;
 
     qDebug() << __PRETTY_FUNCTION__;
@@ -59,7 +61,7 @@ void WeatherData::processForecast()
         return;
     }
 
-    QUrl u("http://api.openweathermap.org/data/2.5/forecast");
+    QUrl u(DEFAULT_WEATHER_URL);
     QUrlQuery query;
 
     qDebug() << __PRETTY_FUNCTION__;
