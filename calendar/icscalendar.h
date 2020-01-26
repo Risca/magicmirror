@@ -33,7 +33,6 @@ protected:
 protected slots:
     void downloadFinished();
 
-
 };
 
 #endif // ICSCALENDAR_H

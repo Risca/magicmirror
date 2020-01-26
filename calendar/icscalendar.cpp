@@ -71,7 +71,7 @@ QString GetSummary(icalcomponent* c)
 bool IcsCalendar::Create(CalendarInterface*& cal, QSharedPointer<QNetworkAccessManager> net, QObject* parent)
 {
     QSharedPointer<QSettings> settings = SettingsFactory::Create("Calendar");
-    if (settings->value("type").toString() == "ics") {
+    if (settings && settings->value("type").toString() == "ics") {
         const QUrl url = settings->value("url").toUrl();
         if (url.isValid()) {
             cal = new IcsCalendar(url, net, parent);
@@ -100,7 +100,7 @@ IcsCalendar::~IcsCalendar()
 void IcsCalendar::sync()
 {
     if (m_reply) {
-        qWarning() << __PRETTY_FUNCTION__ << "request already in progress, abort!";
+        qWarning() << __PRETTY_FUNCTION__ << ": request already in progress, abort!";
         return;
     }
 

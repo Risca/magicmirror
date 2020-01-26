@@ -15,8 +15,6 @@
 #ifndef __MIRRORFRAME_H__
 #define __MIRRORFRAME_H__
 
-#include "calendar/calendarinterface.h"
-#include "WeatherData.h"
 #include "weathericon.h"
 
 #include <QFrame>
@@ -25,6 +23,8 @@
 #include <QTimer>
 #include <QVector>
 
+class CalendarInterface;
+class WeatherData;
 class QJsonObject;
 class QLabel;
 class QNetworkAccessManager;

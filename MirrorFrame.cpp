@@ -1,7 +1,9 @@
 #include "MirrorFrame.h"
 #include "ui_MirrorFrame.h"
 
+#include "calendar/calendarinterface.h"
 #include "settingsfactory.h"
+#include "WeatherData.h"
 
 #include <QDate>
 #include <QDebug>
@@ -92,7 +94,9 @@ MirrorFrame *MirrorFrame::Create()
 
 MirrorFrame::~MirrorFrame()
 {
-    // empty
+    delete m_calendarEvent;
+    delete m_weatherEvent;
+    delete ui;
 }
 
 void MirrorFrame::createWeatherSystem()
