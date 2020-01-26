@@ -6,14 +6,12 @@
 #include <QDate>
 #include <QDebug>
 #include <QFont>
-#include <QHostInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QLayout>
 #include <QLayoutItem>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QProcess>
 #include <QtGlobal>
 #include <QTime>
 #include <QTimer>
@@ -75,7 +73,6 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
         ui->forecastLayout->addWidget(icon, i, 1);
     }
 
-    setupMqttSubscriber();
     createWeatherSystem();
     createCalendarSystem();
 
@@ -95,31 +92,7 @@ MirrorFrame *MirrorFrame::Create()
 
 MirrorFrame::~MirrorFrame()
 {
-}
-
-void MirrorFrame::setupMqttSubscriber()
-{
-#if 0
-    QSharedPointer<QSettings> settings = SettingsFactory::Create("Mqtt");
-    QString hostname = settings->value("server").toString();
-    QHostInfo lookup = QHostInfo::fromName(hostname);
-    QList<QHostAddress> addresses = lookup.addresses();
-
-    if (addresses.size() > 0) {
-        m_mqttClient = new QMqttSubscriber(addresses.at(0), settings->value("port").toInt(), this);
-        qDebug() << __PRETTY_FUNCTION__ << ": setting host address to" << addresses.at(0);
-    }
-    else {
-        m_mqttClient = new QMqttSubscriber(QHostAddress::LocalHost, settings->value("port").toInt(), this);
-        qDebug() << __PRETTY_FUNCTION__ << ": Using localhost";
-    }
-    connect(m_mqttClient, SIGNAL(connectionComplete()), this, SLOT(connectionComplete()));
-    connect(m_mqttClient, SIGNAL(disconnectedEvent()), this, SLOT(disconnectedEvent()));
-    connect(m_mqttClient, SIGNAL(messageReceivedOnTopic(QString, QString)), this, SLOT(messageReceivedOnTopic(QString, QString)));
-    ui->lightningLabel->setText("Connecting to MQTT server...");
-    m_mqttClient->connectToHost();
-    connect(&m_lightningTimer, SIGNAL(timeout()), this, SLOT(lightningTimeout()));
-#endif
+    // empty
 }
 
 void MirrorFrame::createWeatherSystem()
@@ -160,21 +133,10 @@ void MirrorFrame::createCalendarSystem()
     }
 }
 
-void MirrorFrame::registerTouchEvent()
-{
-    emit touchDetected();
-}
-
 void MirrorFrame::updateLocalTemp()
 {
     double temperature = 0.0;
     double humidity = 0.0;
-
-#ifdef __USE_RPI__
-    if (getValues(&temperature, &humidity) == 0) {
-        qDebug() << __PRETTY_FUNCTION__ << ": temp: " << temperature << ", humidity:" << humidity;
-    }
-#endif
 
     ui->localTemp->setText(QString("%1%2").arg(temperature, 0, 'f', 1).arg(QChar(0260)));
     ui->localHumidity->setText(QString("%1%").arg(humidity, 0, 'f', 1));
@@ -403,34 +365,4 @@ void MirrorFrame::iconDownloaded(const QString& icon)
             }
         }
     }
-}
-
-void MirrorFrame::connectionComplete()
-{
-    ui->lightningLabel->clear();
-}
-
-void MirrorFrame::disconnectedEvent()
-{
-    ui->lightningLabel->setText("Connecting to MQTT server...");
-}
-
-void MirrorFrame::messageReceivedOnTopic(const QString &t, const QString &p)
-{
-    qDebug() << __PRETTY_FUNCTION__ << ": Topic:" << t << ", payload: " << p;
-    double d = p.toDouble();
-    double distance = d * .621;
-
-    ui->lightningLabel->setText(QString("Lightning detected at %1 miles").arg(distance, 0, 'f', 1));
-    m_lightningTimer.stop();
-    m_lightningTimer.setInterval(THIRTY_MINUTES);
-    m_lightningTimer.start();
-    emit touchDetected();
-
-}
-
-void MirrorFrame::lightningTimeout()
-{
-    ui->lightningLabel->setText("");
-    m_lightningTimer.stop();
 }

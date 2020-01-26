@@ -15,10 +15,6 @@ along with MythClock.  If not, see <http://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QDebug>
 
-#ifdef __USE_RPI__
-#include <wiringPi.h>
-#endif
-
 #include "MirrorFrame.h"
 #include "settingsfactory.h"
 
@@ -42,24 +38,6 @@ void printFonts()
 #define printFonts()
 #endif
 
-#ifdef __USE_RPI__
-void touchEvent(void) {
-    qDebug() << "Touch event registered";
-    if (frame)
-        frame->registerTouchEvent();
-}
-
-void setupTouchEvents()
-{
-    qDebug() << __PRETTY_FUNCTION__;
-    wiringPiSetupGpio();
-    pinMode(12, INPUT);
-    wiringPiISR(12, INT_EDGE_FALLING, &touchEvent);
-}
-#else
-#define setupTouchEvents()
-#endif
-
 void printSettingsFile()
 {
     qDebug() << __PRETTY_FUNCTION__ << "Using" << SettingsFactory::Create()->fileName();
@@ -74,7 +52,6 @@ int main(int argc, char **argv)
     printSettingsFile();
     printFonts();
 
-    setupTouchEvents();
     QCursor cursor(Qt::BlankCursor);
     QApplication::setOverrideCursor(cursor);
     frame = MirrorFrame::Create();
