@@ -2,6 +2,7 @@
 #include "ui_MirrorFrame.h"
 
 #include "calendar/calendarinterface.h"
+#include "domoticz/sensor.h"
 #include "settingsfactory.h"
 #include "WeatherData.h"
 
@@ -54,7 +55,8 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     m_forecastEntryCount(0),
     m_newEventList(false)
 {
-    QLocale::setDefault(QLocale(SettingsFactory::Create()->value("locale", "en_EN").toString()));
+    QSharedPointer<QSettings> settings = SettingsFactory::Create();
+    QLocale::setDefault(QLocale(settings->value("locale", "en_EN").toString()));
     ui->setupUi(this);
     ui->versionLabel->setText(QString("Version: %1").arg(QString(VERSION_STRING)));
 
@@ -78,9 +80,21 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     createWeatherSystem();
     createCalendarSystem();
 
-    connect(&m_localTempTimer, SIGNAL(timeout()), this, SLOT(updateLocalTemp()));
-    m_localTempTimer.start(1000);        // Get sensor data every second
-    updateLocalTemp();
+    settings->beginGroup(DOMOTICZ_SETTINGS_GROUP);
+    if (settings->contains(DOMOTICZ_INDOOR_TEMP_IDX_SETTINGS_KEY)) {
+        bool idxOk;
+        const int idx = settings->value(DOMOTICZ_INDOOR_TEMP_IDX_SETTINGS_KEY).toInt(&idxOk);
+        if (idxOk && idx > 0 &&
+            domoticz::Sensor::Create(m_indoorTempSensor, idx, m_net, this))
+        {
+            connect(&m_localTempTimer, SIGNAL(timeout()), m_indoorTempSensor, SLOT(update()));
+            connect(m_indoorTempSensor, SIGNAL(valueUpdated(const QString&, const QString&)),
+                    this, SLOT(indoorTemperature(const QString&, const QString&)));
+            m_localTempTimer.start(TEMPERATURE_TIMEOUT);
+            m_indoorTempSensor->update();
+        }
+    }
+    settings->endGroup();
 }
 
 MirrorFrame *MirrorFrame::Create()
@@ -137,12 +151,11 @@ void MirrorFrame::createCalendarSystem()
     }
 }
 
-void MirrorFrame::updateLocalTemp()
+void MirrorFrame::indoorTemperature(const QString &, const QString &temperature)
 {
-    double temperature = 0.0;
     double humidity = 0.0;
 
-    ui->localTemp->setText(QString("%1%2").arg(temperature, 0, 'f', 1).arg(QChar(0260)));
+    ui->localTemp->setText(temperature);
     ui->localHumidity->setText(QString("%1%").arg(humidity, 0, 'f', 1));
 }
 

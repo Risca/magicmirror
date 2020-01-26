@@ -17,6 +17,10 @@
 
 #include "weathericon.h"
 
+namespace domoticz {
+class Sensor;
+}
+
 #include <QFrame>
 #include <QSharedPointer>
 #include <QString>
@@ -36,6 +40,7 @@ class MirrorFrame;
 #define CALEVENTS_TIMEOUT	(1000 * 60 * 60 * 1)
 #define FORECAST_TIMEOUT	(1000 * 60 * 60 * 4)
 #define CURRENT_TIMEOUT		(1000 * 60 * 5)
+#define TEMPERATURE_TIMEOUT (1000 * 60 * 5)
 
 class MirrorFrame : public QFrame {
     Q_OBJECT
@@ -58,7 +63,7 @@ public slots:
     void forecastEntry(const QJsonObject &);
     void forecastEntryCount(int);
     void updateClock();
-    void updateLocalTemp();
+    void indoorTemperature(const QString&, const QString&);
     void iconDownloaded(const QString &icon);
     void currentIcon(const QString &id);
 
@@ -82,6 +87,7 @@ private:
 
     WeatherData *m_weatherEvent;
     CalendarInterface *m_calendarEvent;
+    domoticz::Sensor* m_indoorTempSensor;
 
     int m_forecastIndex;
     int m_forecastEntryCount;

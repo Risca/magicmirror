@@ -24,6 +24,7 @@ SOURCES = MirrorFrame.cpp \
     calendar/calendarfactory.cpp \
     calendar/fakedata.cpp \
     calendar/icscalendar.cpp \
+    domoticz/sensor.cpp \
 	main.cpp \
     settingsfactory.cpp \
         weathericon.cpp
@@ -33,6 +34,7 @@ HEADERS = MirrorFrame.h \
     calendar/calendarinterface.h \
     calendar/fakedata.h \
     calendar/icscalendar.h \
+    domoticz/sensor.h \
     settingsfactory.h \
         weathericon.h
 
