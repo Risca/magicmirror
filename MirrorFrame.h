@@ -31,13 +31,11 @@
 class QJsonObject;
 class QLabel;
 class QNetworkAccessManager;
-class QStateMachine;
 
 namespace Ui {
 class MirrorFrame;
 }
 
-#define MONITOR_TIMEOUT		(1000 * 60 * 1)
 #define CALEVENTS_TIMEOUT	(1000 * 60 * 60 * 1)
 #define FORECAST_TIMEOUT	(1000 * 60 * 60 * 4)
 #define CURRENT_TIMEOUT		(1000 * 60 * 5)
@@ -67,9 +65,6 @@ public slots:
     void forecastEntry(const QJsonObject &);
     void forecastEntryCount(int);
     void updateClock();
-    void monitorOn();
-    void monitorOff();
-    void resetMonitorTimer();
     void updateLocalTemp();
     void iconDownloaded(const QString &icon);
     void currentIcon(const QString &id);
@@ -85,20 +80,15 @@ signals:
 private:
     MirrorFrame(QSharedPointer<QNetworkAccessManager> net);
     void deleteCalendarEventsList();
-    void createStateMachine();
-    void turnMonitorOn();
-    void turnMonitorOff();
     void createWeatherSystem();
     void createCalendarSystem();
     void setupMqttSubscriber();
 
     Ui::MirrorFrame *ui;
-    QStateMachine *m_monitorState;
     QTimer m_calendarTimer;
     QTimer m_forecastTimer;
     QTimer m_currentWeatherTimer;
     QTimer m_clockTimer;
-    QTimer m_monitorTimer;
     QTimer m_localTempTimer;
     QTimer m_lightningTimer;
 

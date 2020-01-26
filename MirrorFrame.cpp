@@ -14,7 +14,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QProcess>
-#include <QStateMachine>
 #include <QtGlobal>
 #include <QTime>
 #include <QTimer>
@@ -59,8 +58,6 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     ui->setupUi(this);
     ui->versionLabel->setText(QString("Version: %1").arg(QString(VERSION_STRING)));
 
-    m_monitorState = new QStateMachine(this);
-
     connect(&m_iconCache, SIGNAL(iconDownloaded(QString)), this, SLOT(iconDownloaded(QString)));
 
     connect(&m_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
@@ -81,15 +78,10 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     setupMqttSubscriber();
     createWeatherSystem();
     createCalendarSystem();
-    createStateMachine();
 
     connect(&m_localTempTimer, SIGNAL(timeout()), this, SLOT(updateLocalTemp()));
     m_localTempTimer.start(1000);        // Get sensor data every second
     updateLocalTemp();
-
-    const int monitorTimeout = SettingsFactory::Create()->value("screentimeout", MONITOR_TIMEOUT / (1000 * 60)).toInt() * 1000 * 60;
-    qDebug() << __PRETTY_FUNCTION__ << ": setting monitor timeout to" << monitorTimeout;
-    m_monitorTimer.start(monitorTimeout);
 }
 
 MirrorFrame *MirrorFrame::Create()
@@ -173,22 +165,6 @@ void MirrorFrame::registerTouchEvent()
     emit touchDetected();
 }
 
-void MirrorFrame::createStateMachine()
-{
-    QState *on = new QState();
-    QState *off = new QState();
-
-    off->addTransition(this, SIGNAL(touchDetected()), on);
-    on->addTransition(&m_monitorTimer, SIGNAL(timeout()), off);
-    connect(on, SIGNAL(entered()), this, SLOT(monitorOn()));
-    connect(off, SIGNAL(entered()), this, SLOT(monitorOff()));
-    connect(this, SIGNAL(touchDetected()), this, SLOT(resetMonitorTimer()));
-    m_monitorState->addState(on);
-    m_monitorState->addState(off);
-    m_monitorState->setInitialState(on);
-    m_monitorState->start();
-}
-
 void MirrorFrame::updateLocalTemp()
 {
     double temperature = 0.0;
@@ -202,46 +178,6 @@ void MirrorFrame::updateLocalTemp()
 
     ui->localTemp->setText(QString("%1%2").arg(temperature, 0, 'f', 1).arg(QChar(0260)));
     ui->localHumidity->setText(QString("%1%").arg(humidity, 0, 'f', 1));
-}
-
-void MirrorFrame::resetMonitorTimer()
-{
-    if (m_monitorTimer.isActive())
-        m_monitorTimer.stop();
-
-    m_monitorTimer.start(MONITOR_TIMEOUT);
-}
-
-void MirrorFrame::monitorOff()
-{
-    turnMonitorOff();
-    if (m_monitorTimer.isActive())
-        m_monitorTimer.stop();
-}
-
-void MirrorFrame::monitorOn()
-{
-    if (!m_monitorTimer.isActive()) {
-        m_monitorTimer.setInterval(MONITOR_TIMEOUT);
-        m_monitorTimer.start();
-    }
-    turnMonitorOn();
-}
-
-void MirrorFrame::turnMonitorOff()
-{
-    QProcess p;
-
-    p.start("vcgencmd", QStringList() << "display_power" << "0");
-    p.waitForFinished();
-}
-
-void MirrorFrame::turnMonitorOn()
-{
-    QProcess p;
-
-    p.start("vcgencmd", QStringList() << "display_power" << "1");
-    p.waitForFinished();
 }
 
 void MirrorFrame::updateClock()
