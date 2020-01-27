@@ -447,7 +447,7 @@
         <widget class="QLabel" name="calLabel">
          <property name="font">
           <font>
-           <pointsize>30</pointsize>
+           <pointsize>15</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -625,7 +625,7 @@
          <widget class="QLabel" name="currentLabel">
           <property name="font">
            <font>
-            <pointsize>30</pointsize>
+            <pointsize>15</pointsize>
            </font>
           </property>
           <property name="text">
@@ -926,7 +926,7 @@
          <widget class="QLabel" name="forecastLabel">
           <property name="font">
            <font>
-            <pointsize>30</pointsize>
+            <pointsize>15</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>

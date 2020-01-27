@@ -352,10 +352,7 @@ void MirrorFrame::calendarEventsEvent(const QString &s)
         deleteCalendarEventsList();
 
     QLabel *lb = new QLabel(s, this);
-    QFont f("Roboto");
-    f.setPixelSize(25*2/3);
-    f.setBold(false);
-    lb->setFont(f);
+    lb->setFont(ui->sunrise->font());
     ui->calendarLayout->addWidget(lb);
 }
 
