@@ -10,16 +10,19 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPair>
 #include <QSettings>
 
 #include <time.h>
 
 #define DEFAULT_RETRY_TIMEOUT (1000 * 30)
 
+typedef QPair<QDate, QDate> StartStopDate;
+
 namespace {
-QString IcalDatePropertyToString(icalproperty* prop)
+
+QDate IcalDatePropertyToQDate(icalproperty* prop, bool& isDate)
 {
-    bool isDate = false;
     const struct icaltimetype t = icalproperty_get_dtstart(prop);
     const icalparameter* p = icalproperty_get_first_parameter(prop, ICAL_VALUE_PARAMETER);
     if (p != 0) {
@@ -33,37 +36,41 @@ QString IcalDatePropertyToString(icalproperty* prop)
             break;
         default:
             qWarning() << __PRETTY_FUNCTION__ << ":" << "Unhandled value kind:" << kind;
-            return QString();
+            return QDate();
         }
     }
 
-    const QDateTime start = QDateTime::fromTime_t(icaltime_as_timet(t));
-    if (isDate) {
-        return start.date().toString(Qt::DefaultLocaleShortDate);
-    }
-    else {
-        return start.toString(Qt::DefaultLocaleShortDate);
-    }
+    return QDateTime::fromTime_t(icaltime_as_timet(t)).date();
 }
 
-QString GetEventDate(icalcomponent* c)
+StartStopDate GetEventStartStopDates(icalcomponent* c)
 {
-    QString dateString;
+    StartStopDate dates;
     icalproperty* prop = icalcomponent_get_first_property(c, ICAL_DTSTART_PROPERTY);
     if (prop != 0) {
-        dateString += IcalDatePropertyToString(prop);
+        bool isDate;
+        dates.first = IcalDatePropertyToQDate(prop, isDate);
         prop = icalcomponent_get_first_property(c, ICAL_DTEND_PROPERTY);
         if (prop != 0) {
-            dateString += " - ";
-            dateString += IcalDatePropertyToString(prop);
+            dates.second = IcalDatePropertyToQDate(prop, isDate);
+            if (isDate) {
+                // trial and error show that if DTEND is a normal date (without time),
+                // then it's commonly set to 00:00 (UTC) the day after the last day.
+                dates.second = dates.second.addDays(-1);
+            }
         }
     }
-    return dateString;
+    return dates;
 }
 
 QString GetSummary(icalcomponent* c)
 {
     return icalcomponent_get_summary(c);
+}
+
+bool IsFutureEvent(const StartStopDate& dates, const QDate& today)
+{
+    return dates.first >= today || (dates.second.isValid() && dates.second >= today);
 }
 
 } // anonymous namespace
@@ -118,14 +125,22 @@ void IcsCalendar::downloadFinished()
         m_retryTimer.start();
     }
     else {
+        const QDate today = QDate::currentDate();
         icalcomponent* comp = icalparser_parse_string(m_reply->readAll().data());
         if (comp != 0) {
             for (icalcomponent* c = icalcomponent_get_first_component(comp, ICAL_VEVENT_COMPONENT);
                  c != 0;
                  c = icalcomponent_get_next_component(comp, ICAL_VEVENT_COMPONENT))
             {
-                const QString event(GetEventDate(c) + QString(" : ") + GetSummary(c));
-                emit newEvent(event);
+                const StartStopDate dates = GetEventStartStopDates(c);
+                if (IsFutureEvent(dates, today)) {
+                    QString event = dates.first.toString(Qt::DefaultLocaleShortDate);
+                    if (dates.second.isValid() && dates.first != dates.second) {
+                        event += " - " + dates.second.toString(Qt::DefaultLocaleShortDate);
+                    }
+                    event += " : " + GetSummary(c);
+                    emit newEvent(event);
+                }
             }
         }
         icalcomponent_free(comp);

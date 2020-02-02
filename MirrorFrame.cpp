@@ -144,7 +144,6 @@ void MirrorFrame::createCalendarSystem()
         connect(m_calendarEvent, SIGNAL(error(QString)), this, SLOT(calendarEventsError(QString)));
         connect(m_calendarEvent, SIGNAL(newEvent(QString)), this, SLOT(calendarEventsEvent(QString)));
         connect(m_calendarEvent, SIGNAL(finished()), this, SLOT(calendarEventsDone()));
-
         connect(&m_calendarTimer, SIGNAL(timeout()), m_calendarEvent, SLOT(sync()));
         m_calendarTimer.start(CALEVENTS_TIMEOUT);
         m_calendarEvent->sync();
@@ -343,11 +342,13 @@ void MirrorFrame::calendarEventsError(const QString& error)
 
 void MirrorFrame::calendarEventsDone()
 {
+    qDebug() << __PRETTY_FUNCTION__;
     m_newEventList = true;
 }
 
 void MirrorFrame::calendarEventsEvent(const QString &s)
 {
+    qDebug() << __PRETTY_FUNCTION__;
     if (m_newEventList)
         deleteCalendarEventsList();
 
