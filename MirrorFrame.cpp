@@ -233,7 +233,7 @@ void MirrorFrame::forecastEntryCount(int c)
 void MirrorFrame::forecastEntry(const QJsonObject &jobj)
 {
     QDateTime dt;
-    QDateTime now = QDateTime::currentDateTime();
+    const QDate today = QDate::currentDate();
     int humidity;
     double high;
     double low;
@@ -243,14 +243,14 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
     qint64 secs = jobj["dt"].toInt();
     secs *= 1000;
     dt.setMSecsSinceEpoch(secs);
-    if (dt.date() < now.date())
+    if (dt.date() < today)
         return;
 
-    humidity = jobj["humidity"].toInt();
-    QJsonObject temp = jobj["temp"].toObject();
-    high = temp["max"].toDouble() + 0.5;
-    low = temp["min"].toDouble() + 0.5;
-    wind = jobj["speed"].toDouble();
+    QJsonObject main = jobj["main"].toObject();
+    humidity = main["humidity"].toInt();
+    high = main["temp_max"].toDouble() + 0.5;
+    low = main["temp_min"].toDouble() + 0.5;
+    wind = jobj["wind"].toObject()["speed"].toDouble();
 
     QJsonArray weather = jobj["weather"].toArray();
     for (int i = 0; i < weather.size(); ++i) {
@@ -274,7 +274,7 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
 
     if (m_forecastIndex < ui->forecastLayout->rowCount()) {
         QLabel *lb = static_cast<QLabel*>(ui->forecastLayout->itemAtPosition(m_forecastIndex, 0)->widget());
-        if (now.date() == dt.date()) {
+        if (dt.date() == today) {
             QString text = QString("Today's (%1) high: %2%3, low: %4%5, %6")
                     .arg(dt.time().toString(Qt::DefaultLocaleShortDate))
                     .arg((int)high)
