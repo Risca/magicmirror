@@ -274,63 +274,34 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
 
     if (m_forecastIndex < ui->forecastLayout->rowCount()) {
         QLabel *lb = static_cast<QLabel*>(ui->forecastLayout->itemAtPosition(m_forecastIndex, 0)->widget());
-        if (dt.date() == today) {
-            QString text = QString("Today's (%1) high: %2%3, low: %4%5, %6")
-                    .arg(dt.time().toString(Qt::DefaultLocaleShortDate))
-                    .arg((int)high)
-                    .arg(QChar(0260))
-                    .arg((int)low)
-                    .arg(QChar(0260))
-                    .arg(sky);
+        QString text = QString("%1 (%2): high: %3%4, low: %5%6: %7")
+                .arg(dt.date() == today ? QString("Today's") : dt.toString("dddd"))
+                .arg(dt.time().toString(Qt::DefaultLocaleShortDate))
+                .arg((int)high)
+                .arg(QChar(0260))
+                .arg((int)low)
+                .arg(QChar(0260))
+                .arg(sky);
 
-            if (wind <= 5.0) {
-                text.append(", calm");
-            }
-            else if (wind <= 15.0) {
-                text.append(", breezy");
-            }
-            else {
-                text.append(", windy");
-            }
-            if (high >= 80) {
-                if (humidity > 70) {
-                    text.append(" and humid");
-                }
-                else if (humidity < 40 && humidity > 0) {
-                    text.append(" and dry");
-                }
-            }
-            lb->setText(text);
+        // wind speed limits taken from https://sv.wikipedia.org/wiki/Vindstyrka#Vindskalor_f%C3%B6r_vanliga_vindar
+        if (wind <= 3.3) {
+            text.append(", calm");
+        }
+        else if (wind <= 8.0) {
+            text.append(", breezy");
         }
         else {
-            QString text = QString("%1 (%2): high: %3%4, low: %5%6: %7")
-                    .arg(dt.toString("dddd"))
-                    .arg(dt.time().toString(Qt::DefaultLocaleShortDate))
-                    .arg((int)high)
-                    .arg(QChar(0260))
-                    .arg((int)low)
-                    .arg(QChar(0260))
-                    .arg(sky);
-
-            if (wind <= 5.0) {
-                text.append(", calm");
-            }
-            else if (wind <= 15.0) {
-                text.append(", breezy");
-            }
-            else {
-                text.append(", windy");
-            }
-            if (high >= 80) {
-                if (humidity > 70) {
-                    text.append(" and humid");
-                }
-                else if (humidity < 40 && humidity > 0) {
-                    text.append(" and dry");
-                }
-            }
-            lb->setText(text);
+            text.append(", windy");
         }
+        if (high >= 26) {
+            if (humidity > 70) {
+                text.append(" and humid");
+            }
+            else if (humidity < 40 && humidity > 0) {
+                text.append(" and dry");
+            }
+        }
+        lb->setText(text);
         m_forecastIndex++;
     }
 }
