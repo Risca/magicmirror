@@ -63,7 +63,7 @@ public slots:
     void forecastEntry(const QJsonObject &);
     void forecastEntryCount(int);
     void updateClock();
-    void indoorTemperature(const QString&, const QString&);
+    void indoorTemperature(const QString&, const QString&, const QDateTime &updated);
     void iconDownloaded(const QString &icon);
     void currentIcon(const QString &id);
 

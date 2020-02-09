@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QUrl>
 
+class QDateTime;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QString;
@@ -25,7 +26,7 @@ public slots:
     void update();
 
 signals:
-    void valueUpdated(const QString& sensor, const QString& value);
+    void valueUpdated(const QString& sensor, const QString& value, const QDateTime& lastUpdated);
 
 protected:
     Q_DISABLE_COPY(Sensor)

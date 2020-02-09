@@ -7,6 +7,7 @@
 #include "WeatherData.h"
 
 #include <QDate>
+#include <QDateTime>
 #include <QDebug>
 #include <QFont>
 #include <QJsonArray>
@@ -88,8 +89,8 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
             domoticz::Sensor::Create(m_indoorTempSensor, idx, m_net, this))
         {
             connect(&m_localTempTimer, SIGNAL(timeout()), m_indoorTempSensor, SLOT(update()));
-            connect(m_indoorTempSensor, SIGNAL(valueUpdated(const QString&, const QString&)),
-                    this, SLOT(indoorTemperature(const QString&, const QString&)));
+            connect(m_indoorTempSensor, SIGNAL(valueUpdated(const QString&, const QString&, const QDateTime&)),
+                    this, SLOT(indoorTemperature(const QString&, const QString&, const QDateTime&)));
             m_localTempTimer.start(TEMPERATURE_TIMEOUT);
             m_indoorTempSensor->update();
         }
@@ -150,11 +151,19 @@ void MirrorFrame::createCalendarSystem()
     }
 }
 
-void MirrorFrame::indoorTemperature(const QString &, const QString &temperature)
+void MirrorFrame::indoorTemperature(const QString &, const QString &temperature, const QDateTime& updated)
 {
-    double humidity = 0.0;
+    const QDateTime yesterday = QDateTime::currentDateTime().addDays(-1);
+    const double humidity = 0.0;
 
     ui->localTemp->setText(temperature);
+    if (updated < yesterday) {
+        ui->localTemp->setStyleSheet("QLabel { color : red; }");
+    }
+    else {
+        // reset to default stylesheet
+        ui->localTemp->setStyleSheet(QString());
+    }
     ui->localHumidity->setText(QString("%1%").arg(humidity, 0, 'f', 1));
 }
 

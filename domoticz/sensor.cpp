@@ -2,6 +2,7 @@
 
 #include "settingsfactory.h"
 
+#include <QDateTime>
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -63,7 +64,6 @@ bool Sensor::Create(Sensor *&sensor, int idx, QSharedPointer<QNetworkAccessManag
             url.setPath("/json.htm");
             url.setQuery(q);
 
-            qDebug() << __PRETTY_FUNCTION__ << ":" << url.toDisplayString();
             sensor = new Sensor(url, net, parent);
             return !!sensor;
         }
@@ -109,9 +109,10 @@ void Sensor::onReplyFinished()
             const QJsonObject s = sensor.toObject();
             const QString name = s["Name"].toString();
             const QString data = s["Data"].toString();
+            const QDateTime lastUpdated = QDateTime::fromString(s["LastUpdate"].toString(), Qt::ISODateWithMs);
             if (!name.isEmpty() && !data.isEmpty()) {
-                qDebug() << __PRETTY_FUNCTION__ << ":" << name << "-" << data;
-                emit valueUpdated(name, data);
+                qDebug() << __PRETTY_FUNCTION__ << ":" << name << ":" << data << ":" << lastUpdated;
+                emit valueUpdated(name, data, lastUpdated);
             }
         }
     }
