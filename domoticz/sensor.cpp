@@ -109,9 +109,9 @@ void Sensor::onReplyFinished()
             const QJsonObject s = sensor.toObject();
             const QString name = s["Name"].toString();
             const QString data = s["Data"].toString();
-            const QDateTime lastUpdated = QDateTime::fromString(s["LastUpdate"].toString(), Qt::ISODateWithMs);
+            const QDateTime lastUpdated = QDateTime::fromString(s["LastUpdate"].toString(), Qt::ISODate);
             if (!name.isEmpty() && !data.isEmpty()) {
-                qDebug() << __PRETTY_FUNCTION__ << ":" << name << ":" << data << ":" << lastUpdated;
+                qDebug() << __PRETTY_FUNCTION__ << ":" << name << "-" << data << "-" << lastUpdated;
                 emit valueUpdated(name, data, lastUpdated);
             }
         }
