@@ -20,16 +20,10 @@ namespace domoticz {
 
 namespace {
 
-QString GetEncodedUserName(const QSharedPointer<QSettings>& a_Settings)
+QByteArray GetAuthHeader(const QString& username, const QString& password)
 {
-    QByteArray username = a_Settings->value("username").toByteArray();
-    return username.toBase64();
-}
-
-QString GetEncodedPassword(const QSharedPointer<QSettings>& a_Settings)
-{
-    QByteArray password = a_Settings->value("password").toByteArray();
-    return password.toBase64();
+    const QByteArray credentials = (username + ":" + password).toUtf8();
+    return QByteArray("Basic ") + credentials.toBase64();
 }
 
 typedef QPair<QString, QString> QueryItem;
@@ -42,13 +36,11 @@ bool Sensor::Create(Sensor *&sensor, int idx, QSharedPointer<QNetworkAccessManag
     QSharedPointer<QSettings> settings = SettingsFactory::Create(DOMOTICZ_SETTINGS_GROUP);
     if (settings) {
         const QString host = settings->value("hostname").toString();
-        const QString username = GetEncodedUserName(settings);
-        const QString password = GetEncodedPassword(settings);
+        const QString username = settings->value("username").toString();
+        const QString password = settings->value("password").toString();
         if (!host.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
             // We got the minimum of what we need, let's build our URL
             QueryList queries;
-            queries.append(QueryItem("username", username));
-            queries.append(QueryItem("password", password));
             queries.append(QueryItem("type", "devices"));
             queries.append(QueryItem("rid", QString::number(idx)));
 
@@ -64,19 +56,23 @@ bool Sensor::Create(Sensor *&sensor, int idx, QSharedPointer<QNetworkAccessManag
             url.setPath("/json.htm");
             url.setQuery(q);
 
-            sensor = new Sensor(url, net, parent);
+            QNetworkRequest req(url);
+            req.setRawHeader("Authorization", GetAuthHeader(username, password));
+
+            sensor = new Sensor(req, net, parent);
             return !!sensor;
         }
     }
     return false;
 }
 
-Sensor::Sensor(const QUrl &url, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
+Sensor::Sensor(const QNetworkRequest &req, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
     QObject(parent),
     m_net(net),
     m_reply(0),
-    m_url(url)
+    m_request(req)
 {
+    qDebug() << __PRETTY_FUNCTION__ << ":" << req.url().toDisplayString();
     m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
     m_retryTimer.setSingleShot(true);
     connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(update()));
@@ -91,8 +87,7 @@ void Sensor::update()
 
     m_retryTimer.stop();
 
-    QNetworkRequest req(m_url);
-    m_reply = m_net->get(req);
+    m_reply = m_net->get(m_request);
     connect(m_reply, SIGNAL(finished()), this, SLOT(onReplyFinished()));
 }
 

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QTimer>
-#include <QUrl>
+#include <QNetworkRequest>
 
 class QDateTime;
 class QNetworkAccessManager;
@@ -30,11 +30,11 @@ signals:
 
 protected:
     Q_DISABLE_COPY(Sensor)
-    explicit Sensor(const QUrl& url, QSharedPointer<QNetworkAccessManager> net, QObject* parent);
+    explicit Sensor(const QNetworkRequest& req, QSharedPointer<QNetworkAccessManager> net, QObject* parent);
 
     QSharedPointer<QNetworkAccessManager> m_net;
     QNetworkReply* m_reply;
-    const QUrl m_url;
+    const QNetworkRequest m_request;
     QTimer m_retryTimer;
 
 protected slots:
