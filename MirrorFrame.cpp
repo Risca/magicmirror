@@ -227,7 +227,7 @@ void MirrorFrame::currentWindSpeed(double speed)
 
 void MirrorFrame::weatherDataError(const QString &error)
 {
-    qDebug() << __PRETTY_FUNCTION__ << ":" << error;
+    qWarning() << __PRETTY_FUNCTION__ << ":" << error;
 }
 
 void MirrorFrame::forecastEntryCount(int c)
@@ -315,7 +315,7 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
 
 void MirrorFrame::calendarEventsError(const QString& error)
 {
-    qDebug() << __PRETTY_FUNCTION__ << ":" << error;
+    qWarning() << __PRETTY_FUNCTION__ << ":" << error;
 }
 
 void MirrorFrame::calendarEventsDone(const QStringList &events)
