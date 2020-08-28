@@ -24,7 +24,11 @@ namespace {
 
 QString epochToTimeOfDay(const quint64 t)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    const qint64 timestamp = t*1000 - QDate::currentDate().startOfDay().toMSecsSinceEpoch();
+#else
     const qint64 timestamp = t*1000 - QDateTime(QDate::currentDate()).toMSecsSinceEpoch();
+#endif
     const QTime s = QTime::fromMSecsSinceStartOfDay(timestamp);
     return s.toString(Qt::DefaultLocaleShortDate);
 }
