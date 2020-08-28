@@ -27,7 +27,7 @@ struct Event {
     bool allDayEvent;
     QString summary;
 
-    bool operator<(const Event& other) {
+    bool operator<(const Event& other) const {
         if (this->start == other.start) {
             return this->stop < other.stop;
         }
