@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QList>
 #include <QString>
+#include <QStringList>
 #include <QTimeZone>
 
 bool FakeData::Create(CalendarInterface *&cal, QObject *parent)
@@ -36,6 +37,7 @@ void FakeData::sync()
     QDateTime start;
     QList<QByteArray> events = results.split('\n');
 
+    QStringList eventStrings;
     for (int i = 0; i < events.size(); i++) {
         if (events.at(i).size() == 0)
             continue;
@@ -52,14 +54,14 @@ void FakeData::sync()
             if (tz.isValid())
                 start.setTimeZone(tz);
             QString event(start.toString("h:mm ap 'on' dddd, MMMM dd") + QString(" : ") + eventDescription.trimmed());
-            emit newEvent(event);
+            eventStrings << event;
         }
         else {
             start = QDateTime::fromString(eventTime, "yyyy-MM-dd");
             QString event(start.toString("dddd, MMMM dd") + QString(" : ") + eventDescription.trimmed());
-            emit newEvent(event);
+            eventStrings << event;
         }
     }
 
-    emit finished();
+    emit finished(eventStrings);
 }

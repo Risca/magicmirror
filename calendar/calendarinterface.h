@@ -6,6 +6,7 @@
 
 class QNetworkAccessManager;
 class QString;
+class QStringList;
 
 class CalendarInterface : public QObject {
     Q_OBJECT
@@ -18,8 +19,7 @@ public slots:
     virtual void sync() = 0;
 
 signals:
-    void newEvent(const QString&);
-    void finished();
+    void finished(const QStringList&);
     void error(const QString&);
 
 protected:

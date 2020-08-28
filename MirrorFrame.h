@@ -32,6 +32,7 @@ class WeatherData;
 class QJsonObject;
 class QLabel;
 class QNetworkAccessManager;
+class QStringList;
 
 namespace Ui {
 class MirrorFrame;
@@ -49,9 +50,8 @@ public:
     virtual ~MirrorFrame();
 
 public slots:
-    void calendarEventsDone();
+    void calendarEventsDone(const QStringList &events);
     void calendarEventsError(const QString &error);
-    void calendarEventsEvent(const QString &s);
     void weatherDataError(const QString &error);
     void weatherEventsDone();
     void currentHumidity(double);
@@ -69,7 +69,6 @@ public slots:
 
 private:
     MirrorFrame(QSharedPointer<QNetworkAccessManager> net);
-    void deleteCalendarEventsList();
     void createWeatherSystem();
     void createCalendarSystem();
 
@@ -91,7 +90,6 @@ private:
 
     int m_forecastIndex;
     int m_forecastEntryCount;
-    bool m_newEventList;
 };
 
 #endif /* __MIRRORFRAME_H__ */

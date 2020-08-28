@@ -53,8 +53,7 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     m_weatherEvent(0),
     m_calendarEvent(0),
     m_forecastIndex(0),
-    m_forecastEntryCount(0),
-    m_newEventList(false)
+    m_forecastEntryCount(0)
 {
     QSharedPointer<QSettings> settings = SettingsFactory::Create();
     QLocale::setDefault(QLocale(settings->value("locale", "en_EN").toString()));
@@ -143,8 +142,7 @@ void MirrorFrame::createCalendarSystem()
 {
     if (CalendarInterface::Create(m_calendarEvent, m_net, this)) {
         connect(m_calendarEvent, SIGNAL(error(QString)), this, SLOT(calendarEventsError(QString)));
-        connect(m_calendarEvent, SIGNAL(newEvent(QString)), this, SLOT(calendarEventsEvent(QString)));
-        connect(m_calendarEvent, SIGNAL(finished()), this, SLOT(calendarEventsDone()));
+        connect(m_calendarEvent, SIGNAL(finished(QStringList)), this, SLOT(calendarEventsDone(QStringList)));
         connect(&m_calendarTimer, SIGNAL(timeout()), m_calendarEvent, SLOT(sync()));
         m_calendarTimer.start(CALEVENTS_TIMEOUT);
         m_calendarEvent->sync();
@@ -320,27 +318,17 @@ void MirrorFrame::calendarEventsError(const QString& error)
     qDebug() << __PRETTY_FUNCTION__ << ":" << error;
 }
 
-void MirrorFrame::calendarEventsDone()
+void MirrorFrame::calendarEventsDone(const QStringList &events)
 {
     qDebug() << __PRETTY_FUNCTION__;
-    m_newEventList = true;
-}
 
-void MirrorFrame::calendarEventsEvent(const QString &s)
-{
-    qDebug() << __PRETTY_FUNCTION__;
-    if (m_newEventList)
-        deleteCalendarEventsList();
-
-    QLabel *lb = new QLabel(s, this);
-    lb->setFont(ui->sunrise->font());
-    ui->calendarLayout->addWidget(lb);
-}
-
-void MirrorFrame::deleteCalendarEventsList()
-{
     clearLayout(ui->calendarLayout);
-    m_newEventList = false;
+
+    foreach (const QString& s, events) {
+        QLabel *lb = new QLabel(s, this);
+        lb->setFont(ui->sunrise->font());
+        ui->calendarLayout->addWidget(lb);
+    }
 }
 
 void MirrorFrame::iconDownloaded(const QString& icon)

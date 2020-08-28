@@ -6,12 +6,12 @@
 
 #include <QDate>
 #include <QDateTime>
-#include <QDebug>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPair>
 #include <QSettings>
+#include <QStringList>
 
 #include <time.h>
 
@@ -20,6 +20,33 @@
 typedef QPair<QDate, QDate> StartStopDate;
 
 namespace {
+
+struct Event {
+    QDate start;
+    QDate stop;
+    bool allDayEvent;
+    QString summary;
+
+    bool operator<(const Event& other) {
+        if (this->start == other.start) {
+            return this->stop < other.stop;
+        }
+        else {
+            return this->start < other.start;
+        }
+    }
+    Event() : allDayEvent(false) {}
+};
+
+QString ToString(const Event& e)
+{
+    QString s = e.start.toString(Qt::DefaultLocaleShortDate);
+    if (e.stop.isValid() && e.start != e.stop) {
+        s += " - " + e.stop.toString(Qt::DefaultLocaleShortDate);
+    }
+    s += " : " + e.summary;
+    return s;
+}
 
 QDate IcalDatePropertyToQDate(icalproperty* prop, bool& isDate)
 {
@@ -125,6 +152,8 @@ void IcsCalendar::downloadFinished()
         m_retryTimer.start();
     }
     else {
+        QList<Event> events;
+        QStringList strings;
         const QDate today = QDate::currentDate();
         icalcomponent* comp = icalparser_parse_string(m_reply->readAll().data());
         if (comp != 0) {
@@ -134,17 +163,24 @@ void IcsCalendar::downloadFinished()
             {
                 const StartStopDate dates = GetEventStartStopDates(c);
                 if (IsFutureEvent(dates, today)) {
-                    QString event = dates.first.toString(Qt::DefaultLocaleShortDate);
+                    Event e;
+                    e.start = dates.first;
                     if (dates.second.isValid() && dates.first != dates.second) {
-                        event += " - " + dates.second.toString(Qt::DefaultLocaleShortDate);
+                        e.allDayEvent = false;
+                        e.stop = dates.second;
                     }
-                    event += " : " + GetSummary(c);
-                    emit newEvent(event);
+                    else {
+                        e.allDayEvent = true;
+                    }
+                    e.summary = GetSummary(c);
+                    events << e;
                 }
             }
         }
         icalcomponent_free(comp);
-        emit finished();
+        std::sort(events.begin(), events.end());
+        std::transform(events.begin(), events.end(), std::back_inserter(strings), ToString);
+        emit finished(strings);
     }
     m_reply->deleteLater();
     m_reply = 0;
