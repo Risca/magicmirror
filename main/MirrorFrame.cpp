@@ -1,7 +1,7 @@
 #include "MirrorFrame.h"
 #include "ui_MirrorFrame.h"
 
-#include "calendar/calendarinterface.h"
+#include "calendar.h"
 #include "domoticz/sensor.h"
 #include "settingsfactory.h"
 #include "WeatherData.h"
@@ -33,20 +33,6 @@ QString epochToTimeOfDay(const quint64 t)
     return s.toString(Qt::DefaultLocaleShortDate);
 }
 
-void clearLayout(QLayout *layout) {
-    QLayoutItem *item;
-    while((item = layout->takeAt(0))) {
-        if (item->layout()) {
-            clearLayout(item->layout());
-            delete item->layout();
-        }
-        if (item->widget()) {
-           delete item->widget();
-        }
-        delete item;
-    }
-}
-
 } // anonymous namespace
 
 MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
@@ -55,12 +41,10 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     m_net(net),
     m_iconCache(net, this),
     m_weatherEvent(0),
-    m_calendarEvent(0),
     m_forecastIndex(0),
     m_forecastEntryCount(0)
 {
     QSharedPointer<QSettings> settings = SettingsFactory::Create();
-    QLocale::setDefault(QLocale(settings->value("locale", "en_EN").toString()));
     ui->setupUi(this);
     ui->versionLabel->setText(QString("Version: %1").arg(QString(VERSION_STRING)));
 
@@ -112,7 +96,6 @@ MirrorFrame *MirrorFrame::Create()
 
 MirrorFrame::~MirrorFrame()
 {
-    delete m_calendarEvent;
     delete m_weatherEvent;
     delete ui;
 }
@@ -144,12 +127,9 @@ void MirrorFrame::createWeatherSystem()
 
 void MirrorFrame::createCalendarSystem()
 {
-    if (CalendarInterface::Create(m_calendarEvent, m_net, this)) {
-        connect(m_calendarEvent, SIGNAL(error(QString)), this, SLOT(calendarEventsError(QString)));
-        connect(m_calendarEvent, SIGNAL(finished(QStringList)), this, SLOT(calendarEventsDone(QStringList)));
-        connect(&m_calendarTimer, SIGNAL(timeout()), m_calendarEvent, SLOT(sync()));
-        m_calendarTimer.start(CALEVENTS_TIMEOUT);
-        m_calendarEvent->sync();
+    calendar::Calendar* cal;
+    if (calendar::Calendar::Create(cal, m_net, this)) {
+        qDebug() << "Successfully created a calendar widget";
     }
 }
 
@@ -317,23 +297,6 @@ void MirrorFrame::forecastEntry(const QJsonObject &jobj)
     }
 }
 
-void MirrorFrame::calendarEventsError(const QString& error)
-{
-    qWarning() << __PRETTY_FUNCTION__ << ":" << error;
-}
-
-void MirrorFrame::calendarEventsDone(const QStringList &events)
-{
-    qDebug() << __PRETTY_FUNCTION__;
-
-    clearLayout(ui->calendarLayout);
-
-    foreach (const QString& s, events) {
-        QLabel *lb = new QLabel(s, this);
-        lb->setFont(ui->sunrise->font());
-        ui->calendarLayout->addWidget(lb);
-    }
-}
 
 void MirrorFrame::iconDownloaded(const QString& icon)
 {

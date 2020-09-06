@@ -1,1 +1,3 @@
-TEMPLATE = lib
+TEMPLATE = subdirs
+
+SUBDIRS = calendar

@@ -1,52 +1,28 @@
-#include "icscalendar.h"
-
-#include "settingsfactory.h"
+#include "icssource.h"
+#include "event.hpp"
 
 #include <libical/ical.h>
 
 #include <QDate>
 #include <QDateTime>
+#include <QList>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPair>
 #include <QSettings>
-#include <QStringList>
+#include <QString>
 
+#include <algorithm>
 #include <time.h>
+
+namespace calendar {
 
 #define DEFAULT_RETRY_TIMEOUT (1000 * 30)
 
 typedef QPair<QDate, QDate> StartStopDate;
 
 namespace {
-
-struct Event {
-    QDate start;
-    QDate stop;
-    bool allDayEvent;
-    QString summary;
-
-    bool operator<(const Event& other) const {
-        if (this->start == other.start) {
-            return this->stop < other.stop;
-        }
-        else {
-            return this->start < other.start;
-        }
-    }
-    Event() : allDayEvent(false) {}
-};
-
-QString ToString(const Event& e)
-{
-    QString s = e.start.toString(Qt::DefaultLocaleShortDate);
-    if (e.stop.isValid() && e.start != e.stop) {
-        s += " - " + e.stop.toString(Qt::DefaultLocaleShortDate);
-    }
-    s += " : " + e.summary;
-    return s;
-}
 
 QDate IcalDatePropertyToQDate(icalproperty* prop, bool& isDate)
 {
@@ -102,36 +78,19 @@ bool IsFutureEvent(const StartStopDate& dates, const QDate& today)
 
 } // anonymous namespace
 
-bool IcsCalendar::Create(CalendarInterface*& cal, QSharedPointer<QNetworkAccessManager> net, QObject* parent)
+bool IcsSource::Create(calendar::ISource *&obj, const QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject *parent)
 {
-    QSharedPointer<QSettings> settings = SettingsFactory::Create("Calendar");
-    if (settings && settings->value("type").toString() == "ics") {
+    if (settings->value("type").toString() == "ics") {
         const QUrl url = settings->value("url").toUrl();
         if (url.isValid()) {
-            cal = new IcsCalendar(url, net, parent);
-            return !!cal;
+            obj = new IcsSource(url, net, parent);
+            return !!obj;
         }
     }
     return false;
 }
 
-IcsCalendar::IcsCalendar(const QUrl &url, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
-    CalendarInterface(parent),
-    m_net(net),
-    m_reply(0),
-    m_url(url)
-{
-    m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
-    m_retryTimer.setSingleShot(true);
-    connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(sync()));
-}
-
-IcsCalendar::~IcsCalendar()
-{
-    // empty
-}
-
-void IcsCalendar::sync()
+void IcsSource::sync()
 {
     if (m_reply) {
         qWarning() << __PRETTY_FUNCTION__ << ": request already in progress, abort!";
@@ -145,15 +104,29 @@ void IcsCalendar::sync()
     connect(m_reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
 }
 
-void IcsCalendar::downloadFinished()
+IcsSource::IcsSource(const QUrl &url, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
+    ISource(parent),
+    m_net(net),
+    m_reply(0),
+    m_url(url)
+{
+    qDebug() << "Using ICS source:" << m_url.toString();
+    m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
+    m_retryTimer.setSingleShot(true);
+    connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(sync()));
+    if (!m_url.isLocalFile()) {
+        m_retryTimer.start();
+    }
+}
+
+void IcsSource::downloadFinished()
 {
     if (m_reply->error()) {
         qWarning() << __PRETTY_FUNCTION__ << ":" << m_reply->errorString();
         m_retryTimer.start();
     }
     else {
-        QList<Event> events;
-        QStringList strings;
+        QList<calendar::Event> events;
         const QDate today = QDate::currentDate();
         icalcomponent* comp = icalparser_parse_string(m_reply->readAll().data());
         if (comp != 0) {
@@ -163,25 +136,26 @@ void IcsCalendar::downloadFinished()
             {
                 const StartStopDate dates = GetEventStartStopDates(c);
                 if (IsFutureEvent(dates, today)) {
-                    Event e;
-                    e.start = dates.first;
+                    calendar::Event event;
+                    event.start = dates.first;
                     if (dates.second.isValid() && dates.first != dates.second) {
-                        e.allDayEvent = false;
-                        e.stop = dates.second;
+                        event.allDayEvent = false;
+                        event.stop = dates.second;
                     }
                     else {
-                        e.allDayEvent = true;
+                        event.allDayEvent = true;
                     }
-                    e.summary = GetSummary(c);
-                    events << e;
+                    event.summary = GetSummary(c);
+                    events << event;
                 }
             }
         }
         icalcomponent_free(comp);
         std::sort(events.begin(), events.end());
-        std::transform(events.begin(), events.end(), std::back_inserter(strings), ToString);
-        emit finished(strings);
+        emit finished(events);
     }
     m_reply->deleteLater();
     m_reply = 0;
 }
+
+} // namespace calendar

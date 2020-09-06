@@ -27,7 +27,6 @@ class Sensor;
 #include <QTimer>
 #include <QVector>
 
-class CalendarInterface;
 class WeatherData;
 class QJsonObject;
 class QLabel;
@@ -50,8 +49,6 @@ public:
     virtual ~MirrorFrame();
 
 public slots:
-    void calendarEventsDone(const QStringList &events);
-    void calendarEventsError(const QString &error);
     void weatherDataError(const QString &error);
     void weatherEventsDone();
     void currentHumidity(double);
@@ -73,7 +70,6 @@ private:
     void createCalendarSystem();
 
     Ui::MirrorFrame *ui;
-    QTimer m_calendarTimer;
     QTimer m_forecastTimer;
     QTimer m_currentWeatherTimer;
     QTimer m_clockTimer;
@@ -85,7 +81,6 @@ private:
     WeatherIcon m_iconCache;
 
     WeatherData *m_weatherEvent;
-    CalendarInterface *m_calendarEvent;
     domoticz::Sensor* m_indoorTempSensor;
 
     int m_forecastIndex;

@@ -19,18 +19,12 @@ DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 
 SOURCES = MirrorFrame.cpp \
         WeatherData.cpp \
-    calendar/calendarfactory.cpp \
-    calendar/fakedata.cpp \
-    calendar/icscalendar.cpp \
     domoticz/sensor.cpp \
         main.cpp \
         weathericon.cpp
 
 HEADERS = MirrorFrame.h \
         WeatherData.h \
-    calendar/calendarinterface.h \
-    calendar/fakedata.h \
-    calendar/icscalendar.h \
     domoticz/sensor.h \
         weathericon.h
 
@@ -46,3 +40,12 @@ else:unix: LIBS += -L$$OUT_PWD/../utils/ -lutils
 
 INCLUDEPATH += $$PWD/../utils
 DEPENDPATH += $$PWD/../utils
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../widgets/calendar/release/ -lcalendar
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../widgets/calendar/debug/ -lcalendar
+else:unix: LIBS += -L$$OUT_PWD/../widgets/calendar/ -lcalendar
+
+INCLUDEPATH += $$PWD/../widgets/calendar
+DEPENDPATH += $$PWD/../widgets/calendar
+
+RESOURCES += stylesheets/breeze.qrc

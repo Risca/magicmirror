@@ -52,6 +52,8 @@ int main(int argc, char **argv)
     printSettingsFile();
     printFonts();
 
+    QLocale::setDefault(SettingsFactory::Create()->value("locale", "en_US").toString());
+
     QCursor cursor(Qt::BlankCursor);
     QApplication::setOverrideCursor(cursor);
     frame = MirrorFrame::Create();
