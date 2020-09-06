@@ -29,7 +29,8 @@ HEADERS += \
     calendar.h \
     data_sources/event.hpp \
     data_sources/icssource.h \
-    data_sources/isource.hpp
+    data_sources/isource.hpp \
+    data_sources/nosource.h
 
 FORMS += \
     calendar.ui

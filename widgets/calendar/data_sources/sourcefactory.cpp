@@ -1,5 +1,6 @@
 #include "isource.hpp"
 #include "icssource.h"
+#include "nosource.h"
 
 #include <QSettings>
 
@@ -10,7 +11,7 @@ bool ISource::Create(ISource *&obj, const QSharedPointer<QSettings> settings, QS
     if (settings->value("type").toString() == "ics") {
         return IcsSource::Create(obj, settings, net, parent);
     }
-    return false;
+    return NoSource::Create(obj, parent);
 }
 
 } // namespace calendar
