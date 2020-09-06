@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS = main widgets
+SUBDIRS = main widgets utils
 
-main.depends = widgets
+widgets.depends = utils
+main.depends = widgets utils
