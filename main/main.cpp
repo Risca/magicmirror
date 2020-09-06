@@ -14,6 +14,8 @@ along with MythClock.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QApplication>
 #include <QDebug>
+#include <QFile>
+#include <QTextStream>
 
 #include "MirrorFrame.h"
 #include "settingsfactory.h"
@@ -53,6 +55,17 @@ int main(int argc, char **argv)
     printFonts();
 
     QLocale::setDefault(SettingsFactory::Create()->value("locale", "en_US").toString());
+
+    // set stylesheet
+    QFile f(":/dark.qss");
+    if (!f.exists()) {
+        qWarning() << "Unable to set stylesheet, file not found";
+    }
+    else   {
+        f.open(QFile::ReadOnly | QFile::Text);
+        QTextStream ts(&f);
+        qApp->setStyleSheet(ts.readAll());
+    }
 
     QCursor cursor(Qt::BlankCursor);
     QApplication::setOverrideCursor(cursor);
