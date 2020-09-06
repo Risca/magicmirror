@@ -95,6 +95,8 @@ void Sensor::update()
 
     m_reply = m_net->get(m_request);
     connect(m_reply, SIGNAL(finished()), this, SLOT(onReplyFinished()));
+    connect(m_reply, SIGNAL(sslErrors(const QList<QSslError> &)),
+            this, SLOT(onSslError(const QList<QSslError> &)));
 }
 
 void Sensor::onReplyFinished()
@@ -120,6 +122,13 @@ void Sensor::onReplyFinished()
 
     m_reply->deleteLater();
     m_reply = 0;
+}
+
+void Sensor::onSslError(const QList<QSslError> &errors)
+{
+    foreach (const QSslError& e, errors) {
+        qWarning() << __PRETTY_FUNCTION__ << e.errorString() << e.certificate();
+    }
 }
 
 } // namespace domoticz

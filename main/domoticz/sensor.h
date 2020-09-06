@@ -1,8 +1,10 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
+#include <QList>
 #include <QObject>
 #include <QSharedPointer>
+#include <QSslError>
 #include <QTimer>
 #include <QNetworkRequest>
 
@@ -39,6 +41,7 @@ protected:
 
 protected slots:
     void onReplyFinished();
+    void onSslError(const QList<QSslError> &errors);
 
 };
 
