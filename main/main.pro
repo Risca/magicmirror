@@ -8,7 +8,7 @@ QT += widgets network
 OBJECTS_DIR = .obj
 MOC_DIR = .moc
 
-VERSION = 1.7.7
+VERSION = 1.8.0
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 
 *-g++ {
