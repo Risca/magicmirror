@@ -1,3 +1,6 @@
+TARGET = magicmirror
+TEMPLATE = app
+
 CONFIG += gui network debug core
 
 QT += widgets network
