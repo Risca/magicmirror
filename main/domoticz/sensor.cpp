@@ -58,6 +58,12 @@ bool Sensor::Create(Sensor *&sensor, int idx, QSharedPointer<QNetworkAccessManag
 
             QNetworkRequest req(url);
             req.setRawHeader("Authorization", GetAuthHeader(username, password));
+            if (!settings->value("verify_peer", true).toBool()) {
+                qWarning() << __PRETTY_FUNCTION__ << "Not verifying remote peer!";
+                QSslConfiguration conf = req.sslConfiguration();
+                conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+                req.setSslConfiguration(conf);
+            }
 
             sensor = new Sensor(req, net, parent);
             return !!sensor;
