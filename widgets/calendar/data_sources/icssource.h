@@ -1,5 +1,5 @@
-#ifndef ICSSOURCE_H
-#define ICSSOURCE_H
+#ifndef CALENDAR_ICSSOURCE_H
+#define CALENDAR_ICSSOURCE_H
 
 #include "isource.hpp"
 
@@ -40,4 +40,4 @@ protected slots:
 
 } // namespace calendar
 
-#endif // ICSSOURCE_H
+#endif // CALENDAR_ICSSOURCE_H

@@ -1,3 +1,4 @@
 TEMPLATE = subdirs
 
-SUBDIRS = calendar
+SUBDIRS = calendar \
+    weather

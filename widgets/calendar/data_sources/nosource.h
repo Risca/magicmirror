@@ -1,5 +1,5 @@
-#ifndef NOSOURCE_H
-#define NOSOURCE_H
+#ifndef CALENDAR_NOSOURCE_H
+#define CALENDAR_NOSOURCE_H
 
 #include "isource.hpp"
 
@@ -35,4 +35,4 @@ protected:
 
 } // namespace calendar
 
-#endif // NOSOURCE_H
+#endif // CALENDAR_NOSOURCE_H

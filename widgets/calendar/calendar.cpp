@@ -13,7 +13,6 @@
 #include <QNetworkAccessManager>
 #include <QSettings>
 #include <QTextCharFormat>
-#include <QTimer>
 #include <QUrl>
 
 namespace calendar {
@@ -22,6 +21,7 @@ namespace {
 
 void SetFadeoutEffect(QWidget* w)
 {
+    qDebug() << "Applying fade:" << w->rect();
     QLinearGradient alphaGradient(w->rect().topLeft(), w->rect().bottomLeft());
     alphaGradient.setColorAt(0.0, Qt::black);
     alphaGradient.setColorAt(1.0, Qt::transparent);
@@ -56,7 +56,6 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
     SetFadeoutEffect(ui->events);
 
     ui->calendar->setFirstDayOfWeek(m_locale.firstDayOfWeek());
-    changeDay();
 
     connect(m_source, SIGNAL(finished(const QList<calendar::Event>&)),
             this, SLOT(NewEventList(const QList<calendar::Event>&)));
@@ -74,22 +73,9 @@ void Calendar::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 }
 
-void Calendar::StartMidnightTimer()
+void Calendar::changeDay(const QDate &day)
 {
-    const int msecsPerDay = 24 * 60 * 60 * 1000;
-    int msecs = QTime::currentTime().msecsTo(QTime(0, 0));
-
-    if (msecs < 0) {
-        msecs += msecsPerDay;
-    }
-
-    QTimer::singleShot(msecs, Qt::VeryCoarseTimer, this, SLOT(changeDay()));
-}
-
-void Calendar::changeDay()
-{
-    ui->month_and_year->setDate(QDate::currentDate());
-    StartMidnightTimer();
+    ui->month_and_year->setDate(day);
 }
 
 void Calendar::NewEventList(const QList<Event> &events)

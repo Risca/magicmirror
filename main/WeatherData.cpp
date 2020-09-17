@@ -13,15 +13,10 @@
 
 #define DEFAULT_RETRY_TIMEOUT (1000 * 30)
 #define DEFAULT_WEATHER_URL "https://api.openweathermap.org/data/2.5/weather"
-#define DEFAULT_FORECAST_URL "https://api.openweathermap.org/data/2.5/forecast"
 
 WeatherData::WeatherData(const QString &appId, const QString &townId, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
-    QObject(parent), m_net(net), m_forecast(0), m_current(0), m_appID(appId), m_townID(townId)
+    QObject(parent), m_net(net), m_current(0), m_appID(appId), m_townID(townId)
 {
-    m_forecastRetryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
-    m_forecastRetryTimer.setSingleShot(true);
-    connect(&m_forecastRetryTimer, SIGNAL(timeout()), this, SLOT(processForecast()));
-
     m_currentRetryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
     m_currentRetryTimer.setSingleShot(true);
     connect(&m_currentRetryTimer, SIGNAL(timeout()), this, SLOT(processCurrentWeather()));
@@ -65,29 +60,6 @@ void WeatherData::processCurrentWeather()
     connect(m_current, SIGNAL(finished()), this, SLOT(currentReplyFinished()));
 }
 
-void WeatherData::processForecast()
-{
-    if (m_forecast) {
-        qWarning() << __PRETTY_FUNCTION__ << ": weather forecast request already in process - aborting";
-        return;
-    }
-
-    m_forecastRetryTimer.stop();
-
-    QUrl u(DEFAULT_FORECAST_URL);
-    QUrlQuery query;
-
-    qDebug() << __PRETTY_FUNCTION__;
-    query.addQueryItem("appid", m_appID);
-    query.addQueryItem("id", m_townID);
-    query.addQueryItem("units", "metric");
-    query.addQueryItem("cnt", "5");
-    u.setQuery(query);
-
-    m_forecast = m_net->get(QNetworkRequest(u));
-    connect(m_forecast, SIGNAL(finished()), this, SLOT(forecastReplyFinished()));
-}
-
 void WeatherData::currentReplyFinished()
 {
     if (m_current->error()) {
@@ -118,25 +90,3 @@ void WeatherData::currentReplyFinished()
     m_current = 0;
 }
 
-void WeatherData::forecastReplyFinished()
-{
-    qDebug() << __PRETTY_FUNCTION__;
-    if (m_forecast->error()) {
-        qWarning() << __PRETTY_FUNCTION__ << ":" << m_forecast->errorString();
-        m_forecastRetryTimer.start();
-    }
-    else {
-        QJsonDocument jdoc = QJsonDocument::fromJson(m_forecast->readAll());
-        QJsonObject jobj = jdoc.object();
-        QJsonArray entries = jobj["list"].toArray();
-        QJsonArray weather = jobj["weather"].toArray();
-        emit forecastEntryCount(entries.count());
-        qDebug() << __PRETTY_FUNCTION__ << ": sending" << entries.count() << "entries to the mirror";
-        for (int i = 0; i < entries.size(); i++) {
-            emit forecastEntry(entries[i].toObject());
-        }
-    }
-    emit finished();
-    m_forecast->deleteLater();
-    m_forecast = 0;
-}

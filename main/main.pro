@@ -23,13 +23,11 @@ DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 SOURCES = MirrorFrame.cpp \
         WeatherData.cpp \
     domoticz/sensor.cpp \
-        main.cpp \
-        weathericon.cpp
+        main.cpp
 
 HEADERS = MirrorFrame.h \
         WeatherData.h \
-    domoticz/sensor.h \
-        weathericon.h
+    domoticz/sensor.h
 
 FORMS += \
     MirrorFrame.ui
@@ -39,5 +37,6 @@ unix: PKGCONFIG += libical
 
 include(../utils/utils.pri)
 include(../widgets/calendar/calendar.pri)
+include(../widgets/weather/weather.pri)
 
 RESOURCES += stylesheets/breeze.qrc

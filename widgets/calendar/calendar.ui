@@ -46,9 +46,6 @@
      <property name="keyboardTracking">
       <bool>false</bool>
      </property>
-     <property name="currentSection">
-      <enum>QDateTimeEdit::MonthSection</enum>
-     </property>
      <property name="displayFormat">
       <string>MMMM yyyy</string>
      </property>
@@ -56,6 +53,9 @@
    </item>
    <item>
     <widget class="QCalendarWidget" name="calendar">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="selectionMode">
       <enum>QCalendarWidget::NoSelection</enum>
      </property>

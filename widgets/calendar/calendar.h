@@ -6,6 +6,7 @@
 #include <QSharedPointer>
 #include <QWidget>
 
+class QDate;
 class QNetworkAccessManager;
 
 namespace Ui { class Calendar; }
@@ -23,6 +24,9 @@ public:
     static bool Create(Calendar*& cal, QSharedPointer<QNetworkAccessManager> net, QWidget *parent = 0);
     virtual ~Calendar();
 
+public slots:
+    void changeDay(const QDate& day);
+
 protected:
     virtual void resizeEvent(QResizeEvent* event);
 
@@ -32,11 +36,8 @@ private:
     ISource* m_source;
     QLocale m_locale;
 
-    void StartMidnightTimer();
-
 private slots:
     void NewEventList(const QList<calendar::Event>&);
-    void changeDay();
 };
 
 } // namespace calendar

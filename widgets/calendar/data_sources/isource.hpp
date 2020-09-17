@@ -1,5 +1,5 @@
-#ifndef ISOURCE_HPP
-#define ISOURCE_HPP
+#ifndef CALENDAR_ISOURCE_HPP
+#define CALENDAR_ISOURCE_HPP
 
 #include <QList>
 #include <QObject>
@@ -34,4 +34,4 @@ protected:
 };
 
 }
-#endif // ISOURCE_HPP
+#endif // CALENDAR_ISOURCE_HPP

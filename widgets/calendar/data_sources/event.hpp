@@ -1,5 +1,5 @@
-#ifndef EVENT_HPP
-#define EVENT_HPP
+#ifndef CALENDAR_EVENT_HPP
+#define CALENDAR_EVENT_HPP
 
 #include <QDate>
 #include <QString>
@@ -25,4 +25,4 @@ struct Event {
 
 } // namespace calendar
 
-#endif // EVENT_HPP
+#endif // CALENDAR_EVENT_HPP
