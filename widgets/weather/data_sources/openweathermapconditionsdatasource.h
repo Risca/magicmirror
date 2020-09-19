@@ -30,7 +30,7 @@ protected:
     Q_DISABLE_COPY(OpenWeatherMapConditionsDataSource);
     OpenWeatherMapConditionsDataSource(const QString& appId, const QString& townId, QSharedPointer<QNetworkAccessManager> net, QObject *parent);
 
-    friend ICurrentConditionsDataSource;
+    friend class ICurrentConditionsDataSource;
 
     QSharedPointer<QNetworkAccessManager> m_net;
     QNetworkReply *m_reply;

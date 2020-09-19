@@ -18,7 +18,7 @@ private:
     Q_DISABLE_COPY(FakeForecastData);
     explicit FakeForecastData(QObject *parent = NULL);
 
-    friend IForecastDataSource;
+    friend class IForecastDataSource;
 
     QList<Data> m_currentForecast;
 

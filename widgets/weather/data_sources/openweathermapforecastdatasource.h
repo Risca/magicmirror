@@ -34,7 +34,7 @@ protected:
     Q_DISABLE_COPY(OpenWeatherMapForecastDataSource);
     OpenWeatherMapForecastDataSource(const QString& appId, const QString& townId, QSharedPointer<QNetworkAccessManager> net, QObject *parent);
 
-    friend IForecastDataSource;
+    friend class IForecastDataSource;
 
     QList<Data> m_currentForecast;
     QList<QString> m_forecastIcons;
