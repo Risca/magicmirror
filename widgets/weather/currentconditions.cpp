@@ -18,6 +18,7 @@ CurrentConditions::CurrentConditions(QSharedPointer<QNetworkAccessManager> &net,
     if (ICurrentConditionsDataSource::Create(m_dataSource, settings, net, this)) {
         connect(m_dataSource, SIGNAL(image(QPixmap)), ui->image, SLOT(setPixmap(QPixmap)));
         connect(m_dataSource, SIGNAL(temperature(double)), this, SLOT(setTemperature(double)));
+        connect(m_dataSource, SIGNAL(skyConditions(QString)), ui->label, SLOT(setText(QString)));
     }
 }
 

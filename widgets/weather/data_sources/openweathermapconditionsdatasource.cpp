@@ -97,7 +97,7 @@ void OpenWeatherMapConditionsDataSource::requestFinished()
         //emit sunrise(static_cast<qint64>(sys["sunrise"].toInt()));
         //emit sunset(static_cast<qint64>(sys["sunset"].toInt()));
         QJsonObject weather = jobj["weather"].toArray().first().toObject();
-        emit skyConditions(weather["main"].toString());
+        emit skyConditions(weather["description"].toString());
 
         QString icon = weather["icon"].toString();
         //icon += "@2x"; // request bigger icon
