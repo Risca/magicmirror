@@ -86,8 +86,6 @@ void OpenWeatherMapForecastDataSource::requestForecast()
 
 void OpenWeatherMapForecastDataSource::forecastRequestFinished()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     if (m_reply->error()) {
         qWarning() << __PRETTY_FUNCTION__ << ":" << m_reply->errorString();
         m_timer.setInterval(DEFAULT_RETRY_TIMEOUT);

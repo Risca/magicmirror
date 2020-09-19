@@ -28,7 +28,6 @@ Forecast::Forecast(QSharedPointer<QNetworkAccessManager>& net, QWidget *parent) 
         ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
         ui->tableView->resizeColumnsToContents();
         ui->tableView->resizeRowsToContents();
-        qDebug() << "table resized (improved)";
     }
 }
 

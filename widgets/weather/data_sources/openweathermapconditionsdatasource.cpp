@@ -87,7 +87,6 @@ void OpenWeatherMapConditionsDataSource::requestFinished()
     else {
         QJsonDocument jdoc = QJsonDocument::fromJson(m_reply->readAll());
         QJsonObject jobj = jdoc.object();
-        qDebug() << jobj;
         QJsonObject main = jobj["main"].toObject();
         emit temperature(main["temp"].toDouble());
         emit humidity(main["humidity"].toDouble());
@@ -102,7 +101,6 @@ void OpenWeatherMapConditionsDataSource::requestFinished()
 
         QString icon = weather["icon"].toString();
         //icon += "@2x"; // request bigger icon
-        qDebug() << __PRETTY_FUNCTION__ << icon;
         if (m_iconCache->exists(icon)) {
             QPixmap im;
             m_iconCache->get(icon, im);
@@ -125,7 +123,6 @@ void OpenWeatherMapConditionsDataSource::iconDownloaded(const QString &icon)
 {
     QPixmap im;
     if (m_iconCache->get(icon, im)) {
-        qDebug() << __PRETTY_FUNCTION__ << icon;
         emit image(im);
     }
 }
