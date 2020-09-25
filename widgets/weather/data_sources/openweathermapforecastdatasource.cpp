@@ -102,6 +102,7 @@ void OpenWeatherMapForecastDataSource::forecastRequestFinished()
 
         for (int i = 0; i < entries.count(); i++) {
             QJsonObject jobj = entries[i].toObject();
+            double temp_min, temp_max;
             Data d;
 
             qint64 secs = jobj["dt"].toInt();
@@ -117,8 +118,15 @@ void OpenWeatherMapForecastDataSource::forecastRequestFinished()
 
             QJsonObject main = jobj["main"].toObject();
             d.values[HUMIDITY] = main["humidity"].toDouble();
-            d.values[TEMPERATURE_HIGH] = main["temp_max"].toDouble();
-            d.values[TEMPERATURE_LOW] = main["temp_min"].toDouble();
+            temp_min = main["temp_min"].toDouble();
+            temp_max = main["temp_max"].toDouble();
+            if (temp_max - temp_min <= 0.05) {
+                d.values[TEMPERATURE] = temp_max;
+            }
+            else {
+                d.values[TEMPERATURE_LOW] = temp_min;
+                d.values[TEMPERATURE_HIGH] = temp_max;
+            }
             d.values[WIND_SPEED] = jobj["wind"].toObject()["speed"].toDouble();
             if (jobj.contains("rain")) {
                 d.values[PRECIPITATION] = jobj["rain"].toObject()["3h"].toDouble();
