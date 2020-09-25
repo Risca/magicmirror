@@ -18,7 +18,7 @@ class IForecastDataSource : public QObject
 
 public:
     static bool Create(IForecastDataSource*& obj, const QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject* parent = 0);
-    virtual ~IForecastDataSource() {}
+    virtual ~IForecastDataSource() = 0;
 
     virtual const QList<Data>& forecast() const = 0;
 
@@ -29,6 +29,7 @@ protected:
     IForecastDataSource(QObject* parent) : QObject(parent) {}
     Q_DISABLE_COPY(IForecastDataSource)
 };
+inline IForecastDataSource::~IForecastDataSource() {}
 
 }
 

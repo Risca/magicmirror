@@ -18,7 +18,7 @@ class ISource : public QObject {
 
 public:
     static bool Create(ISource*& obj, const QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject* parent = 0);
-    virtual ~ISource() {}
+    virtual ~ISource() = 0;
 
 public slots:
     virtual void sync() = 0;
@@ -32,6 +32,7 @@ protected:
     Q_DISABLE_COPY(ISource)
 
 };
+inline ISource::~ISource() {}
 
 }
 #endif // CALENDAR_ISOURCE_HPP

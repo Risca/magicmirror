@@ -20,7 +20,7 @@ class ICurrentConditionsDataSource : public QObject
     Q_OBJECT
 public:
     static bool Create(ICurrentConditionsDataSource*& obj, const QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject* parent = 0);
-    virtual ~ICurrentConditionsDataSource() {}
+    virtual ~ICurrentConditionsDataSource() = 0;
 
 signals:
     void temperature(double);
@@ -35,6 +35,7 @@ protected:
     ICurrentConditionsDataSource(QObject* parent = 0) : QObject(parent) {}
     Q_DISABLE_COPY(ICurrentConditionsDataSource)
 };
+inline ICurrentConditionsDataSource::~ICurrentConditionsDataSource() {}
 
 } // namespace weather
 
