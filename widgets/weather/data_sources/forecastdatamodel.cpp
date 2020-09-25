@@ -39,7 +39,7 @@ QString Humidity(double h)
 
 QString Precipitation(double p)
 {
-    return QString::number(p, 'f', 0) + "mm";
+    return QString::number(p, 'f', 0) + " mm";
 }
 
 } // anonymous namespace

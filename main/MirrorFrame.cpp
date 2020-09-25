@@ -21,7 +21,7 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     ui->setupUi(this);
     ui->versionLabel->setText(QString("Version: %1").arg(QString(VERSION_STRING)));
 
-    ui->clock->setDisplayFormat(QLocale().timeFormat());
+    ui->clock->setDisplayFormat(QLocale().timeFormat(QLocale::ShortFormat));
     connect(&m_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
     m_clockTimer.start(500);
 
