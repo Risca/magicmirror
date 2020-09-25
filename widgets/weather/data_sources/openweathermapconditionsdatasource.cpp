@@ -17,8 +17,7 @@ namespace {
 
 QUrl IconUrl(const QString &icon)
 {
-    //return QUrl("http://openweathermap.org/img/wn/" + icon + ".png");
-    return QUrl("http://openweathermap.org/img/w/" + icon + ".png");
+    return QUrl("https://openweathermap.org/img/wn/" + icon + ".png");
 }
 
 } // anonymous namespace
@@ -100,7 +99,7 @@ void OpenWeatherMapConditionsDataSource::requestFinished()
         emit skyConditions(weather["description"].toString());
 
         QString icon = weather["icon"].toString();
-        //icon += "@2x"; // request bigger icon
+        icon += "@2x"; // request bigger icon
         if (m_iconCache->exists(icon)) {
             QPixmap im;
             m_iconCache->get(icon, im);

@@ -20,7 +20,7 @@ namespace {
 
 QUrl IconUrl(const QString &icon)
 {
-    return QUrl("http://openweathermap.org/img/w/" + icon + ".png");
+    return QUrl("https://openweathermap.org/img/wn/" + icon + ".png");
 }
 
 } // anonymous namespace
