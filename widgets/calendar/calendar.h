@@ -4,6 +4,7 @@
 #include <QList>
 #include <QLocale>
 #include <QSharedPointer>
+#include <QTimer>
 #include <QWidget>
 
 class QDate;
@@ -35,6 +36,7 @@ private:
     Ui::Calendar *ui;
     ISource* m_source;
     QLocale m_locale;
+    QTimer m_timer;
 
 private slots:
     void NewEventList(const QList<calendar::Event>&);

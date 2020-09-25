@@ -17,6 +17,8 @@
 
 namespace calendar {
 
+#define CALENDAR_SYNC_PERIOD (2 * 60 * 60 * 1000)
+
 namespace {
 
 void SetFadeoutEffect(QWidget* w)
@@ -57,9 +59,15 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
 
     ui->calendar->setFirstDayOfWeek(m_locale.firstDayOfWeek());
 
+    m_timer.setTimerType(Qt::VeryCoarseTimer);
+    m_timer.setInterval(CALENDAR_SYNC_PERIOD);
+    connect(&m_timer, SIGNAL(timeout()), m_source, SLOT(sync()));
+
     connect(m_source, SIGNAL(finished(const QList<calendar::Event>&)),
             this, SLOT(NewEventList(const QList<calendar::Event>&)));
     m_source->sync();
+
+    m_timer.start();
 }
 
 Calendar::~Calendar()
@@ -100,6 +108,8 @@ void Calendar::NewEventList(const QList<Event> &events)
         ui->events->addItem(event);
     }
     SetFadeoutEffect(ui->events);
+
+    m_timer.start();
 }
 
 }
