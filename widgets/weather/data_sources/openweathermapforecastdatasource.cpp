@@ -41,6 +41,7 @@ OpenWeatherMapForecastDataSource::OpenWeatherMapForecastDataSource(
     m_townID(townId),
     m_iconCache(0)
 {
+    m_timer.setTimerType(Qt::VeryCoarseTimer);
     m_timer.setSingleShot(true);
     m_timer.setInterval(DEFAULT_RETRY_TIMEOUT);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(requestForecast()));

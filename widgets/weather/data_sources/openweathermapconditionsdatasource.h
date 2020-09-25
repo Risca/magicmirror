@@ -19,10 +19,8 @@ class OpenWeatherMapConditionsDataSource : public ICurrentConditionsDataSource
 public:
     ~OpenWeatherMapConditionsDataSource();
 
-public slots:
-    void requestWeatherConditions();
-
 protected slots:
+    void requestWeatherConditions();
     void requestFinished();
     void iconDownloaded(const QString& icon);
 
