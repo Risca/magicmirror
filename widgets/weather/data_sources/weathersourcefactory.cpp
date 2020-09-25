@@ -2,6 +2,7 @@
 
 #include "iforecastdatasource.h"
 #include "fakeforecastdatasource.h"
+#include "fakeweatherconditionsdatasource.h"
 #include "openweathermapforecastdatasource.h"
 #include "openweathermapconditionsdatasource.h"
 
@@ -30,6 +31,10 @@ bool ICurrentConditionsDataSource::Create(ICurrentConditionsDataSource*& obj, co
     const QString townId = settings->value("townid").toString();
     if (!appId.isEmpty() && !townId.isEmpty()) {
         obj = new OpenWeatherMapConditionsDataSource(appId, townId, net, parent);
+    }
+    else {
+        qWarning() << "Falling back to fake weather conditions";
+        obj = new FakeWeatherConditionsDataSource(parent);
     }
     return !!obj;
 }

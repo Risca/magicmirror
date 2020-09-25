@@ -44,6 +44,7 @@ SOURCES = main/MirrorFrame.cpp \
     widgets/calendar/calendar.cpp \
     widgets/weather/currentconditions.cpp \
     widgets/weather/data_sources/fakeforecastdatasource.cpp \
+    widgets/weather/data_sources/fakeweatherconditionsdatasource.cpp \
     widgets/weather/data_sources/forecastdatamodel.cpp \
     widgets/weather/data_sources/openweathermapconditionsdatasource.cpp \
     widgets/weather/data_sources/openweathermapforecastdatasource.cpp \
@@ -62,6 +63,7 @@ HEADERS = main/MirrorFrame.h \
     widgets/calendar/data_sources/nosource.h \
     widgets/weather/currentconditions.h \
     widgets/weather/data_sources/fakeforecastdatasource.h \
+    widgets/weather/data_sources/fakeweatherconditionsdatasource.h \
     widgets/weather/data_sources/forecastdatamodel.h \
     widgets/weather/data_sources/icurrentconditionsdatasource.h \
     widgets/weather/data_sources/iforecastdatasource.h \
@@ -80,4 +82,5 @@ FORMS += \
 unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += libical
 
-RESOURCES += main/stylesheets/breeze.qrc
+RESOURCES += main/stylesheets/breeze.qrc \
+    widgets/weather/resources/icons.qrc
