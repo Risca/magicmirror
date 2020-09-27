@@ -68,7 +68,7 @@ Compliment::Compliment(QWidget *parent) :
     connect(m_fadeIn, SIGNAL(finished()), &m_timer, SLOT(start()));
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(changeCompliment()));
 
-    changeCompliment();
+    QTimer::singleShot(5000, this, SLOT(changeCompliment()));
 }
 
 void Compliment::setText(const QString &text)

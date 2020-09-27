@@ -19,6 +19,7 @@ signals:
 
 public slots:
     virtual void setText(const QString &text);
+    void changeCompliment();
 
 private:
     QPropertyAnimation *m_fadeIn;
@@ -30,7 +31,6 @@ private:
 
 private slots:
     void textFadedOut();
-    void changeCompliment();
 };
 
 #endif // COMPLIMENT_H
