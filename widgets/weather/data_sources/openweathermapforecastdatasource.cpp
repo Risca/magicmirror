@@ -78,7 +78,7 @@ void OpenWeatherMapForecastDataSource::requestForecast()
     query.addQueryItem("appid", m_appID);
     query.addQueryItem("id", m_townID);
     query.addQueryItem("units", "metric");
-    query.addQueryItem("cnt", "5");
+    query.addQueryItem("cnt", "10");
     u.setQuery(query);
 
     m_reply = m_net->get(QNetworkRequest(u));
