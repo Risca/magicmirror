@@ -2,21 +2,50 @@
 
 #include "utils/settingsfactory.h"
 
+#include <QDebug>
+#include <QFile>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
+#include <QTextStream>
 
 #define COMPLIMENT_UPDATE_INTERVAL (3 * 60 * 60 * 1000)
+
+namespace {
+
+void LoadComplimentsFromFile(const QString& path, QStringList& compliments)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        compliments.push_back(line);
+    }
+}
+
+} // anonymous namespace
 
 Compliment::Compliment(QWidget *parent) :
     QLabel(parent)
 {
     QSharedPointer<QSettings> settings = SettingsFactory::Create("Compliments");
     if (settings->contains("anytime")) {
-        m_compliments = settings->value("anytime").toStringList();
+        QVariant compliments = settings->value("anytime");
+        if (compliments.type() == QVariant::StringList) {
+            m_compliments = compliments.toStringList();
+        }
+        // assume it's a file path
+        else {
+            LoadComplimentsFromFile(compliments.toString(), m_compliments);
+        }
     }
-    else {
-        m_compliments << "Hello sexy!" << "Looking good!";
+    if (m_compliments.empty()) {
+        m_compliments << "You're beautiful";
     }
+
+    qDebug() << __PRETTY_FUNCTION__ << "Loaded" << m_compliments.size() << "compliments";
 
     m_timer.setTimerType(Qt::VeryCoarseTimer);
     m_timer.setInterval(COMPLIMENT_UPDATE_INTERVAL);
