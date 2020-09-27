@@ -22,10 +22,11 @@ along with MythClock.  If not, see <http://www.gnu.org/licenses/>.
 
 MirrorFrame *frame = NULL;
 
-namespace {
-
 #ifdef __PRINT_FONTS__
-void printFonts()
+#include <QFontDatabase>
+#include <QString>
+#include <QStringList>
+static void printFonts()
 {
     QFontDatabase database;
 
@@ -39,6 +40,8 @@ void printFonts()
 #else
 #define printFonts()
 #endif
+
+namespace {
 
 void printSettingsFile()
 {
