@@ -28,9 +28,6 @@ public:
 public slots:
     void changeDay(const QDate& day);
 
-protected:
-    virtual void resizeEvent(QResizeEvent* event);
-
 private:
     Calendar(ISource* dataSource, QWidget *parent = NULL);
     Ui::Calendar *ui;

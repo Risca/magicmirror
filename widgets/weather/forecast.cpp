@@ -4,7 +4,8 @@
 #include "data_sources/forecastdatamodel.h"
 #include "data_sources/iforecastdatasource.h"
 
-#include "settingsfactory.h"
+#include "utils/effects.h"
+#include "utils/settingsfactory.h"
 
 #include <QAbstractItemModel>
 #include <QDebug>
@@ -29,6 +30,7 @@ Forecast::Forecast(QSharedPointer<QNetworkAccessManager>& net, QWidget *parent) 
         ui->tableView->resizeColumnsToContents();
         ui->tableView->resizeRowsToContents();
     }
+    utils::ApplyFade(ui->tableView);
 }
 
 Forecast::~Forecast()

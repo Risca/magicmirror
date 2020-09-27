@@ -37,6 +37,7 @@ SOURCES = main/MirrorFrame.cpp \
         main/WeatherData.cpp \
     main/domoticz/sensor.cpp \
         main/main.cpp \
+    utils/effects.cpp \
 	utils/settingsfactory.cpp \
         utils/iconcache.cpp \
     widgets/calendar/data_sources/calendarsourcefactory.cpp \
@@ -54,6 +55,7 @@ SOURCES = main/MirrorFrame.cpp \
 HEADERS = main/MirrorFrame.h \
         main/WeatherData.h \
     main/domoticz/sensor.h \
+    utils/effects.h \
     utils/settingsfactory.h \
     utils/iconcache.h \
     widgets/calendar/calendar.h \

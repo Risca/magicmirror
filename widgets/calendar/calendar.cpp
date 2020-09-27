@@ -4,7 +4,8 @@
 #include "data_sources/event.hpp"
 #include "data_sources/isource.hpp"
 
-#include "settingsfactory.h"
+#include "utils/effects.h"
+#include "utils/settingsfactory.h"
 
 #include <QDebug>
 #include <QGraphicsOpacityEffect>
@@ -18,21 +19,6 @@
 namespace calendar {
 
 #define CALENDAR_SYNC_PERIOD (2 * 60 * 60 * 1000)
-
-namespace {
-
-void SetFadeoutEffect(QWidget* w)
-{
-    qDebug() << "Applying fade:" << w->rect();
-    QLinearGradient alphaGradient(w->rect().topLeft(), w->rect().bottomLeft());
-    alphaGradient.setColorAt(0.0, Qt::black);
-    alphaGradient.setColorAt(1.0, Qt::transparent);
-    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
-    effect->setOpacityMask(alphaGradient);
-    w->setGraphicsEffect(effect);
-}
-
-} // anonymous namespace
 
 bool Calendar::Create(Calendar *&cal, QSharedPointer<QNetworkAccessManager> net, QWidget *parent)
 {
@@ -55,7 +41,7 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
 {
     ui->setupUi(this);
 
-    SetFadeoutEffect(ui->events);
+    utils::ApplyFade(ui->events);
 
     ui->calendar->setFirstDayOfWeek(m_locale.firstDayOfWeek());
 
@@ -73,12 +59,6 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
 Calendar::~Calendar()
 {
     delete ui;
-}
-
-void Calendar::resizeEvent(QResizeEvent *event)
-{
-    SetFadeoutEffect(ui->events);
-    QWidget::resizeEvent(event);
 }
 
 void Calendar::changeDay(const QDate &day)
@@ -107,7 +87,6 @@ void Calendar::NewEventList(const QList<Event> &events)
         const QString event = m_locale.toString(e.start, QLocale::ShortFormat) + " " + e.summary;
         ui->events->addItem(event);
     }
-    SetFadeoutEffect(ui->events);
 
     m_timer.start();
 }
