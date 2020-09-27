@@ -33,9 +33,6 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="image">
-       <property name="frameShape">
-        <enum>QFrame::Box</enum>
-       </property>
        <property name="text">
         <string/>
        </property>
@@ -50,9 +47,6 @@
         <font>
          <pointsize>20</pointsize>
         </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::Box</enum>
        </property>
        <property name="text">
         <string/>
@@ -70,9 +64,6 @@
       <font>
        <italic>true</italic>
       </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
      </property>
      <property name="text">
       <string/>
