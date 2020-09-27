@@ -15,4 +15,6 @@ void weather::FakeWeatherConditionsDataSource::generateNewFakeData()
 
     QPixmap noWeather(":/weather/icons/no-weather-icon.png");
     emit image(noWeather);
+
+    emit skyConditions("no data");
 }

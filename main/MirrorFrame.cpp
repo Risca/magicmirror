@@ -21,8 +21,9 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     ui->setupUi(this);
     ui->versionLabel->setText(QString("Version: %1").arg(QString(VERSION_STRING)));
 
-    ui->clock->setDisplayFormat(QLocale().timeFormat(QLocale::ShortFormat));
+    ui->clock->setDisplayFormat(QLocale().timeFormat(QLocale::LongFormat));
     connect(&m_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
+    m_clockTimer.setTimerType(Qt::CoarseTimer);
     m_clockTimer.start(500);
 
     createWeatherSystem();
@@ -48,13 +49,12 @@ void MirrorFrame::createWeatherSystem()
     QVBoxLayout* layout = new QVBoxLayout;
 
     weather::CurrentConditions* weather = new weather::CurrentConditions(m_net, this);
-    layout->addWidget(weather);
+    layout->addWidget(weather, 0, Qt::AlignRight);
 
     weather::Forecast* forecast = new weather::Forecast(m_net, this);
-    layout->addWidget(forecast);
+    layout->addWidget(forecast, 1, Qt::AlignRight);
 
-    ui->bottomHorizontalLayout->insertLayout(0, layout);
-    ui->bottomHorizontalLayout->setStretch(1,1);
+    ui->topHorizontalLayout->addLayout(layout);
 }
 
 void MirrorFrame::createCalendarSystem()
@@ -62,7 +62,7 @@ void MirrorFrame::createCalendarSystem()
     calendar::Calendar* cal;
     if (calendar::Calendar::Create(cal, m_net, this)) {
         qDebug() << "Successfully created a calendar widget";
-        ui->topHorizontalLayout->insertWidget(0,cal);
+        ui->topHorizontalLayout->insertWidget(0, cal, 0, Qt::AlignLeft);
         connect(this, SIGNAL(dayChanged(const QDate&)), cal, SLOT(changeDay(const QDate&)));
     }
 }
