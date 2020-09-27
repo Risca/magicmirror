@@ -49,7 +49,7 @@ void MirrorFrame::createWeatherSystem()
     QVBoxLayout* layout = new QVBoxLayout;
 
     weather::CurrentConditions* weather = new weather::CurrentConditions(m_net, this);
-    layout->addWidget(weather, 0, Qt::AlignRight);
+    layout->addWidget(weather, 0);
 
     weather::Forecast* forecast = new weather::Forecast(m_net, this);
     layout->addWidget(forecast, 1, Qt::AlignRight);
