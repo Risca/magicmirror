@@ -28,6 +28,7 @@ private:
 
 private slots:
     void setTemperature(double t);
+    void setPixmap(const QPixmap& pixmap);
 };
 
 } // namespace weather

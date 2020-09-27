@@ -16,7 +16,7 @@ CurrentConditions::CurrentConditions(QSharedPointer<QNetworkAccessManager> &net,
     QSharedPointer<QSettings> settings = SettingsFactory::Create("Weather");
 
     if (ICurrentConditionsDataSource::Create(m_dataSource, settings, net, this)) {
-        connect(m_dataSource, SIGNAL(image(QPixmap)), ui->image, SLOT(setPixmap(QPixmap)));
+        connect(m_dataSource, SIGNAL(image(QPixmap)), this, SLOT(setPixmap(QPixmap)));
         connect(m_dataSource, SIGNAL(temperature(double)), this, SLOT(setTemperature(double)));
         connect(m_dataSource, SIGNAL(skyConditions(QString)), ui->label, SLOT(setText(QString)));
     }
@@ -31,6 +31,14 @@ CurrentConditions::~CurrentConditions()
 void CurrentConditions::setTemperature(double t)
 {
     ui->temperature->setText(QString::number(t, 'f', 1) + QString::fromUtf8("°"));
+}
+
+void CurrentConditions::setPixmap(const QPixmap &pixmap)
+{
+    // scale image to same 3/2 the size of text
+    QFontInfo fi = ui->temperature->fontInfo();
+    int height = fi.pixelSize() * pixmap.devicePixelRatio() * 3 / 2;
+    ui->image->setPixmap(pixmap.scaledToHeight(height));
 }
 
 } // namespace weather
