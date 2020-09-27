@@ -144,6 +144,7 @@ void IcsSource::downloadFinished()
                     }
                     else {
                         event.allDayEvent = true;
+                        event.stop = dates.first;
                     }
                     event.summary = GetSummary(c);
                     events << event;

@@ -76,13 +76,15 @@ void Calendar::NewEventList(const QList<Event> &events)
                  << "All day event:" << (e.allDayEvent ? "yes" : "no")
                  << e.summary;
 
-        // Make date bold
-        QTextCharFormat format = ui->calendar->dateTextFormat(e.start);
+        // Make date(s) bold
         QFont font = this->font();
         font.setBold(true);
         font.setPointSize(font.pointSize() + 1);
-        format.setFont(font);
-        ui->calendar->setDateTextFormat(e.start, format);
+        for (QDate date = e.start; date <= e.stop; date = date.addDays(1)) {
+            QTextCharFormat format = ui->calendar->dateTextFormat(date);
+            format.setFont(font);
+            ui->calendar->setDateTextFormat(date, format);
+        }
 
         const QString event = m_locale.toString(e.start, QLocale::ShortFormat) + " " + e.summary;
         ui->events->addItem(event);
