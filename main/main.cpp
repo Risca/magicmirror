@@ -41,23 +41,21 @@ static void printFonts()
 #define printFonts()
 #endif
 
-namespace {
-
-void printSettingsFile()
-{
-    qDebug() << __PRETTY_FUNCTION__ << "Using" << SettingsFactory::Create()->fileName();
-}
-
-} // anonymous
-
 int main(int argc, char **argv)
 {
     QApplication app (argc, argv);
 
-    printSettingsFile();
-    printFonts();
+    QSharedPointer<QSettings> settings = SettingsFactory::Create();
+    qDebug() << "Using settings file:" << settings->fileName();
 
-    QLocale::setDefault(SettingsFactory::Create()->value("locale", "en_US").toString());
+    if (settings->contains("font")) {
+        QFont font(settings->value("font").toString());
+        QApplication::setFont(font);
+    }
+    printFonts();
+    qDebug() << "Using font:" << QApplication::font().toString();
+
+    QLocale::setDefault(settings->value("locale", "en_US").toString());
 
     // set stylesheet
     QFile f(":/dark.qss");
