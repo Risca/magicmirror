@@ -99,12 +99,18 @@ void OpenWeatherMapConditionsDataSource::requestFinished()
         QJsonObject weather = jobj["weather"].toArray().first().toObject();
         emit skyConditions(weather["description"].toString());
 
+        /* OpenWeatherMap gives us an icon with lots of transparent padding.
+         * The icon cache will strip that padding and scale up the icon to its
+         * original size. To preserve the icon quality, we request an icon 4x
+         * the size (200x200), the icon cache will scale it up, only for us to
+         * down-scale it again.
+         */
         QString icon = weather["icon"].toString();
-        icon += "@2x"; // request bigger icon
+        icon += "@4x";
         if (m_iconCache->exists(icon)) {
             QPixmap im;
             m_iconCache->get(icon, im);
-            emit image(im);
+            emit image(im.scaledToHeight(100));
         }
         else {
             m_iconCache->download(icon, IconUrl(icon));
@@ -123,7 +129,7 @@ void OpenWeatherMapConditionsDataSource::iconDownloaded(const QString &icon)
 {
     QPixmap im;
     if (m_iconCache->get(icon, im)) {
-        emit image(im);
+        emit image(im.scaledToHeight(100));
     }
 }
 

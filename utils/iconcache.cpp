@@ -2,6 +2,7 @@
 
 #include "settingsfactory.h"
 
+#include <QBitmap>
 #include <QDebug>
 #include <QDir>
 #include <QIcon>
@@ -11,7 +12,54 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QRegion>
 #include <QStandardPaths>
+
+namespace {
+
+void ResizeToVisible(QImage& im)
+{
+    const QRect visibleRect = QRegion(QBitmap::fromImage(im.createMaskFromColor(0x00000000))).boundingRect();
+    if (im.rect() != visibleRect) {
+        im = im.copy(visibleRect).scaled(im.size(), Qt::KeepAspectRatio);
+    }
+}
+
+void LoadImage(QImageReader& r, QImage& image)
+{
+    r.read(&image);
+    ResizeToVisible(image);
+}
+
+void LoadImage(QImageReader& reader, QPixmap& pixmap)
+{
+    QImage im;
+    LoadImage(reader, im);
+    pixmap = QPixmap::fromImage(im);
+}
+
+void LoadImage(QImageReader& reader, QIcon& icon)
+{
+    QPixmap pixmap;
+    LoadImage(reader, pixmap);
+    icon = QIcon(pixmap);
+}
+
+template<class T>
+bool LoadImageFromPath(const QString& fullPath, T& icon)
+{
+    QImageReader reader(fullPath);
+
+    if (!reader.canRead()) {
+        qDebug() << __PRETTY_FUNCTION__ << ": Unable to read cached icon at" << fullPath;
+        return false;
+    }
+
+    LoadImage(reader, icon);
+    return true;
+}
+
+} // anonymous namespace
 
 IconCache::IconCache(QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
     QObject(parent),
@@ -44,40 +92,19 @@ bool IconCache::exists(const QString &name) const
 bool IconCache::get(const QString &name, QIcon &icon) const
 {
     const QString fullPath = GetFullPath(name);
-    QImageReader image(fullPath);
-
-    if (image.canRead()) {
-        icon = QIcon(QPixmap::fromImageReader(&image));
-        return true;
-    }
-    qDebug() << __PRETTY_FUNCTION__ << ": Unable to read cached icon at" << fullPath;
-    return false;
+    return LoadImageFromPath(fullPath, icon);
 }
 
 bool IconCache::get(const QString &name, QImage &icon) const
 {
     const QString fullPath = GetFullPath(name);
-    QImageReader image(fullPath);
-
-    if (image.canRead()) {
-        icon = image.read();
-        return true;
-    }
-    qDebug() << __PRETTY_FUNCTION__ << ": Unable to read cached icon at" << fullPath;
-    return false;
+    return LoadImageFromPath(fullPath, icon);
 }
 
 bool IconCache::get(const QString &name, QPixmap &icon) const
 {
     const QString fullPath = GetFullPath(name);
-    QImageReader image(fullPath);
-
-    if (image.canRead()) {
-        icon = QPixmap::fromImageReader(&image);
-        return true;
-    }
-    qDebug() << __PRETTY_FUNCTION__ << ": Unable to read cached icon at" << fullPath;
-    return false;
+    return LoadImageFromPath(fullPath, icon);
 }
 
 void IconCache::download(const QString name, const QUrl &url)
@@ -144,6 +171,7 @@ bool IconCache::Store(const QString &name, const QByteArray &data)
     QImage icon;
 
     if (icon.loadFromData(data)) {
+        ResizeToVisible(icon);
         if (image.canWrite()) {
             image.write(icon);
             qDebug() << __PRETTY_FUNCTION__ << ": Wrote icon" << name;
