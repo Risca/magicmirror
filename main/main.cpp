@@ -20,7 +20,7 @@ along with MythClock.  If not, see <http://www.gnu.org/licenses/>.
 #include "MirrorFrame.h"
 #include "settingsfactory.h"
 
-MirrorFrame *frame = NULL;
+#include <time.h>
 
 #ifdef __PRINT_FONTS__
 #include <QFontDatabase>
@@ -44,6 +44,9 @@ static void printFonts()
 int main(int argc, char **argv)
 {
     QApplication app (argc, argv);
+    MirrorFrame *frame = NULL;
+
+    srand(time(NULL));
 
     QSharedPointer<QSettings> settings = SettingsFactory::Create();
     qDebug() << "Using settings file:" << settings->fileName();

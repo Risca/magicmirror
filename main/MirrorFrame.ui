@@ -10,7 +10,7 @@
     <height>720</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0">
    <item>
     <layout class="QHBoxLayout" name="topHorizontalLayout" stretch="1">
      <item>
@@ -99,6 +99,22 @@
     </spacer>
    </item>
    <item>
+    <widget class="Compliment" name="compliment">
+     <property name="font">
+      <font>
+       <pointsize>20</pointsize>
+       <italic>true</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>Hey sexy!</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="bottomHorizontalLayout" stretch="0,0">
      <item>
       <spacer name="horizontalSpacer_3">
@@ -151,6 +167,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Compliment</class>
+   <extends>QLabel</extends>
+   <header>compliment.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

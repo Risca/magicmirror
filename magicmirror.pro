@@ -30,6 +30,7 @@ DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 
 INCLUDEPATH += main \
     utils \
+    widgets\
     widgets/calendar \
     widgets/weather
 
@@ -43,6 +44,7 @@ SOURCES = main/MirrorFrame.cpp \
     widgets/calendar/data_sources/calendarsourcefactory.cpp \
     widgets/calendar/data_sources/icssource.cpp \
     widgets/calendar/calendar.cpp \
+    widgets/compliment.cpp \
     widgets/weather/currentconditions.cpp \
     widgets/weather/data_sources/fakeforecastdatasource.cpp \
     widgets/weather/data_sources/fakeweatherconditionsdatasource.cpp \
@@ -63,6 +65,7 @@ HEADERS = main/MirrorFrame.h \
     widgets/calendar/data_sources/icssource.h \
     widgets/calendar/data_sources/isource.hpp \
     widgets/calendar/data_sources/nosource.h \
+    widgets/compliment.h \
     widgets/weather/currentconditions.h \
     widgets/weather/data_sources/fakeforecastdatasource.h \
     widgets/weather/data_sources/fakeweatherconditionsdatasource.h \
