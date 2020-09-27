@@ -8,7 +8,7 @@
 #include <QPropertyAnimation>
 #include <QTextStream>
 
-#define COMPLIMENT_UPDATE_INTERVAL (3 * 60 * 60 * 1000)
+#define COMPLIMENT_UPDATE_INTERVAL (60 * 1000)
 
 namespace {
 
