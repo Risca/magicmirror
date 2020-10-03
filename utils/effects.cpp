@@ -14,7 +14,7 @@ namespace {
 void SetGradient(QWidget* w)
 {
     QLinearGradient alphaGradient(w->rect().topLeft(), w->rect().bottomLeft());
-    alphaGradient.setColorAt(0.0, Qt::black);
+    alphaGradient.setColorAt(0.5, Qt::black);
     alphaGradient.setColorAt(1.0, Qt::transparent);
     QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
     effect->setOpacityMask(alphaGradient);
