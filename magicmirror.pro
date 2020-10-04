@@ -35,7 +35,6 @@ INCLUDEPATH += main \
     widgets/weather
 
 SOURCES = main/MirrorFrame.cpp \
-    main/domoticz/sensor.cpp \
         main/main.cpp \
     utils/effects.cpp \
 	utils/settingsfactory.cpp \
@@ -44,6 +43,9 @@ SOURCES = main/MirrorFrame.cpp \
     widgets/calendar/data_sources/icssource.cpp \
     widgets/calendar/calendar.cpp \
     widgets/compliment.cpp \
+    widgets/sensors/data_sources/domoticzsensor.cpp \
+    widgets/sensors/data_sources/sensorsourcefactory.cpp \
+    widgets/sensors/sensors.cpp \
     widgets/weather/currentconditions.cpp \
     widgets/weather/data_sources/fakeforecastdatasource.cpp \
     widgets/weather/data_sources/fakeweatherconditionsdatasource.cpp \
@@ -54,7 +56,6 @@ SOURCES = main/MirrorFrame.cpp \
     widgets/weather/forecast.cpp
 
 HEADERS = main/MirrorFrame.h \
-    main/domoticz/sensor.h \
     utils/effects.h \
     utils/settingsfactory.h \
     utils/iconcache.h \
@@ -64,6 +65,11 @@ HEADERS = main/MirrorFrame.h \
     widgets/calendar/data_sources/event.hpp \
     widgets/calendar/data_sources/icssource.h \
     widgets/compliment.h \
+    widgets/sensors/data_sources/domoticzsensor.h \
+    widgets/sensors/data_sources/sensor_isource.h \
+    widgets/sensors/data_sources/sensor_nosource.h \
+    widgets/sensors/data_sources/sensordata.h \
+    widgets/sensors/sensors.h \
     widgets/weather/currentconditions.h \
     widgets/weather/data_sources/fakeforecastdatasource.h \
     widgets/weather/data_sources/fakeweatherconditionsdatasource.h \
@@ -79,6 +85,7 @@ HEADERS = main/MirrorFrame.h \
 FORMS += \
     main/MirrorFrame.ui \
     widgets/calendar/calendar.ui \
+    widgets/sensors/sensors.ui \
     widgets/weather/currentconditions.ui \
     widgets/weather/forecast.ui
 

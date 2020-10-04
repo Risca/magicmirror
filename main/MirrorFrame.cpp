@@ -1,10 +1,11 @@
 #include "MirrorFrame.h"
 #include "ui_MirrorFrame.h"
 
-#include "calendar.h"
-#include "forecast.h"
-#include "currentconditions.h"
-#include "settingsfactory.h"
+#include "utils/settingsfactory.h"
+#include "widgets/calendar/calendar.h"
+#include "widgets/weather/currentconditions.h"
+#include "widgets/weather/forecast.h"
+#include "widgets/sensors/sensors.h"
 
 #include <QDate>
 #include <QDateTime>
@@ -26,7 +27,7 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     m_clockTimer.setTimerType(Qt::CoarseTimer);
     m_clockTimer.start(500);
 
-    createWeatherSystem();
+    createClimateSystem();
     createCalendarSystem();
 }
 
@@ -44,12 +45,18 @@ MirrorFrame::~MirrorFrame()
     delete ui;
 }
 
-void MirrorFrame::createWeatherSystem()
+void MirrorFrame::createClimateSystem()
 {
     QVBoxLayout* layout = new QVBoxLayout;
 
     weather::CurrentConditions* weather = new weather::CurrentConditions(m_net, this);
     layout->addWidget(weather, 0);
+
+    sensors::Sensors *sensorWidget;
+    if (sensors::Sensors::Create(sensorWidget, m_net, this)) {
+        qDebug() << __PRETTY_FUNCTION__ << "adding sensor widget";
+        layout->addWidget(sensorWidget, 0);
+    }
 
     weather::Forecast* forecast = new weather::Forecast(m_net, this);
     layout->addWidget(forecast, 1, Qt::AlignRight);
