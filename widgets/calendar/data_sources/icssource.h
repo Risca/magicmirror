@@ -1,7 +1,6 @@
-#ifndef CALENDAR_ICSSOURCE_H
-#define CALENDAR_ICSSOURCE_H
+#pragma once
 
-#include "isource.hpp"
+#include "cal_isource.h"
 
 #include <QObject>
 #include <QSharedPointer>
@@ -27,8 +26,8 @@ public slots:
 
 protected:
     Q_DISABLE_COPY(IcsSource)
-
     IcsSource(const QUrl& url, QSharedPointer<QNetworkAccessManager> net, QObject* parent);
+
     QSharedPointer<QNetworkAccessManager> m_net;
     QNetworkReply* m_reply;
     const QUrl m_url;
@@ -39,5 +38,3 @@ protected slots:
 };
 
 } // namespace calendar
-
-#endif // CALENDAR_ICSSOURCE_H

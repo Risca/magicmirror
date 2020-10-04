@@ -1,6 +1,6 @@
-#include "isource.hpp"
+#include "cal_isource.h"
 #include "icssource.h"
-#include "nosource.h"
+#include "cal_nosource.h"
 
 #include <QSettings>
 

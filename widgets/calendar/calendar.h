@@ -36,7 +36,7 @@ private:
     QTimer m_timer;
 
 private slots:
-    void NewEventList(const QList<calendar::Event>&);
+    void NewEventList(const QList<Event>&);
 };
 
 } // namespace calendar

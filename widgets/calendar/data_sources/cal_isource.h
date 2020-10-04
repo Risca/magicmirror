@@ -1,5 +1,8 @@
-#ifndef CALENDAR_ISOURCE_HPP
-#define CALENDAR_ISOURCE_HPP
+#pragma once
+
+/*
+ * This file is named cal_isource.h to not confuse Qt moc with sensor::ISource
+ */
 
 #include <QList>
 #include <QObject>
@@ -13,7 +16,8 @@ namespace calendar {
 
 struct Event;
 
-class ISource : public QObject {
+class ISource : public QObject
+{
     Q_OBJECT
 
 public:
@@ -24,7 +28,7 @@ public slots:
     virtual void sync() = 0;
 
 signals:
-    void finished(const QList<calendar::Event>&);
+    void finished(const QList<Event>&);
     void error(const QString&);
 
 protected:
@@ -35,4 +39,3 @@ protected:
 inline ISource::~ISource() {}
 
 }
-#endif // CALENDAR_ISOURCE_HPP

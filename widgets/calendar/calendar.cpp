@@ -2,7 +2,7 @@
 #include "ui_calendar.h"
 
 #include "data_sources/event.hpp"
-#include "data_sources/isource.hpp"
+#include "data_sources/cal_isource.h"
 
 #include "utils/effects.h"
 #include "utils/settingsfactory.h"
@@ -49,8 +49,8 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
     m_timer.setInterval(CALENDAR_SYNC_PERIOD);
     connect(&m_timer, SIGNAL(timeout()), m_source, SLOT(sync()));
 
-    connect(m_source, SIGNAL(finished(const QList<calendar::Event>&)),
-            this, SLOT(NewEventList(const QList<calendar::Event>&)));
+    connect(m_source, SIGNAL(finished(const QList<Event>&)),
+            this, SLOT(NewEventList(const QList<Event>&)));
     m_source->sync();
 
     m_timer.start();

@@ -1,13 +1,12 @@
-#ifndef CALENDAR_NOSOURCE_H
-#define CALENDAR_NOSOURCE_H
+#pragma once
 
-#include "isource.hpp"
+/*
+ * This file is named cal_nosource.h to not confuse Qt moc with sensor::NoSource
+ */
+
+#include "cal_isource.h"
 
 #include <QObject>
-#include <QSharedPointer>
-
-class QNetworkAccessManager;
-class QSettings;
 
 namespace calendar {
 
@@ -28,11 +27,8 @@ public slots:
     virtual void sync() {}
 
 protected:
-    Q_DISABLE_COPY(NoSource)
-
     NoSource(QObject* parent) : ISource(parent) { /* empty */ }
+    Q_DISABLE_COPY(NoSource)
 };
 
 } // namespace calendar
-
-#endif // CALENDAR_NOSOURCE_H

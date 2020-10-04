@@ -90,20 +90,6 @@ bool IcsSource::Create(calendar::ISource *&obj, const QSharedPointer<QSettings> 
     return false;
 }
 
-void IcsSource::sync()
-{
-    if (m_reply) {
-        qWarning() << __PRETTY_FUNCTION__ << ": request already in progress, abort!";
-        return;
-    }
-
-    m_retryTimer.stop();
-
-    QNetworkRequest req(m_url);
-    m_reply = m_net->get(req);
-    connect(m_reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
-}
-
 IcsSource::IcsSource(const QUrl &url, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
     ISource(parent),
     m_net(net),
@@ -117,6 +103,20 @@ IcsSource::IcsSource(const QUrl &url, QSharedPointer<QNetworkAccessManager> net,
     if (!m_url.isLocalFile()) {
         m_retryTimer.start();
     }
+}
+
+void IcsSource::sync()
+{
+    if (m_reply) {
+        qWarning() << __PRETTY_FUNCTION__ << ": request already in progress, abort!";
+        return;
+    }
+
+    m_retryTimer.stop();
+
+    QNetworkRequest req(m_url);
+    m_reply = m_net->get(req);
+    connect(m_reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
 }
 
 void IcsSource::downloadFinished()

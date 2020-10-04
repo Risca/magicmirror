@@ -61,10 +61,10 @@ HEADERS = main/MirrorFrame.h \
     utils/settingsfactory.h \
     utils/iconcache.h \
     widgets/calendar/calendar.h \
+    widgets/calendar/data_sources/cal_isource.h \
+    widgets/calendar/data_sources/cal_nosource.h \
     widgets/calendar/data_sources/event.hpp \
     widgets/calendar/data_sources/icssource.h \
-    widgets/calendar/data_sources/isource.hpp \
-    widgets/calendar/data_sources/nosource.h \
     widgets/compliment.h \
     widgets/weather/currentconditions.h \
     widgets/weather/data_sources/fakeforecastdatasource.h \
