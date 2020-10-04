@@ -35,7 +35,6 @@ INCLUDEPATH += main \
     widgets/weather
 
 SOURCES = main/MirrorFrame.cpp \
-        main/WeatherData.cpp \
     main/domoticz/sensor.cpp \
         main/main.cpp \
     utils/effects.cpp \
@@ -55,7 +54,6 @@ SOURCES = main/MirrorFrame.cpp \
     widgets/weather/forecast.cpp
 
 HEADERS = main/MirrorFrame.h \
-        main/WeatherData.h \
     main/domoticz/sensor.h \
     utils/effects.h \
     utils/settingsfactory.h \
