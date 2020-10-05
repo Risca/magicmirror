@@ -93,4 +93,4 @@ unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += libical
 
 RESOURCES += main/stylesheets/breeze.qrc \
-    widgets/weather/resources/icons.qrc
+    resources/icons.qrc
