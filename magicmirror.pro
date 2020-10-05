@@ -44,6 +44,7 @@ SOURCES = main/MirrorFrame.cpp \
     widgets/calendar/calendar.cpp \
     widgets/compliment.cpp \
     widgets/sensors/data_sources/domoticzsensor.cpp \
+    widgets/sensors/data_sources/sensormodel.cpp \
     widgets/sensors/data_sources/sensorsourcefactory.cpp \
     widgets/sensors/sensors.cpp \
     widgets/weather/currentconditions.cpp \
@@ -69,6 +70,7 @@ HEADERS = main/MirrorFrame.h \
     widgets/sensors/data_sources/sensor_isource.h \
     widgets/sensors/data_sources/sensor_nosource.h \
     widgets/sensors/data_sources/sensordata.h \
+    widgets/sensors/data_sources/sensormodel.h \
     widgets/sensors/sensors.h \
     widgets/weather/currentconditions.h \
     widgets/weather/data_sources/fakeforecastdatasource.h \

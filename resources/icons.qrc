@@ -2,4 +2,7 @@
     <qresource prefix="/weather/icons">
         <file>no-weather-icon.png</file>
     </qresource>
+    <qresource prefix="/sensors/icons">
+        <file alias="low_battery.svg">noun_Battery_1630004_white.svg</file>
+    </qresource>
 </RCC>

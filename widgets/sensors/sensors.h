@@ -12,8 +12,7 @@ class Sensors;
 
 namespace sensors {
 
-class ISource;
-class SensorData;
+class SensorModel;
 
 class Sensors : public QWidget
 {
@@ -23,14 +22,11 @@ public:
     static bool Create(Sensors*& obj, QSharedPointer<QNetworkAccessManager>& net, QWidget* parent = 0);
     ~Sensors();
 
-protected slots:
-    void SetSensorData(const QList<SensorData>& list);
-
 private:
-    explicit Sensors(ISource* dataSource, QWidget *parent = 0);
+    explicit Sensors(SensorModel* model, QWidget *parent = 0);
 
     Ui::Sensors *ui;
-    ISource* m_ds;
+    SensorModel* m_model;
 };
 
 } // namespace sensors

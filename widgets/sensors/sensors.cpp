@@ -2,7 +2,7 @@
 #include "ui_sensors.h"
 
 #include "data_sources/sensor_isource.h"
-#include "data_sources/sensordata.h"
+#include "data_sources/sensormodel.h"
 
 #include "utils/settingsfactory.h"
 
@@ -19,53 +19,31 @@ bool Sensors::Create(Sensors *&obj, QSharedPointer<QNetworkAccessManager> &net, 
     obj = 0;
 
     if (ISource::Create(src, settings, net)) {
-        obj = new Sensors(src, parent);
+        obj = new Sensors(new SensorModel(src), parent);
     }
 
     return !!obj;
 }
 
-Sensors::Sensors(ISource* dataSource, QWidget *parent) :
+Sensors::Sensors(SensorModel *model, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Sensors),
-    m_ds(dataSource)
+    m_model(model)
 {
     ui->setupUi(this);
 
-    ui->sensorList->sortByColumn(0, Qt::AscendingOrder);
+    m_model->setParent(this);
 
-    connect(m_ds, SIGNAL(sensorDataUpdated(const QList<SensorData>&)),
-            this, SLOT(SetSensorData(const QList<SensorData>&)));
+    ui->sensorList->setModel(m_model);
+    ui->sensorList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->sensorList->horizontalHeader()->setSectionResizeMode(model->columnCount() - 1, QHeaderView::ResizeToContents);
+    ui->sensorList->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 Sensors::~Sensors()
 {
     delete ui;
-}
-
-void Sensors::SetSensorData(const QList<SensorData> &list)
-{
-    const QDateTime yesterday = QDateTime::currentDateTime().addDays(-1);
-    bool sorting = ui->sensorList->isSortingEnabled();
-
-    ui->sensorList->clearContents();
-    ui->sensorList->setRowCount(list.count());
-
-    ui->sensorList->setSortingEnabled(false);
-
-    for (int row = 0; row < list.count(); ++row) {
-        const SensorData& d = list[row];
-        ui->sensorList->setItem(row, 0, new QTableWidgetItem(d.name));
-
-        QTableWidgetItem* value = new QTableWidgetItem(d.value);
-        value->setTextAlignment(Qt::AlignRight);
-        if (d.lastUpdated < yesterday) {
-            value->setForeground(Qt::red);
-        }
-        ui->sensorList->setItem(row, 1, value);
-    }
-    ui->sensorList->setSortingEnabled(sorting);
-    ui->sensorList->resizeColumnToContents(1);
+    delete m_model;
 }
 
 } // namespace sensors
