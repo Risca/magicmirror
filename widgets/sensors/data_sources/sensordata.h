@@ -11,7 +11,7 @@ struct SensorData
     QString value;
     QDateTime lastUpdated;
 
-    bool operator<(const SensorData& other) { return this->name < other.name; }
+    bool operator<(const SensorData& other) const { return this->name < other.name; }
 };
 
 } // namespace sensors
