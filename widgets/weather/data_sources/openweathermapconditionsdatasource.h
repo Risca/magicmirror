@@ -1,5 +1,4 @@
-#ifndef OPENWEATHERMAPCONDITIONSDATASOURCE_H
-#define OPENWEATHERMAPCONDITIONSDATASOURCE_H
+#pragma once
 
 #include "icurrentconditionsdatasource.h"
 
@@ -41,5 +40,3 @@ protected:
 };
 
 } // namespace weather
-
-#endif // OPENWEATHERMAPCONDITIONSDATASOURCE_H

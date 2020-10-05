@@ -1,5 +1,4 @@
-#ifndef WEATHERDATA_H
-#define WEATHERDATA_H
+#pragma once
 
 #include <QDate>
 #include <QIcon>
@@ -26,5 +25,3 @@ struct Data
 };
 
 } // namespace weather
-
-#endif // WEATHERDATA_H

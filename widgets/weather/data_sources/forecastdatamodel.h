@@ -1,10 +1,8 @@
-#ifndef FORECASTDATAMODEL_H
-#define FORECASTDATAMODEL_H
+#pragma once
 
 #include "iforecastdatasource.h"
 
 #include <QAbstractItemModel>
-#include <QSharedPointer>
 
 class QModelIndex;
 
@@ -36,5 +34,3 @@ protected slots:
 };
 
 } // namespace weather
-
-#endif // FORECASTDATAMODEL_H

@@ -1,5 +1,4 @@
-#ifndef WEATHER_IFORECASTDATASOURCE_H
-#define WEATHER_IFORECASTDATASOURCE_H
+#pragma once
 
 #include "weatherdata.h"
 
@@ -32,5 +31,3 @@ protected:
 inline IForecastDataSource::~IForecastDataSource() {}
 
 }
-
-#endif // WEATHER_IFORECASTDATASOURCE_H

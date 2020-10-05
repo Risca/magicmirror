@@ -1,5 +1,4 @@
-#ifndef FAKEWEATHERCONDITIONSDATASOURCE_H
-#define FAKEWEATHERCONDITIONSDATASOURCE_H
+#pragma once
 
 #include "icurrentconditionsdatasource.h"
 #include <QObject>
@@ -23,5 +22,3 @@ private slots:
 };
 
 } // namespace weather
-
-#endif // FAKEWEATHERCONDITIONSDATASOURCE_H

@@ -1,5 +1,4 @@
-#ifndef ICURRENTCONDITIONSDATASOURCE_H
-#define ICURRENTCONDITIONSDATASOURCE_H
+#pragma once
 
 #include <QObject>
 
@@ -38,5 +37,3 @@ protected:
 inline ICurrentConditionsDataSource::~ICurrentConditionsDataSource() {}
 
 } // namespace weather
-
-#endif // ICURRENTCONDITIONSDATASOURCE_H

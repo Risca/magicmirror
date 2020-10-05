@@ -1,5 +1,4 @@
-#ifndef OPENWEATHERMAPFORECASTDATASOURCE_H
-#define OPENWEATHERMAPFORECASTDATASOURCE_H
+#pragma once
 
 #include "iforecastdatasource.h"
 
@@ -50,5 +49,3 @@ protected:
 };
 
 } // namespace weather
-
-#endif // OPENWEATHERMAPFORECASTDATASOURCE_H

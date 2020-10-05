@@ -1,5 +1,4 @@
-#ifndef FAKEFORECASTDATASOURCE_H
-#define FAKEFORECASTDATASOURCE_H
+#pragma once
 
 #include "iforecastdatasource.h"
 
@@ -27,5 +26,3 @@ private slots:
 };
 
 } // namespace weather
-
-#endif // FAKEFORECASTDATASOURCE_H
