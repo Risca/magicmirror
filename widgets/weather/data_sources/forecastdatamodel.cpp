@@ -6,6 +6,7 @@
 #include <QIcon>
 #include <QLocale>
 #include <QModelIndex>
+#include <QString>
 #include <QVariant>
 
 
@@ -13,13 +14,21 @@ namespace weather {
 
 namespace {
 
+QString Capitalized(const QString& str, const QLocale& locale = QLocale())
+{
+    QString firstLetter = str.left(1);
+    return locale.toUpper(firstLetter) + str.right(str.size() - 1);
+}
+
 QString Date(const QDateTime& dt)
 {
-    const QDate tomorrow = QDate::currentDate().addDays(1);
+    const qint64 HOURS = 3600;
+    const QDateTime later = QDateTime::currentDateTime().addSecs(16 * HOURS);
     const QLocale locale;
 
-    if (dt.date() >= tomorrow) {
-        return dt.date().toString("ddd");
+    if (dt >= later) {
+        QString day = locale.toString(dt.date(), "ddd");
+        return Capitalized(day);
     }
     else {
         return locale.toString(dt.time(), QLocale::ShortFormat);
