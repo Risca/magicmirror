@@ -126,8 +126,6 @@ void DomoticzSensor::downloadFinished()
         QJsonDocument jdoc = QJsonDocument::fromJson(m_reply->readAll());
         QJsonObject jobj = jdoc.object();
 
-        qDebug() << __PRETTY_FUNCTION__ << jobj;
-
         foreach (const QJsonValue& sensor, jobj["result"].toArray()) {
             SensorData d;
             const QJsonObject s = sensor.toObject();
