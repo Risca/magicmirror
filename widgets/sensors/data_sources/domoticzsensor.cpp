@@ -128,6 +128,9 @@ void DomoticzSensor::downloadFinished()
             if (s.contains("Temp")) {
                 d.values[utils::TEMPERATURE] = s["Temp"].toDouble();
             }
+            if (s.contains("Humidity")) {
+                d.values[utils::HUMIDITY] = s["Humidity"].toDouble();
+            }
             d.timestamp = QDateTime::fromString(s["LastUpdate"].toString(), Qt::ISODate);
             if (!d.source.isEmpty() && !d.values.isEmpty()) {
                 qDebug() << __PRETTY_FUNCTION__ << ":" << d.source << "-" << d.timestamp << "-" << d.values.count() << "reading(s)";

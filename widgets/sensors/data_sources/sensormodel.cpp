@@ -17,7 +17,8 @@ enum Column {
     COL_NAME,
     COL_ICON,
     COL_TEMPERATURE,
-    COL_LAST = COL_TEMPERATURE,
+    COL_HUMIDITY,
+    COL_LAST = COL_HUMIDITY,
     COL_COUNT,
 };
 
@@ -95,6 +96,10 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
             return d.source;
         case COL_TEMPERATURE:
             return utils::Temperature(d.values[utils::TEMPERATURE]);
+        case COL_HUMIDITY:
+            if (d.values.contains(utils::HUMIDITY)) {
+                return utils::Humidity(d.values[utils::HUMIDITY]);
+            }
         default:
             break;
         }
@@ -103,11 +108,18 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
     case Qt::TextAlignmentRole:
         break;
     case Qt::ForegroundRole:
-        if (col == COL_TEMPERATURE) {
-            const QDateTime yesterday = QDateTime::currentDateTime().addDays(-1);
-            if (d.timestamp < yesterday) {
-                return QBrush(Qt::red);
+        switch (col) {
+        case COL_TEMPERATURE:
+        case COL_HUMIDITY:
+            {
+                const QDateTime yesterday = QDateTime::currentDateTime().addDays(-1);
+                if (d.timestamp < yesterday) {
+                    return QBrush(Qt::red);
+                }
             }
+            break;
+        default:
+            break;
         }
         break;
     default:
