@@ -1,6 +1,6 @@
 #pragma once
 
-#include "weatherdata.h"
+#include "utils/sensordata.h"
 
 #include <QList>
 #include <QObject>
@@ -19,7 +19,7 @@ public:
     static bool Create(IForecastDataSource*& obj, const QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject* parent = 0);
     virtual ~IForecastDataSource() = 0;
 
-    virtual const QList<Data>& forecast() const = 0;
+    virtual const QList<utils::SensorData>& forecast() const = 0;
 
 signals:
     void newForecastAvailable();

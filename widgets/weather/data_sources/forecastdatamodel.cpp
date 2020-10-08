@@ -101,13 +101,13 @@ QVariant ForecastDataModel::data(const QModelIndex &index, int role) const
     const int col = index.column();
     const int row = index.row();
 
-    const QList<Data>& forecastList = m_source->forecast();
+    const QList<utils::SensorData>& forecastList = m_source->forecast();
 
     if (row >= forecastList.size()) {
         return QVariant();
     }
 
-    const Data forecast = forecastList.at(row);
+    const utils::SensorData &forecast = forecastList.at(row);
 
     switch (role) {
     case Qt::DecorationRole:
@@ -119,28 +119,28 @@ QVariant ForecastDataModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
         switch (col) {
         case 0:
-            return Date(forecast.dateTime);
+            return Date(forecast.timestamp);
         case 1:
             // Only icons in this column
             break;
         case 2:
-            if (forecast.values.contains(weather::TEMPERATURE_HIGH)) {
-                return Temperature(forecast.values[weather::TEMPERATURE_HIGH]);
+            if (forecast.values.contains(utils::TEMPERATURE_HIGH)) {
+                return Temperature(forecast.values[utils::TEMPERATURE_HIGH]);
             }
-            return Temperature(forecast.values[weather::TEMPERATURE]);
+            return Temperature(forecast.values[utils::TEMPERATURE]);
         case 3:
-            if (forecast.values.contains(weather::TEMPERATURE_LOW)) {
-                return Temperature(forecast.values[weather::TEMPERATURE_LOW]);
+            if (forecast.values.contains(utils::TEMPERATURE_LOW)) {
+                return Temperature(forecast.values[utils::TEMPERATURE_LOW]);
             }
             break;
         case 4:
-            if (forecast.values.contains(weather::HUMIDITY)) {
-                return Humidity(forecast.values[weather::HUMIDITY]);
+            if (forecast.values.contains(utils::HUMIDITY)) {
+                return Humidity(forecast.values[utils::HUMIDITY]);
             }
             break;
         case 5:
-            if (forecast.values.contains(weather::PRECIPITATION)) {
-                return Precipitation(forecast.values[weather::PRECIPITATION]);
+            if (forecast.values.contains(utils::PRECIPITATION)) {
+                return Precipitation(forecast.values[utils::PRECIPITATION]);
             }
             break;
         default:
@@ -156,12 +156,12 @@ QVariant ForecastDataModel::data(const QModelIndex &index, int role) const
     case Qt::ForegroundRole:
         switch (col) {
         case 2:
-            if (forecast.values.contains(weather::TEMPERATURE_HIGH)) {
+            if (forecast.values.contains(utils::TEMPERATURE_HIGH)) {
                 return QBrush(Qt::yellow);
             }
             break;
         case 3:
-            if (forecast.values.contains(weather::TEMPERATURE_LOW)) {
+            if (forecast.values.contains(utils::TEMPERATURE_LOW)) {
                 return QBrush(Qt::blue);
             }
         default:

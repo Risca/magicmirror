@@ -1,7 +1,7 @@
 #include "openweathermapforecastdatasource.h"
 
-#include "iconcache.h"
-#include "weatherdata.h"
+#include "utils/iconcache.h"
+#include "utils/sensordata.h"
 
 #include <QtGlobal>
 #include <QDebug>
@@ -58,7 +58,7 @@ OpenWeatherMapForecastDataSource::~OpenWeatherMapForecastDataSource()
     delete m_iconCache;
 }
 
-const QList<Data> &OpenWeatherMapForecastDataSource::forecast() const
+const QList<utils::SensorData> &OpenWeatherMapForecastDataSource::forecast() const
 {
     return m_currentForecast;
 }
@@ -93,7 +93,7 @@ void OpenWeatherMapForecastDataSource::forecastRequestFinished()
     }
     else {
         const QDate today = QDate::currentDate();
-        QList<Data> forecast;
+        QList<utils::SensorData> forecast;
         QList<QString> icons;
         QJsonDocument jdoc = QJsonDocument::fromJson(m_reply->readAll());
         QJsonArray entries = jdoc.object()["list"].toArray();
@@ -103,33 +103,33 @@ void OpenWeatherMapForecastDataSource::forecastRequestFinished()
         for (int i = 0; i < entries.count(); i++) {
             QJsonObject jobj = entries[i].toObject();
             double temp_min, temp_max;
-            Data d;
+            utils::SensorData d;
 
             qint64 secs = jobj["dt"].toInt();
 #if (QT_VERSION < QT_VERSION_CHECK(5, 8, 0))
-            d.dateTime = QDateTime::fromMSecsSinceEpoch(secs * 1000);
+            d.timestamp = QDateTime::fromMSecsSinceEpoch(secs * 1000);
 #else
-            d.dateTime = QDateTime::fromSecsSinceEpoch(secs);
+            d.timestamp = QDateTime::fromSecsSinceEpoch(secs);
 #endif
-            if (d.dateTime.date() < today) {
-                qWarning() << "Ignoring forecast in the past:" << d.dateTime;
+            if (d.timestamp.date() < today) {
+                qWarning() << "Ignoring forecast in the past:" << d.timestamp;
                 continue;
             }
 
             QJsonObject main = jobj["main"].toObject();
-            d.values[HUMIDITY] = main["humidity"].toDouble();
+            d.values[utils::HUMIDITY] = main["humidity"].toDouble();
             temp_min = main["temp_min"].toDouble();
             temp_max = main["temp_max"].toDouble();
             if (temp_max - temp_min <= 0.05) {
-                d.values[TEMPERATURE] = temp_max;
+                d.values[utils::TEMPERATURE] = temp_max;
             }
             else {
-                d.values[TEMPERATURE_LOW] = temp_min;
-                d.values[TEMPERATURE_HIGH] = temp_max;
+                d.values[utils::TEMPERATURE_LOW] = temp_min;
+                d.values[utils::TEMPERATURE_HIGH] = temp_max;
             }
-            d.values[WIND_SPEED] = jobj["wind"].toObject()["speed"].toDouble();
+            d.values[utils::WIND_SPEED] = jobj["wind"].toObject()["speed"].toDouble();
             if (jobj.contains("rain")) {
-                d.values[PRECIPITATION] = jobj["rain"].toObject()["3h"].toDouble();
+                d.values[utils::PRECIPITATION] = jobj["rain"].toObject()["3h"].toDouble();
             }
 
             const QString icon = jobj["weather"].toArray().first().toObject()["icon"].toString();

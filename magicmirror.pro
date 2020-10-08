@@ -58,6 +58,7 @@ SOURCES = main/MirrorFrame.cpp \
 
 HEADERS = main/MirrorFrame.h \
     utils/effects.h \
+    utils/sensordata.h \
     utils/settingsfactory.h \
     utils/iconcache.h \
     widgets/calendar/calendar.h \
@@ -80,7 +81,6 @@ HEADERS = main/MirrorFrame.h \
     widgets/weather/data_sources/iforecastdatasource.h \
     widgets/weather/data_sources/openweathermapconditionsdatasource.h \
     widgets/weather/data_sources/openweathermapforecastdatasource.h \
-    widgets/weather/data_sources/weatherdata.h \
     widgets/weather/forecast.h
 
 

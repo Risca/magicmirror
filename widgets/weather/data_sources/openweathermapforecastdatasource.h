@@ -20,7 +20,7 @@ class OpenWeatherMapForecastDataSource : public IForecastDataSource
 public:
     virtual ~OpenWeatherMapForecastDataSource();
 
-    const QList<Data>& forecast() const;
+    const QList<utils::SensorData>& forecast() const;
 
 public slots:
     void requestForecast();
@@ -35,7 +35,7 @@ protected:
 
     friend class IForecastDataSource;
 
-    QList<Data> m_currentForecast;
+    QList<utils::SensorData> m_currentForecast;
     QList<QString> m_forecastIcons;
 
     QSharedPointer<QNetworkAccessManager> m_net;

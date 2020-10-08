@@ -11,7 +11,7 @@ class FakeForecastData : public IForecastDataSource
 public:
     virtual ~FakeForecastData() {}
 
-    const QList<Data>& forecast() const;
+    const QList<utils::SensorData>& forecast() const;
 
 private:
     Q_DISABLE_COPY(FakeForecastData);
@@ -19,7 +19,7 @@ private:
 
     friend class IForecastDataSource;
 
-    QList<Data> m_currentForecast;
+    QList<utils::SensorData> m_currentForecast;
 
 private slots:
     void generateNewFakeData();

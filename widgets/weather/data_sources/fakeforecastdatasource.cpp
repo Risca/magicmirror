@@ -1,5 +1,7 @@
 #include "fakeforecastdatasource.h"
 
+#include "utils/sensordata.h"
+
 #include <QTimer>
 
 namespace weather {
@@ -11,7 +13,7 @@ FakeForecastData::FakeForecastData(QObject *parent)
     QTimer::singleShot(1000, this, SLOT(generateNewFakeData()));
 }
 
-const QList<Data> &FakeForecastData::forecast() const
+const QList<utils::SensorData> &FakeForecastData::forecast() const
 {
     return m_currentForecast;
 }
@@ -20,41 +22,41 @@ void FakeForecastData::generateNewFakeData()
 {
     const int HOURS = 60 * 60;
     const QDateTime now = QDateTime::currentDateTime();
-    QList<Data> forecast;
-    Data d;
+    QList<utils::SensorData> forecast;
+    utils::SensorData d;
 
-    d.dateTime = now;
-    d.values[TEMPERATURE] = 27;
-    d.values[HUMIDITY] = 15;
+    d.timestamp = now;
+    d.values[utils::TEMPERATURE] = 27;
+    d.values[utils::HUMIDITY] = 15;
     forecast.push_back(d);
 
-    d = Data();
-    d.dateTime = now.addSecs(6 * HOURS);
-    d.values[TEMPERATURE] = 21;
-    d.values[HUMIDITY] = 0;
+    d = utils::SensorData();
+    d.timestamp = now.addSecs(6 * HOURS);
+    d.values[utils::TEMPERATURE] = 21;
+    d.values[utils::HUMIDITY] = 0;
     forecast.push_back(d);
 
-    d = Data();
-    d.dateTime = now.addSecs(12 * HOURS);
-    d.values[TEMPERATURE] = 18;
-    d.values[HUMIDITY] = 6;
-    d.values[PRECIPITATION] = 2;
+    d = utils::SensorData();
+    d.timestamp = now.addSecs(12 * HOURS);
+    d.values[utils::TEMPERATURE] = 18;
+    d.values[utils::HUMIDITY] = 6;
+    d.values[utils::PRECIPITATION] = 2;
     forecast.push_back(d);
 
-    d = Data();
-    d.dateTime = now.addSecs(24 * HOURS);
-    d.values[TEMPERATURE_HIGH] = 24;
-    d.values[TEMPERATURE_LOW] = 18;
-    d.values[HUMIDITY] = 70;
-    d.values[PRECIPITATION] = 8;
+    d = utils::SensorData();
+    d.timestamp = now.addSecs(24 * HOURS);
+    d.values[utils::TEMPERATURE_HIGH] = 24;
+    d.values[utils::TEMPERATURE_LOW] = 18;
+    d.values[utils::HUMIDITY] = 70;
+    d.values[utils::PRECIPITATION] = 8;
     forecast.push_back(d);
 
-    d = Data();
-    d.dateTime = now.addSecs(48 * HOURS);
-    d.values[TEMPERATURE_HIGH] = 27;
-    d.values[TEMPERATURE_LOW] = 18;
-    d.values[HUMIDITY] = 10;
-    d.values[PRECIPITATION] = 0;
+    d = utils::SensorData();
+    d.timestamp = now.addSecs(48 * HOURS);
+    d.values[utils::TEMPERATURE_HIGH] = 27;
+    d.values[utils::TEMPERATURE_LOW] = 18;
+    d.values[utils::HUMIDITY] = 10;
+    d.values[utils::PRECIPITATION] = 0;
     forecast.push_back(d);
 
     m_currentForecast = forecast;
