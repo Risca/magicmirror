@@ -35,8 +35,8 @@ Sensors::Sensors(SensorModel *model, QWidget *parent) :
     m_model->setParent(this);
 
     ui->sensorList->setModel(m_model);
-    ui->sensorList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->sensorList->horizontalHeader()->setSectionResizeMode(model->columnCount() - 1, QHeaderView::ResizeToContents);
+    ui->sensorList->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->sensorList->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->sensorList->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 

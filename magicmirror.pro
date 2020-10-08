@@ -70,7 +70,6 @@ HEADERS = main/MirrorFrame.h \
     widgets/sensors/data_sources/domoticzsensor.h \
     widgets/sensors/data_sources/sensor_isource.h \
     widgets/sensors/data_sources/sensor_nosource.h \
-    widgets/sensors/data_sources/sensordata.h \
     widgets/sensors/data_sources/sensormodel.h \
     widgets/sensors/sensors.h \
     widgets/weather/currentconditions.h \

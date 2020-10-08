@@ -1,7 +1,7 @@
 #include "sensormodel.h"
 
 #include "sensor_isource.h"
-#include "sensordata.h"
+#include "utils/sensordata.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -12,10 +12,20 @@
 
 namespace sensors {
 
+namespace {
+
+QString Temperature(double t)
+{
+    return QString::number(t, 'f', 1) + QString::fromUtf8("°");
+}
+
+} // anonymous namespace
+
 enum Column {
     COL_NAME,
-    COL_VALUE,
-    COL_LAST = COL_VALUE,
+    COL_ICON,
+    COL_TEMPERATURE,
+    COL_LAST = COL_TEMPERATURE,
     COL_COUNT,
 };
 
@@ -25,8 +35,8 @@ SensorModel::SensorModel(ISource *dataSource, QObject *parent) :
 {
     m_source->setParent(this);
 
-    connect(m_source, SIGNAL(sensorDataUpdated(const QList<SensorData>&)),
-            this, SLOT(addData(const QList<SensorData>&)));
+    connect(m_source, SIGNAL(sensorDataUpdated(const QList<utils::SensorData>&)),
+            this, SLOT(addData(const QList<utils::SensorData>&)));
 }
 
 SensorModel::~SensorModel()
@@ -74,14 +84,14 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    const SensorData d = m_data.at(row);
+    const utils::SensorData& d = m_data.at(row);
 
     switch (role) {
     case Qt::DecorationRole:
         // icons
-        if (col == COL_VALUE) {
+        if (col == COL_ICON) {
             const QDateTime yesterday = QDateTime::currentDateTime().addDays(-1);
-            if (d.lastUpdated < yesterday) {
+            if (d.timestamp < yesterday) {
                 return QIcon(":/sensors/icons/low_battery.svg");
             }
         }
@@ -90,23 +100,20 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
         switch (col) {
         case COL_NAME:
-            return d.name;
-        case COL_VALUE:
-            return d.value;
+            return d.source;
+        case COL_TEMPERATURE:
+            return Temperature(d.values[utils::TEMPERATURE]);
         default:
             break;
         }
         break;
 
     case Qt::TextAlignmentRole:
-        if (col == COL_LAST) {
-            return static_cast<Qt::Alignment::Int>(Qt::AlignVCenter | Qt::AlignRight);
-        }
         break;
     case Qt::ForegroundRole:
-        if (col == COL_VALUE) {
+        if (col == COL_TEMPERATURE) {
             const QDateTime yesterday = QDateTime::currentDateTime().addDays(-1);
-            if (d.lastUpdated < yesterday) {
+            if (d.timestamp < yesterday) {
                 return QBrush(Qt::red);
             }
         }
@@ -117,11 +124,11 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void SensorModel::addData(const QList<SensorData> &data)
+void SensorModel::addData(const QList<utils::SensorData> &data)
 {
     beginResetModel();
     m_data = data;
-    std::sort(m_data.begin(), m_data.end());
+    std::sort(m_data.begin(), m_data.end(), utils::SensorData::SortbySource());
     endResetModel();
 }
 

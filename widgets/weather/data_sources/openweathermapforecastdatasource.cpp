@@ -105,6 +105,8 @@ void OpenWeatherMapForecastDataSource::forecastRequestFinished()
             double temp_min, temp_max;
             utils::SensorData d;
 
+            d.source = "Forecast";
+
             qint64 secs = jobj["dt"].toInt();
 #if (QT_VERSION < QT_VERSION_CHECK(5, 8, 0))
             d.timestamp = QDateTime::fromMSecsSinceEpoch(secs * 1000);

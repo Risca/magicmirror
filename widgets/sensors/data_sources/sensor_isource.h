@@ -12,9 +12,13 @@ class QNetworkAccessManager;
 class QSettings;
 class QString;
 
-namespace sensors {
+namespace utils {
 
 struct SensorData;
+
+}
+
+namespace sensors {
 
 class ISource : public QObject
 {
@@ -25,7 +29,7 @@ public:
     virtual ~ISource() = 0;
 
 signals:
-    void sensorDataUpdated(const QList<SensorData>& data);
+    void sensorDataUpdated(const QList<utils::SensorData>& data);
     void error(const QString&);
 
 protected:

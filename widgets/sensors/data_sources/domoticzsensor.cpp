@@ -1,6 +1,6 @@
 #include "domoticzsensor.h"
 
-#include "sensordata.h"
+#include "utils/sensordata.h"
 
 #include <QByteArray>
 #include <QDebug>
@@ -25,11 +25,6 @@
 namespace sensors {
 
 namespace {
-
-QString Temperature(double t)
-{
-    return QString::number(t, 'f', 1) + QString::fromUtf8("°");
-}
 
 QByteArray AuthHeader(const QString& username, const QString& password)
 {
@@ -122,18 +117,20 @@ void DomoticzSensor::downloadFinished()
         m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
     }
     else {
-        QList<SensorData> list;
+        QList<utils::SensorData> list;
         QJsonDocument jdoc = QJsonDocument::fromJson(m_reply->readAll());
         QJsonObject jobj = jdoc.object();
 
         foreach (const QJsonValue& sensor, jobj["result"].toArray()) {
-            SensorData d;
+            utils::SensorData d;
             const QJsonObject s = sensor.toObject();
-            d.name = s["Name"].toString();
-            d.value = Temperature(s["Temp"].toDouble());
-            d.lastUpdated = QDateTime::fromString(s["LastUpdate"].toString(), Qt::ISODate);
-            if (!d.name.isEmpty() && !d.value.isEmpty()) {
-                qDebug() << __PRETTY_FUNCTION__ << ":" << d.name << "-" << d.value << "-" << d.lastUpdated;
+            d.source = s["Name"].toString();
+            if (s.contains("Temp")) {
+                d.values[utils::TEMPERATURE] = s["Temp"].toDouble();
+            }
+            d.timestamp = QDateTime::fromString(s["LastUpdate"].toString(), Qt::ISODate);
+            if (!d.source.isEmpty() && !d.values.isEmpty()) {
+                qDebug() << __PRETTY_FUNCTION__ << ":" << d.source << "-" << d.timestamp << "-" << d.values.count() << "reading(s)";
                 list.append(d);
             }
         }

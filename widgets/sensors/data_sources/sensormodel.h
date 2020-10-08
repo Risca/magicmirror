@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sensordata.h"
+#include "utils/sensordata.h"
 
 #include <QAbstractItemModel>
 #include <QList>
@@ -32,10 +32,10 @@ public:
 protected:
     ISource* m_source;
 
-    QList<SensorData> m_data;
+    QList<utils::SensorData> m_data;
 
 protected slots:
-    void addData(const QList<SensorData>& data);
+    void addData(const QList<utils::SensorData>& data);
 };
 
 } // namespace sensors
