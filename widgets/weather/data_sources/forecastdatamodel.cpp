@@ -1,5 +1,7 @@
 #include "forecastdatamodel.h"
 
+#include "utils/formatting.h"
+
 #include <QBrush>
 #include <QDateTime>
 #include <QDebug>
@@ -11,47 +13,6 @@
 
 
 namespace weather {
-
-namespace {
-
-QString Capitalized(const QString& str, const QLocale& locale = QLocale())
-{
-    QString firstLetter = str.left(1);
-    return locale.toUpper(firstLetter) + str.right(str.size() - 1);
-}
-
-QString Date(const QDateTime& dt)
-{
-    const qint64 HOURS = 3600;
-    const QDateTime later = QDateTime::currentDateTime().addSecs(16 * HOURS);
-    const QLocale locale;
-
-    if (dt >= later) {
-        QString day = locale.toString(dt.date(), "ddd");
-        return Capitalized(day);
-    }
-    else {
-        return locale.toString(dt.time(), QLocale::ShortFormat);
-    }
-    return QString();
-}
-
-QString Temperature(double t)
-{
-    return QString::number(t, 'f', 1) + QString::fromUtf8("°");
-}
-
-QString Humidity(double h)
-{
-    return QString::number(h, 'f', 0) + "%";
-}
-
-QString Precipitation(double p)
-{
-    return QString::number(p, 'f', 0) + " mm";
-}
-
-} // anonymous namespace
 
 ForecastDataModel::ForecastDataModel(IForecastDataSource *dataSource, QObject *parent) :
     QAbstractItemModel(parent),
@@ -119,28 +80,28 @@ QVariant ForecastDataModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
         switch (col) {
         case 0:
-            return Date(forecast.timestamp);
+            return utils::Date(forecast.timestamp);
         case 1:
             // Only icons in this column
             break;
         case 2:
             if (forecast.values.contains(utils::TEMPERATURE_HIGH)) {
-                return Temperature(forecast.values[utils::TEMPERATURE_HIGH]);
+                return utils::Temperature(forecast.values[utils::TEMPERATURE_HIGH]);
             }
-            return Temperature(forecast.values[utils::TEMPERATURE]);
+            return utils::Temperature(forecast.values[utils::TEMPERATURE]);
         case 3:
             if (forecast.values.contains(utils::TEMPERATURE_LOW)) {
-                return Temperature(forecast.values[utils::TEMPERATURE_LOW]);
+                return utils::Temperature(forecast.values[utils::TEMPERATURE_LOW]);
             }
             break;
         case 4:
             if (forecast.values.contains(utils::HUMIDITY)) {
-                return Humidity(forecast.values[utils::HUMIDITY]);
+                return utils::Humidity(forecast.values[utils::HUMIDITY]);
             }
             break;
         case 5:
             if (forecast.values.contains(utils::PRECIPITATION)) {
-                return Precipitation(forecast.values[utils::PRECIPITATION]);
+                return utils::Precipitation(forecast.values[utils::PRECIPITATION]);
             }
             break;
         default:

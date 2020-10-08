@@ -58,6 +58,7 @@ SOURCES = main/MirrorFrame.cpp \
 
 HEADERS = main/MirrorFrame.h \
     utils/effects.h \
+    utils/formatting.h \
     utils/sensordata.h \
     utils/settingsfactory.h \
     utils/iconcache.h \

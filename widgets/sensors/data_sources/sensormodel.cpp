@@ -1,6 +1,7 @@
 #include "sensormodel.h"
 
 #include "sensor_isource.h"
+#include "utils/formatting.h"
 #include "utils/sensordata.h"
 
 #include <QBrush>
@@ -11,15 +12,6 @@
 #include <algorithm>
 
 namespace sensors {
-
-namespace {
-
-QString Temperature(double t)
-{
-    return QString::number(t, 'f', 1) + QString::fromUtf8("°");
-}
-
-} // anonymous namespace
 
 enum Column {
     COL_NAME,
@@ -102,7 +94,7 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
         case COL_NAME:
             return d.source;
         case COL_TEMPERATURE:
-            return Temperature(d.values[utils::TEMPERATURE]);
+            return utils::Temperature(d.values[utils::TEMPERATURE]);
         default:
             break;
         }
