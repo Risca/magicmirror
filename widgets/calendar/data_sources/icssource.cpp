@@ -80,12 +80,10 @@ bool IsFutureEvent(const StartStopDate& dates, const QDate& today)
 
 bool IcsSource::Create(calendar::ISource *&obj, const QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject *parent)
 {
-    if (settings->value("type").toString() == "ics") {
-        const QUrl url = settings->value("url").toUrl();
-        if (url.isValid()) {
-            obj = new IcsSource(url, net, parent);
-            return !!obj;
-        }
+    const QUrl url = settings->value("url").toUrl();
+    if (url.isValid()) {
+        obj = new IcsSource(url, net, parent);
+        return !!obj;
     }
     return false;
 }
