@@ -48,6 +48,9 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
+    QApplication::setOrganizationName("MagicMirror");
+    QApplication::setApplicationName("MagicMirror");
+
     QSharedPointer<QSettings> settings = SettingsFactory::Create();
     qDebug() << "Using settings file:" << settings->fileName();
 
