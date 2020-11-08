@@ -73,7 +73,6 @@ void Calendar::NewEventList(const QList<Event> &events)
     foreach (const calendar::Event& e, events) {
         qDebug() << m_locale.toString(e.start, QLocale::LongFormat)
                  << m_locale.toString(e.stop, QLocale::LongFormat)
-                 << "All day event:" << (e.allDayEvent ? "yes" : "no")
                  << e.summary;
 
         // Make date(s) bold

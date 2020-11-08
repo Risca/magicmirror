@@ -136,14 +136,7 @@ void IcsSource::downloadFinished()
                 if (IsFutureEvent(dates, today)) {
                     calendar::Event event;
                     event.start = dates.first;
-                    if (dates.second.isValid() && dates.first != dates.second) {
-                        event.allDayEvent = false;
-                        event.stop = dates.second;
-                    }
-                    else {
-                        event.allDayEvent = true;
-                        event.stop = dates.first;
-                    }
+                    event.stop = dates.second.isValid() ? dates.second : dates.first;
                     event.summary = GetSummary(c);
                     events << event;
                 }

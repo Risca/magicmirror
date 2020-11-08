@@ -9,7 +9,6 @@ namespace calendar {
 struct Event {
     QDate start;
     QDate stop;
-    bool allDayEvent;
     QString summary;
 
     bool operator<(const Event& other) const {
@@ -20,7 +19,6 @@ struct Event {
             return this->start < other.start;
         }
     }
-    Event() : allDayEvent(false) {}
 };
 
 } // namespace calendar
