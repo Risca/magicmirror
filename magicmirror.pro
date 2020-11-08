@@ -37,6 +37,7 @@ INCLUDEPATH += main \
 SOURCES = main/MirrorFrame.cpp \
         main/main.cpp \
     utils/effects.cpp \
+    utils/qrcodepopup.cpp \
 	utils/settingsfactory.cpp \
         utils/iconcache.cpp \
     widgets/calendar/data_sources/calendarsourcefactory.cpp \
@@ -59,6 +60,7 @@ SOURCES = main/MirrorFrame.cpp \
 HEADERS = main/MirrorFrame.h \
     utils/effects.h \
     utils/formatting.h \
+    utils/qrcodepopup.h \
     utils/sensordata.h \
     utils/settingsfactory.h \
     utils/iconcache.h \
@@ -92,7 +94,7 @@ FORMS += \
     widgets/weather/forecast.ui
 
 unix: CONFIG += link_pkgconfig
-unix: PKGCONFIG += libical
+unix: PKGCONFIG += libical libqrencode
 
 RESOURCES += main/stylesheets/breeze.qrc \
     resources/icons.qrc
