@@ -41,6 +41,7 @@ SOURCES = main/MirrorFrame.cpp \
 	utils/settingsfactory.cpp \
         utils/iconcache.cpp \
     widgets/calendar/data_sources/calendarsourcefactory.cpp \
+    widgets/calendar/data_sources/googlecalendarsource.cpp \
     widgets/calendar/data_sources/icssource.cpp \
     widgets/calendar/calendar.cpp \
     widgets/compliment.cpp \
@@ -68,6 +69,7 @@ HEADERS = main/MirrorFrame.h \
     widgets/calendar/data_sources/cal_isource.h \
     widgets/calendar/data_sources/cal_nosource.h \
     widgets/calendar/data_sources/event.hpp \
+    widgets/calendar/data_sources/googlecalendarsource.h \
     widgets/calendar/data_sources/icssource.h \
     widgets/compliment.h \
     widgets/sensors/data_sources/domoticzsensor.h \
@@ -94,7 +96,7 @@ FORMS += \
     widgets/weather/forecast.ui
 
 unix: CONFIG += link_pkgconfig
-unix: PKGCONFIG += libical libqrencode
+unix: PKGCONFIG += libical o2 libqrencode
 
 RESOURCES += main/stylesheets/breeze.qrc \
     resources/icons.qrc

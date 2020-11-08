@@ -1,5 +1,6 @@
 #include "cal_isource.h"
 #include "icssource.h"
+#include "googlecalendarsource.h"
 #include "cal_nosource.h"
 
 #include <QDebug>
@@ -13,6 +14,13 @@ bool ISource::Create(ISource *&obj, QSharedPointer<QSettings> settings, QSharedP
 
     settings->beginGroup("ICS");
     objectCreated = IcsSource::Create(obj, settings, net, parent);
+    settings->endGroup();
+    if (objectCreated) {
+        return true;
+    }
+
+    settings->beginGroup("Google");
+    objectCreated = GoogleCalendarSource::Create(obj, settings, net, parent);
     settings->endGroup();
     if (objectCreated) {
         return true;
