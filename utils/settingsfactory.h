@@ -11,6 +11,7 @@ class SettingsFactory
 {
 public:
     static QSharedPointer<QSettings> Create(const QString& widget = QString());
+    static QSettings *CreateNew();
 
 private:
     static QMap<QString, QSharedPointer<QSettings> > g_ObjectCache;
