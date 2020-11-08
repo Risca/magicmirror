@@ -4,6 +4,7 @@
 
 #include <QNetworkReply>
 #include <QStringList>
+#include <QTimer>
 
 class O2GoogleDevice;
 class O2Requestor;
@@ -41,6 +42,7 @@ protected:
     O2Requestor *m_requestor;
     QStringList m_ids;
     int m_requestId;
+    QTimer m_retryTimer;
 };
 
 } // namespace calendar

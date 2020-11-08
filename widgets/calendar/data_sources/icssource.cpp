@@ -95,6 +95,7 @@ IcsSource::IcsSource(const QUrl &url, QSharedPointer<QNetworkAccessManager> net,
     m_url(url)
 {
     qDebug() << "Using ICS source:" << m_url.toString();
+    m_retryTimer.setTimerType(Qt::VeryCoarseTimer);
     m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
     m_retryTimer.setSingleShot(true);
     connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(sync()));

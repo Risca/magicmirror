@@ -22,6 +22,8 @@ namespace calendar {
 
 namespace {
 
+#define DEFAULT_RETRY_TIMEOUT (1000 * 30)
+
 const QString BASE_URL = "https://www.googleapis.com/calendar/v3/calendars/";
 const char *SCOPE = "https://www.googleapis.com/auth/calendar";
 const char *STORE_ENCRYPTION_KEY = "T;qVL}Ub*A57hhX=";
@@ -84,6 +86,11 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
     connect(o2, SIGNAL(linkingSucceeded()), this, SLOT(onLinkingSucceeded()));
     connect(o2, SIGNAL(showVerificationUriAndCode(QUrl, QString)),
             this, SLOT(onVerificationCodeAndUrl(QUrl, QString)));
+
+    m_retryTimer.setTimerType(Qt::VeryCoarseTimer);
+    m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
+    m_retryTimer.setSingleShot(true);
+    connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(sync()));
 }
 
 GoogleCalendarSource::~GoogleCalendarSource()
@@ -94,6 +101,8 @@ GoogleCalendarSource::~GoogleCalendarSource()
 void GoogleCalendarSource::sync()
 {
     qDebug() << __PRETTY_FUNCTION__;
+
+    m_retryTimer.stop();
 
     if (m_o2->linked()) {
         getEvents();
@@ -108,6 +117,7 @@ void GoogleCalendarSource::onLinkedChanged()
     qDebug() << __PRETTY_FUNCTION__ << "linked:" << m_o2->linked();
     if (!m_o2->linked()) {
         deleteRequestor();
+        m_retryTimer.start();
     }
 }
 
@@ -115,6 +125,7 @@ void GoogleCalendarSource::onLinkingFailed()
 {
     qDebug() << __PRETTY_FUNCTION__;
     deleteRequestor();
+    m_retryTimer.start();
 }
 
 void GoogleCalendarSource::onLinkingSucceeded()
