@@ -10,11 +10,15 @@
 
 #include <QDate>
 #include <QDebug>
+#include <QDir>
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QSettings>
+#include <QStandardPaths>
+#include <QTextStream>
 
 #include <algorithm>
 
@@ -26,7 +30,7 @@ namespace {
 
 const QString BASE_URL = "https://www.googleapis.com/calendar/v3/calendars/";
 const char *SCOPE = "https://www.googleapis.com/auth/calendar";
-const char *STORE_ENCRYPTION_KEY = "T;qVL}Ub*A57hhX=";
+const char *DEFAULT_STORE_ENCRYPTION_KEY = "T;qVL}Ub*A57hhX=";
 
 QDate toDate(const QJsonValue &v)
 {
@@ -55,8 +59,26 @@ bool GoogleCalendarSource::Create(ISource *&obj, const QSharedPointer<QSettings>
         return false;
     }
 
-    O0SettingsStore *store = new O0SettingsStore(SettingsFactory::CreateNew(), STORE_ENCRYPTION_KEY, o2);
+    QString storeKey = DEFAULT_STORE_ENCRYPTION_KEY;
+    const QString storePath = settings->value("settings_dir",
+        QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)).toString();
+
+    QFile f(settings->value("settings_key_file").toString());
+    if (f.open(QFile::ReadOnly | QFile::Text)) {
+        QTextStream in(&f);
+        storeKey = in.readAll();
+    }
+
+    QSettings *storeSettings = new QSettings(storePath + QDir::separator() + "google_calendar_store",
+                                             QSettings::NativeFormat);
+    if (!storeSettings) {
+        delete o2;
+        return false;
+    }
+
+    O0SettingsStore *store = new O0SettingsStore(storeSettings, storeKey, o2);
     if (!store) {
+        delete storeSettings;
         delete o2;
         return false;
     }
