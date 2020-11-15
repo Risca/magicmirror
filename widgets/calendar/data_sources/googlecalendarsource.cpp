@@ -113,6 +113,12 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
     m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
     m_retryTimer.setSingleShot(true);
     connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(sync()));
+
+    m_refreshTimer.setTimerType(Qt::VeryCoarseTimer);
+    m_refreshTimer.setSingleShot(true);
+    connect(&m_refreshTimer, SIGNAL(timeout()), m_o2, SLOT(refresh()));
+    connect(m_o2, SIGNAL(refreshFinished(QNetworkReply::NetworkError)),
+            this, SLOT(onRefreshFinished(QNetworkReply::NetworkError)));
 }
 
 GoogleCalendarSource::~GoogleCalendarSource()
@@ -139,6 +145,7 @@ void GoogleCalendarSource::onLinkedChanged()
     qDebug() << __PRETTY_FUNCTION__ << "linked:" << m_o2->linked();
     if (!m_o2->linked()) {
         deleteRequestor();
+        m_refreshTimer.stop();
         m_retryTimer.start();
     }
 }
@@ -147,12 +154,15 @@ void GoogleCalendarSource::onLinkingFailed()
 {
     qDebug() << __PRETTY_FUNCTION__;
     deleteRequestor();
+    m_refreshTimer.stop();
     m_retryTimer.start();
 }
 
 void GoogleCalendarSource::onLinkingSucceeded()
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    int expires = static_cast<qint64>(m_o2->expires())*1000 - QDateTime::currentMSecsSinceEpoch();
+    qDebug() << __PRETTY_FUNCTION__ << "expires in" << expires*1000 << "seconds";
+    m_refreshTimer.start(expires);
     deleteRequestor();
     getEvents();
 }
@@ -199,6 +209,11 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
     std::sort(events.begin(), events.end());
 
     emit finished(events);
+}
+
+void GoogleCalendarSource::onRefreshFinished(QNetworkReply::NetworkError error)
+{
+    qDebug() << __PRETTY_FUNCTION__ << error;
 }
 
 void GoogleCalendarSource::getEvents()

@@ -29,6 +29,7 @@ protected slots:
     void onLinkingSucceeded();
     void onVerificationCodeAndUrl(const QUrl &url, const QString &code);
     void onFinished(int id, QNetworkReply::NetworkError error, const QByteArray &data);
+    void onRefreshFinished(QNetworkReply::NetworkError error);
 
 protected:
     Q_DISABLE_COPY(GoogleCalendarSource)
@@ -43,6 +44,7 @@ protected:
     QStringList m_ids;
     int m_requestId;
     QTimer m_retryTimer;
+    QTimer m_refreshTimer;
 };
 
 } // namespace calendar
