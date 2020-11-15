@@ -201,10 +201,14 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
         foreach (const QJsonValue &i, items) {
             QJsonObject item = i.toObject();
             calendar::Event e;
-            // Google calendar sets end date to the day after last
-            e.stop = toDate(item["end"]).addDays(-1);
+
+            e.stop = toDate(item["end"]);
             if (e.stop >= today) {
                 e.start = toDate(item["start"]);
+                // Google calendar sets end date to the day after last, unless
+                // it's a same day event.
+                if (e.start != e.stop)
+                    e.stop = e.stop.addDays(-1);
                 e.summary = item["summary"].toString();
                 e.color = Qt::gray;
                 m_events.push_back(e);
