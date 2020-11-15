@@ -45,7 +45,7 @@ protected:
     void getColors();
     void getCalendarInfo();
     void getEvents(const QString& calendar);
-    void restartRefreshTimer();
+    bool isAccessTokenValid();
 
     void addEvents(const QJsonDocument &jdoc, const QString &calendarId);
     QColor getEventColor(const QJsonObject &event, const QString &calendarId);

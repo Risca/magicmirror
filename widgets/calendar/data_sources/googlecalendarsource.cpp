@@ -159,8 +159,7 @@ void GoogleCalendarSource::sync()
     m_retryTimer.stop();
 
     if (m_o2->linked()) {
-        restartRefreshTimer();
-        getEvents(m_ids.first());
+        onLinkingSucceeded();
     }
     else {
         m_o2->link();
@@ -185,8 +184,9 @@ void GoogleCalendarSource::onLinkingFailed()
 
 void GoogleCalendarSource::onLinkingSucceeded()
 {
-    restartRefreshTimer();
-    getEvents(m_ids.first());
+    if (isAccessTokenValid()) {
+        getColors();
+    }
 }
 
 void GoogleCalendarSource::onVerificationCodeAndUrl(const QUrl &url, const QString &code)
@@ -266,7 +266,8 @@ void GoogleCalendarSource::onRefreshFinished(QNetworkReply::NetworkError error)
 {
     qDebug() << __PRETTY_FUNCTION__ << error;
     if (error == QNetworkReply::NoError) {
-        restartRefreshTimer();
+        // this restarts the refresh timer
+        isAccessTokenValid();
     }
 }
 
@@ -292,11 +293,19 @@ void GoogleCalendarSource::getEvents(const QString &calendar)
     m_currentRequest[id] = calendar;
 }
 
-void GoogleCalendarSource::restartRefreshTimer()
+bool GoogleCalendarSource::isAccessTokenValid()
 {
     int expires = m_o2->expires()*1000 - QDateTime::currentMSecsSinceEpoch();
-    qDebug() << __PRETTY_FUNCTION__ << "expires in" << expires/1000 << "seconds";
-    m_refreshTimer.start(expires);
+    if (expires <= 0) {
+        qDebug() << __PRETTY_FUNCTION__ << "already expired - refreshing";
+        m_o2->refresh();
+        return false;
+    }
+    else {
+        qDebug() << __PRETTY_FUNCTION__ << "expires in" << expires/1000 << "seconds";
+        m_refreshTimer.start(expires);
+    }
+    return true;
 }
 
 void GoogleCalendarSource::addEvents(const QJsonDocument &jdoc, const QString &calendarId)
