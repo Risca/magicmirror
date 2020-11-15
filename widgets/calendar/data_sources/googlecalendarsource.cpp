@@ -98,8 +98,7 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
     m_net(net),
     m_o2(o2),
     m_requestor(new O2Requestor(m_net.data(), m_o2, this)),
-    m_ids(calendars),
-    m_requestId(0)
+    m_ids(calendars)
 {
     m_o2->setParent(this);
 
@@ -140,7 +139,7 @@ void GoogleCalendarSource::sync()
     m_retryTimer.stop();
 
     if (m_o2->linked()) {
-        getEvents();
+        getEvents(m_ids.first());
     }
     else {
         m_o2->link();
@@ -168,7 +167,7 @@ void GoogleCalendarSource::onLinkingSucceeded()
     int expires = static_cast<qint64>(m_o2->expires())*1000 - QDateTime::currentMSecsSinceEpoch();
     qDebug() << __PRETTY_FUNCTION__ << "expires in" << expires*1000 << "seconds";
     m_refreshTimer.start(expires);
-    getEvents();
+    getEvents(m_ids.first());
 }
 
 void GoogleCalendarSource::onVerificationCodeAndUrl(const QUrl &url, const QString &code)
@@ -184,35 +183,43 @@ void GoogleCalendarSource::onVerificationCodeAndUrl(const QUrl &url, const QStri
 
 void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error, const QByteArray &data)
 {
-    if (id != m_requestId) {
+    if (!m_currentRequest.contains(id)) {
         return;
     }
+
+    const QString &calendar = m_currentRequest[id];
+    qDebug() << __PRETTY_FUNCTION__ << calendar;
 
     if (error != QNetworkReply::NoError) {
         qWarning() << __PRETTY_FUNCTION__ << "error:" << error;
-        return;
     }
+    else {
+        QJsonDocument jdoc = QJsonDocument::fromJson(data);
+        QJsonArray items = jdoc.object()["items"].toArray();
 
-    QJsonDocument jdoc = QJsonDocument::fromJson(data);
-    QJsonArray items = jdoc.object()["items"].toArray();
-
-    const QDate today = QDate::currentDate();
-    QList<calendar::Event> events;
-    foreach (const QJsonValue &i, items) {
-        QJsonObject item = i.toObject();
-        calendar::Event e;
-        // Google calendar sets end date to the day after last
-        e.stop = toDate(item["end"]).addDays(-1);
-        if (e.stop >= today) {
-            e.start = toDate(item["start"]);
-            e.summary = item["summary"].toString();
-            events.push_back(e);
+        const QDate today = QDate::currentDate();
+        foreach (const QJsonValue &i, items) {
+            QJsonObject item = i.toObject();
+            calendar::Event e;
+            // Google calendar sets end date to the day after last
+            e.stop = toDate(item["end"]).addDays(-1);
+            if (e.stop >= today) {
+                e.start = toDate(item["start"]);
+                e.summary = item["summary"].toString();
+                m_events.push_back(e);
+            }
         }
     }
 
-    std::sort(events.begin(), events.end());
+    int nextCalendarIndex = m_ids.indexOf(calendar) + 1;
+    if (nextCalendarIndex == m_ids.size()) {
+        std::sort(m_events.begin(), m_events.end());
+        emit finished(m_events);
+    }
+    else {
+        getEvents(m_ids[nextCalendarIndex]);
+    }
 
-    emit finished(events);
 }
 
 void GoogleCalendarSource::onRefreshFinished(QNetworkReply::NetworkError error)
@@ -220,11 +227,12 @@ void GoogleCalendarSource::onRefreshFinished(QNetworkReply::NetworkError error)
     qDebug() << __PRETTY_FUNCTION__ << error;
 }
 
-void GoogleCalendarSource::getEvents()
+void GoogleCalendarSource::getEvents(const QString &calendar)
 {
-    QUrl url = BASE_URL + m_ids.first() + "/events";
+    QUrl url = BASE_URL + calendar + "/events";
     QNetworkRequest req(url);
-    m_requestId = m_requestor->get(req);
+    int id = m_requestor->get(req);
+    m_currentRequest[id] = calendar;
 }
 
 } // namespace calendar

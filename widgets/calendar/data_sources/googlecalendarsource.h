@@ -2,6 +2,8 @@
 
 #include "cal_isource.h"
 
+#include <QList>
+#include <QMap>
 #include <QNetworkReply>
 #include <QStringList>
 #include <QTimer>
@@ -11,6 +13,8 @@ class O2Requestor;
 class QSettings;
 
 namespace calendar {
+
+struct Event;
 
 class GoogleCalendarSource : public ISource
 {
@@ -35,13 +39,14 @@ protected:
     Q_DISABLE_COPY(GoogleCalendarSource)
     GoogleCalendarSource(O2GoogleDevice *o2, const QStringList& calendars, QSharedPointer<QNetworkAccessManager> net, QObject *parent);
 
-    void getEvents();
+    void getEvents(const QString& calendar);
 
     QSharedPointer<QNetworkAccessManager> m_net;
     O2GoogleDevice *m_o2;
     O2Requestor *m_requestor;
     QStringList m_ids;
-    int m_requestId;
+    QMap<int, QString> m_currentRequest;
+    QList<calendar::Event> m_events;
     QTimer m_retryTimer;
     QTimer m_refreshTimer;
 };
