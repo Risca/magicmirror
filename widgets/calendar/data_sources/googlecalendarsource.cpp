@@ -191,6 +191,7 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
 
     if (error != QNetworkReply::NoError) {
         qWarning() << __PRETTY_FUNCTION__ << "error:" << error;
+        m_retryTimer.start();
     }
     else {
         QJsonDocument jdoc = QJsonDocument::fromJson(data);
