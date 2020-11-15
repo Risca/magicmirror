@@ -2,6 +2,7 @@
 
 #include "cal_isource.h"
 
+#include <QColor>
 #include <QList>
 #include <QMap>
 #include <QNetworkReply>
@@ -10,6 +11,8 @@
 
 class O2GoogleDevice;
 class O2Requestor;
+class QJsonDocument;
+class QJsonObject;
 class QSettings;
 
 namespace calendar {
@@ -39,13 +42,23 @@ protected:
     Q_DISABLE_COPY(GoogleCalendarSource)
     GoogleCalendarSource(O2GoogleDevice *o2, const QStringList& calendars, QSharedPointer<QNetworkAccessManager> net, QObject *parent);
 
+    void getColors();
+    void getCalendarInfo();
     void getEvents(const QString& calendar);
     void restartRefreshTimer();
+
+    void addEvents(const QJsonDocument &jdoc, const QString &calendarId);
+    QColor getEventColor(const QJsonObject &event, const QString &calendarId);
 
     QSharedPointer<QNetworkAccessManager> m_net;
     O2GoogleDevice *m_o2;
     O2Requestor *m_requestor;
     QStringList m_ids;
+    int m_colorRequest;
+    int m_calendarInfoRequest;
+    QMap<int, QColor> m_calendarColorsByColorId;
+    QMap<QString, QColor> m_calendarColorsByCalendarId;
+    QMap<int, QColor> m_eventColors;
     QMap<int, QString> m_currentRequest;
     QList<calendar::Event> m_events;
     QTimer m_retryTimer;

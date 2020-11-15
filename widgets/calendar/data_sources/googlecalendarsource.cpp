@@ -28,7 +28,7 @@ namespace {
 
 #define DEFAULT_RETRY_TIMEOUT (1000 * 30)
 
-const QString BASE_URL = "https://www.googleapis.com/calendar/v3/calendars/";
+const QString BASE_URL = "https://www.googleapis.com/calendar/v3/";
 const char *SCOPE = "https://www.googleapis.com/auth/calendar";
 const char *DEFAULT_STORE_ENCRYPTION_KEY = "T;qVL}Ub*A57hhX=";
 
@@ -40,6 +40,24 @@ QDate toDate(const QJsonValue &v)
         date = value["dateTime"].toString();
     }
     return QDate::fromString(date, Qt::ISODate);
+}
+
+QColor colorFromHexString(const QString &string)
+{
+    QColor c;
+    c.setNamedColor(string);
+    return c;
+}
+
+QMap<int, QColor> toColorMap(const QJsonObject &list)
+{
+    QMap<int, QColor> map;
+    for (QJsonObject::const_iterator color = list.constBegin();
+         color != list.constEnd(); color ++)
+    {
+        map[color.key().toInt()] = colorFromHexString(color.value()["background"].toString());
+    }
+    return map;
 }
 
 } // anonymous namespace
@@ -98,7 +116,9 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
     m_net(net),
     m_o2(o2),
     m_requestor(new O2Requestor(m_net.data(), m_o2, this)),
-    m_ids(calendars)
+    m_ids(calendars),
+    m_colorRequest(-1),
+    m_calendarInfoRequest(-1)
 {
     m_o2->setParent(this);
 
@@ -182,12 +202,15 @@ void GoogleCalendarSource::onVerificationCodeAndUrl(const QUrl &url, const QStri
 
 void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error, const QByteArray &data)
 {
-    if (!m_currentRequest.contains(id)) {
+    if (id != m_colorRequest && id != m_calendarInfoRequest && !m_currentRequest.contains(id)) {
+        qWarning() << __PRETTY_FUNCTION__ << "invalid request id:" << id << m_colorRequest;
         return;
     }
 
-    const QString &calendar = m_currentRequest[id];
-    qDebug() << __PRETTY_FUNCTION__ << calendar;
+    const QString &calendar = m_currentRequest.value(id);
+    qDebug() << __PRETTY_FUNCTION__ << id << (id == m_colorRequest ? "colors" :
+                                             (id == m_calendarInfoRequest ? "calendar info" :
+                                             calendar));
 
     if (error != QNetworkReply::NoError) {
         qWarning() << __PRETTY_FUNCTION__ << "error:" << error;
@@ -195,37 +218,48 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
     }
     else {
         QJsonDocument jdoc = QJsonDocument::fromJson(data);
-        QJsonArray items = jdoc.object()["items"].toArray();
 
-        const QDate today = QDate::currentDate();
-        foreach (const QJsonValue &i, items) {
-            QJsonObject item = i.toObject();
-            calendar::Event e;
+        if (id == m_colorRequest) {
+            m_colorRequest = -1;
 
-            e.stop = toDate(item["end"]);
-            if (e.stop >= today) {
-                e.start = toDate(item["start"]);
-                // Google calendar sets end date to the day after last, unless
-                // it's a same day event.
-                if (e.start != e.stop)
-                    e.stop = e.stop.addDays(-1);
-                e.summary = item["summary"].toString();
-                e.color = Qt::gray;
-                m_events.push_back(e);
+            m_calendarColorsByColorId = toColorMap(jdoc.object()["calendar"].toObject());
+            m_eventColors = toColorMap(jdoc.object()["event"].toObject());
+
+            getCalendarInfo();
+        }
+        else if (id == m_calendarInfoRequest) {
+            m_calendarInfoRequest = -1;
+
+            m_calendarColorsByCalendarId.clear();
+            foreach (const QJsonValue &i, jdoc.object()["items"].toArray()) {
+                QJsonObject calendar = i.toObject();
+                const QString calendarId = calendar["id"].toString();
+                if (m_ids.contains(calendarId)) {
+                    const QString hex = calendar["backgroundColor"].toString();
+                    m_calendarColorsByCalendarId[calendarId] = colorFromHexString(hex);
+                }
             }
+            // Got our info, let's get the first calendar
+            getEvents(m_ids.first());
+        }
+        else {
+            addEvents(jdoc, calendar);
         }
     }
 
-    int nextCalendarIndex = m_ids.indexOf(calendar) + 1;
-    if (nextCalendarIndex == m_ids.size()) {
-        std::sort(m_events.begin(), m_events.end());
-        emit finished(m_events);
-        m_events.clear();
+    if (!calendar.isNull()) {
+        const int nextCalendarIndex = m_ids.indexOf(calendar) + 1;
+        if (nextCalendarIndex == m_ids.size()) {
+            // Fetched all events, time to publish
+            std::sort(m_events.begin(), m_events.end());
+            emit finished(m_events);
+            m_events.clear();
+        }
+        else {
+            // Fetch next calendar's events
+            getEvents(m_ids[nextCalendarIndex]);
+        }
     }
-    else {
-        getEvents(m_ids[nextCalendarIndex]);
-    }
-
 }
 
 void GoogleCalendarSource::onRefreshFinished(QNetworkReply::NetworkError error)
@@ -236,9 +270,23 @@ void GoogleCalendarSource::onRefreshFinished(QNetworkReply::NetworkError error)
     }
 }
 
+void GoogleCalendarSource::getColors()
+{
+    QUrl url = BASE_URL + "colors";
+    QNetworkRequest req(url);
+    m_colorRequest = m_requestor->get(req);
+}
+
+void GoogleCalendarSource::getCalendarInfo()
+{
+    QUrl url = BASE_URL + "users/me/calendarList";
+    QNetworkRequest req(url);
+    m_calendarInfoRequest = m_requestor->get(req);
+}
+
 void GoogleCalendarSource::getEvents(const QString &calendar)
 {
-    QUrl url = BASE_URL + calendar + "/events";
+    QUrl url = BASE_URL + "calendars/" + calendar + "/events";
     QNetworkRequest req(url);
     int id = m_requestor->get(req);
     m_currentRequest[id] = calendar;
@@ -249,6 +297,42 @@ void GoogleCalendarSource::restartRefreshTimer()
     int expires = m_o2->expires()*1000 - QDateTime::currentMSecsSinceEpoch();
     qDebug() << __PRETTY_FUNCTION__ << "expires in" << expires/1000 << "seconds";
     m_refreshTimer.start(expires);
+}
+
+void GoogleCalendarSource::addEvents(const QJsonDocument &jdoc, const QString &calendarId)
+{
+    QJsonArray items = jdoc.object()["items"].toArray();
+
+    const QDate today = QDate::currentDate();
+    foreach (const QJsonValue &i, items) {
+        QJsonObject event = i.toObject();
+        calendar::Event e;
+
+        e.stop = toDate(event["end"]);
+        if (e.stop >= today) {
+            e.start = toDate(event["start"]);
+            // Google calendar sets end date to the day after last, unless
+            // it's a same day event.
+            if (e.start != e.stop)
+                e.stop = e.stop.addDays(-1);
+            e.summary = event["summary"].toString();
+            e.color = getEventColor(event, calendarId);
+            m_events.push_back(e);
+        }
+    }
+}
+
+QColor GoogleCalendarSource::getEventColor(const QJsonObject &event, const QString &calendarId)
+{
+    // Check if event has specific color
+    bool ok;
+    int colorId = event["colorId"].toString().toInt(&ok);
+    if (ok && m_eventColors.contains(colorId)) {
+        return m_eventColors[colorId];
+    }
+
+    // fallback
+    return m_calendarColorsByCalendarId.value(calendarId, Qt::gray);
 }
 
 } // namespace calendar
