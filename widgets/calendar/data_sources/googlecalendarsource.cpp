@@ -55,7 +55,12 @@ QMap<int, QColor> toColorMap(const QJsonObject &list)
     for (QJsonObject::const_iterator color = list.constBegin();
          color != list.constEnd(); color ++)
     {
-        map[color.key().toInt()] = colorFromHexString(color.value()["background"].toString());
+#if QT_VERSION >= 0x050a00
+        const QString &hex = color.value()["background"].toString();
+#else
+        const QString &hex = color.value().toObject()["background"].toString();
+#endif
+        map[color.key().toInt()] = colorFromHexString(hex);
     }
     return map;
 }
