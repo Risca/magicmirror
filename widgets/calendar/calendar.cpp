@@ -51,6 +51,8 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
 
     connect(m_source, SIGNAL(finished(const QList<Event>&)),
             this, SLOT(NewEventList(const QList<Event>&)));
+    connect(m_source, SIGNAL(finished(const QList<Event>&)),
+            ui->calendar, SLOT(setEvents(const QList<Event>&)));
     m_source->sync();
 
     m_timer.start();
@@ -74,16 +76,6 @@ void Calendar::NewEventList(const QList<Event> &events)
         qDebug() << locale().toString(e.start, QLocale::LongFormat)
                  << locale().toString(e.stop, QLocale::LongFormat)
                  << e.summary;
-
-        // Make date(s) bold
-        QFont font = this->font();
-        font.setBold(true);
-        font.setPointSize(font.pointSize() + 1);
-        for (QDate date = e.start; date <= e.stop; date = date.addDays(1)) {
-            QTextCharFormat format = ui->calendar->dateTextFormat(date);
-            format.setFont(font);
-            ui->calendar->setDateTextFormat(date, format);
-        }
 
         const QString event = locale().toString(e.start, QLocale::ShortFormat) + " " + e.summary;
         ui->events->addItem(event);

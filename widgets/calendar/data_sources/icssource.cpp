@@ -139,6 +139,7 @@ void IcsSource::downloadFinished()
                     event.start = dates.first;
                     event.stop = dates.second.isValid() ? dates.second : dates.first;
                     event.summary = GetSummary(c);
+                    event.color = Qt::gray;
                     events << event;
                 }
             }

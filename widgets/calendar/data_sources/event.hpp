@@ -1,6 +1,7 @@
 #ifndef CALENDAR_EVENT_HPP
 #define CALENDAR_EVENT_HPP
 
+#include <QColor>
 #include <QDate>
 #include <QString>
 
@@ -10,6 +11,7 @@ struct Event {
     QDate start;
     QDate stop;
     QString summary;
+    QColor color;
 
     bool operator<(const Event& other) const {
         if (this->start == other.start) {
@@ -18,6 +20,10 @@ struct Event {
         else {
             return this->start < other.start;
         }
+    }
+
+    bool operator==(const QDate& date) const {
+        return this->start <= date && date <= this->stop;
     }
 };
 

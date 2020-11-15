@@ -40,6 +40,7 @@ SOURCES = main/MirrorFrame.cpp \
     utils/qrcodepopup.cpp \
 	utils/settingsfactory.cpp \
         utils/iconcache.cpp \
+    widgets/calendar/customcalendarwidget.cpp \
     widgets/calendar/data_sources/calendarsourcefactory.cpp \
     widgets/calendar/data_sources/googlecalendarsource.cpp \
     widgets/calendar/data_sources/icssource.cpp \
@@ -66,6 +67,7 @@ HEADERS = main/MirrorFrame.h \
     utils/settingsfactory.h \
     utils/iconcache.h \
     widgets/calendar/calendar.h \
+    widgets/calendar/customcalendarwidget.h \
     widgets/calendar/data_sources/cal_isource.h \
     widgets/calendar/data_sources/cal_nosource.h \
     widgets/calendar/data_sources/event.hpp \

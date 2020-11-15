@@ -52,7 +52,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QCalendarWidget" name="calendar">
+    <widget class="calendar::CustomCalendarWidget" name="calendar">
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
@@ -117,6 +117,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>calendar::CustomCalendarWidget</class>
+   <extends>QCalendarWidget</extends>
+   <header>customcalendarwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

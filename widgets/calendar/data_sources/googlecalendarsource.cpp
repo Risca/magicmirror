@@ -206,6 +206,7 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
             if (e.stop >= today) {
                 e.start = toDate(item["start"]);
                 e.summary = item["summary"].toString();
+                e.color = Qt::gray;
                 m_events.push_back(e);
             }
         }
