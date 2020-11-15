@@ -214,6 +214,7 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
     if (nextCalendarIndex == m_ids.size()) {
         std::sort(m_events.begin(), m_events.end());
         emit finished(m_events);
+        m_events.clear();
     }
     else {
         getEvents(m_ids[nextCalendarIndex]);
