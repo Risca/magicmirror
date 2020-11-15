@@ -97,7 +97,7 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
     ISource(parent),
     m_net(net),
     m_o2(o2),
-    m_requestor(NULL),
+    m_requestor(new O2Requestor(m_net.data(), m_o2, this)),
     m_ids(calendars),
     m_requestId(0)
 {
@@ -108,6 +108,13 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
     connect(o2, SIGNAL(linkingSucceeded()), this, SLOT(onLinkingSucceeded()));
     connect(o2, SIGNAL(showVerificationUriAndCode(QUrl, QString)),
             this, SLOT(onVerificationCodeAndUrl(QUrl, QString)));
+
+    // configure requestor
+    m_requestor->setAddAccessTokenInQuery(false);
+    m_requestor->setAccessTokenInAuthenticationHTTPHeaderFormat("Bearer %1");
+
+    connect(m_requestor, SIGNAL(finished(int, QNetworkReply::NetworkError, QByteArray)),
+        this, SLOT(onFinished(int, QNetworkReply::NetworkError, QByteArray)));
 
     m_retryTimer.setTimerType(Qt::VeryCoarseTimer);
     m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
@@ -144,7 +151,6 @@ void GoogleCalendarSource::onLinkedChanged()
 {
     qDebug() << __PRETTY_FUNCTION__ << "linked:" << m_o2->linked();
     if (!m_o2->linked()) {
-        deleteRequestor();
         m_refreshTimer.stop();
         m_retryTimer.start();
     }
@@ -153,7 +159,6 @@ void GoogleCalendarSource::onLinkedChanged()
 void GoogleCalendarSource::onLinkingFailed()
 {
     qDebug() << __PRETTY_FUNCTION__;
-    deleteRequestor();
     m_refreshTimer.stop();
     m_retryTimer.start();
 }
@@ -163,7 +168,6 @@ void GoogleCalendarSource::onLinkingSucceeded()
     int expires = static_cast<qint64>(m_o2->expires())*1000 - QDateTime::currentMSecsSinceEpoch();
     qDebug() << __PRETTY_FUNCTION__ << "expires in" << expires*1000 << "seconds";
     m_refreshTimer.start(expires);
-    deleteRequestor();
     getEvents();
 }
 
@@ -220,26 +224,7 @@ void GoogleCalendarSource::getEvents()
 {
     QUrl url = BASE_URL + m_ids.first() + "/events";
     QNetworkRequest req(url);
-
-    if (!m_requestor) {
-        m_requestor = new O2Requestor(m_net.data(), m_o2, this);
-
-        m_requestor->setAddAccessTokenInQuery(false);
-        m_requestor->setAccessTokenInAuthenticationHTTPHeaderFormat("Bearer %1");
-
-        connect(m_requestor, SIGNAL(finished(int, QNetworkReply::NetworkError, QByteArray)),
-            this, SLOT(onFinished(int, QNetworkReply::NetworkError, QByteArray)));
-    }
-
     m_requestId = m_requestor->get(req);
-}
-
-void GoogleCalendarSource::deleteRequestor()
-{
-    if (m_requestor) {
-        m_requestor->deleteLater();
-        m_requestor = NULL;
-    }
 }
 
 } // namespace calendar

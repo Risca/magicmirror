@@ -36,7 +36,6 @@ protected:
     GoogleCalendarSource(O2GoogleDevice *o2, const QStringList& calendars, QSharedPointer<QNetworkAccessManager> net, QObject *parent);
 
     void getEvents();
-    void deleteRequestor();
 
     QSharedPointer<QNetworkAccessManager> m_net;
     O2GoogleDevice *m_o2;
