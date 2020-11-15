@@ -43,7 +43,7 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
 
     utils::ApplyFade(ui->events);
 
-    ui->calendar->setFirstDayOfWeek(m_locale.firstDayOfWeek());
+    ui->calendar->setFirstDayOfWeek(locale().firstDayOfWeek());
 
     m_timer.setTimerType(Qt::VeryCoarseTimer);
     m_timer.setInterval(CALENDAR_SYNC_PERIOD);
@@ -71,8 +71,8 @@ void Calendar::NewEventList(const QList<Event> &events)
     ui->events->clear();
     ui->calendar->setDateTextFormat(QDate(), QTextCharFormat());
     foreach (const calendar::Event& e, events) {
-        qDebug() << m_locale.toString(e.start, QLocale::LongFormat)
-                 << m_locale.toString(e.stop, QLocale::LongFormat)
+        qDebug() << locale().toString(e.start, QLocale::LongFormat)
+                 << locale().toString(e.stop, QLocale::LongFormat)
                  << e.summary;
 
         // Make date(s) bold
@@ -85,7 +85,7 @@ void Calendar::NewEventList(const QList<Event> &events)
             ui->calendar->setDateTextFormat(date, format);
         }
 
-        const QString event = m_locale.toString(e.start, QLocale::ShortFormat) + " " + e.summary;
+        const QString event = locale().toString(e.start, QLocale::ShortFormat) + " " + e.summary;
         ui->events->addItem(event);
     }
 

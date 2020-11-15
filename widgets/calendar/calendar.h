@@ -32,7 +32,6 @@ private:
     Calendar(ISource* dataSource, QWidget *parent = NULL);
     Ui::Calendar *ui;
     ISource* m_source;
-    QLocale m_locale;
     QTimer m_timer;
 
 private slots:
