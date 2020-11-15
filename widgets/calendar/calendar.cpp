@@ -7,11 +7,16 @@
 #include "utils/effects.h"
 #include "utils/settingsfactory.h"
 
+#include <QBrush>
 #include <QDebug>
+#include <QFontMetrics>
+#include <QIcon>
 #include <QGraphicsOpacityEffect>
 #include <QLinearGradient>
 #include <QLocale>
 #include <QNetworkAccessManager>
+#include <QPainter>
+#include <QPixmap>
 #include <QSettings>
 #include <QTextCharFormat>
 #include <QUrl>
@@ -77,8 +82,21 @@ void Calendar::NewEventList(const QList<Event> &events)
                  << locale().toString(e.stop, QLocale::LongFormat)
                  << e.summary;
 
-        const QString event = locale().toString(e.start, QLocale::ShortFormat) + " " + e.summary;
-        ui->events->addItem(event);
+        const QString text = locale().toString(e.start, QLocale::ShortFormat) + " " + e.summary;
+
+        QFontMetrics fm = ui->events->fontMetrics();
+        // Make icon half as big as the available space
+        QPixmap pix(fm.height() / 2, fm.height() / 2);
+        pix.fill(Qt::transparent);
+
+        QPainter *p = new QPainter(&pix);
+        p->setRenderHint(QPainter::Antialiasing);
+        p->setPen(Qt::NoPen);
+        p->setBrush(QBrush(e.color));
+        p->drawEllipse(pix.rect());
+        delete p;
+
+        ui->events->addItem(new QListWidgetItem(QIcon(pix), text));
     }
 
     m_timer.start();
