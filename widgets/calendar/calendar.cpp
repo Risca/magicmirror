@@ -8,20 +8,17 @@
 #include "utils/settingsfactory.h"
 
 #include <QApplication>
+#include <QAbstractTableModel>
 #include <QBrush>
 #include <QDebug>
 #include <QFontMetrics>
-#include <QIcon>
-#include <QGraphicsOpacityEffect>
-#include <QLinearGradient>
 #include <QLocale>
 #include <QModelIndex>
 #include <QNetworkAccessManager>
 #include <QPainter>
 #include <QPixmap>
 #include <QSettings>
-#include <QStyle>
-#include <QStyledItemDelegate>
+#include <QTableView>
 #include <QTextCharFormat>
 #include <QUrl>
 
@@ -29,69 +26,124 @@ namespace calendar {
 
 namespace {
 
-class EventItemDelegate : public QStyledItemDelegate
+class CalendarModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    EventItemDelegate(QObject *parent) : QStyledItemDelegate(parent) { }
+    CalendarModel(QObject *parent = 0) :
+        QAbstractTableModel(parent)
+    { }
+    virtual ~CalendarModel() {}
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &vopt, const QModelIndex &index) const
-    {
-#if QT_VERSION >= 0x050E00
-        QStringList texts = index.data().toString().split(' ', Qt::SkipEmptyParts);
-#else
-        QStringList texts = index.data().toString().split(' ', QString::SkipEmptyParts);
-#endif
-        if (texts.size() < 2) {
-            painter->restore();
-            return QStyledItemDelegate::paint(painter, vopt, index);
-        }
-        const QString &date = texts.takeFirst();
-        const QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
-        const QString summary = texts.join(' ');
+    int rowCount(const QModelIndex &) const { return m_currentEvents.size(); }
+    int columnCount(const QModelIndex &) const { return 2; }
 
-        const QWidget *widget = vopt.widget;
-        QStyle *style = widget ? widget->style() : QApplication::style();
+    QVariant data(const QModelIndex &index, int role) const;
 
-        painter->save();
-        painter->setClipRect(vopt.rect);
+    void setView(QTableView *view)
+    { m_view = view; }
 
-        // Draw the background
-        style->drawPrimitive(QStyle::PE_PanelItemViewItem, &vopt, painter, widget);
+public slots:
+    void setEvents(const QList<Event> &events);
 
-        // Draw the date
-        painter->save();
-        // Reduce the font a bit
-        QFont font = painter->font();
-        font.setPointSize(font.pointSize() * 2 / 3);
-        painter->setFont(font);
-        // Write date with darker colors
-        painter->setPen(vopt.palette.color(QPalette::Disabled, QPalette::Text));
-        QFontMetrics fm = painter->fontMetrics();
-#if QT_VERSION >= 0x050B00
-        int width = fm.horizontalAdvance(date);
-#else
-        int width = fm.width(date);
-#endif
-        QRect textRect = QRect(vopt.rect.topLeft(), QSize(width, vopt.rect.height()));
-        painter->drawText(textRect, vopt.displayAlignment, date);
-        painter->restore();
+private:
+    QTableView *m_view;
+    QList<Event> m_currentEvents;
 
-        // Draw the icon
-        QRect iconRect = QRect(textRect.topRight(), QSize(1, 1) * vopt.rect.height());
-        icon.paint(painter, iconRect, Qt::AlignHCenter | Qt::AlignVCenter);
-
-        // Draw the summary
-        fm = painter->fontMetrics();
-        textRect = QRect(iconRect.topRight(), vopt.rect.bottomRight() + QPoint(1, 1));
-        painter->drawText(textRect, vopt.displayAlignment, summary);
-
-        painter->restore();
-    }
+    QTextCharFormat formatForColumn(int column) const;
 };
 
+QVariant CalendarModel::data(const QModelIndex &index, int role) const
+{
+    int row = index.row();
+    int column = index.column();
+
+    if (row > m_currentEvents.size()) {
+        return QVariant();
+    }
+
+    const Event &e = m_currentEvents[row];
+
+    if (role == Qt::DisplayRole) {
+        switch (column) {
+        case 0:
+            if (m_view)
+                return m_view->locale().toString(e.start, QLocale::ShortFormat);
+            else
+                return e.start.toString(Qt::DefaultLocaleShortDate);
+        case 1:
+            return e.summary;
+        default:
+            return QVariant();
+        }
+    }
+
+    if (role == Qt::DecorationRole && column == 1) {
+        QFontMetrics fm = m_view ? m_view->fontMetrics() : QApplication::fontMetrics();
+        // Make icon half as big as the available space
+        QPixmap pix(fm.height() / 2, fm.height() / 2);
+        pix.fill(Qt::transparent);
+
+        QPainter *p = new QPainter(&pix);
+        p->setRenderHint(QPainter::Antialiasing);
+        p->setPen(Qt::NoPen);
+        p->setBrush(QBrush(e.color));
+        p->drawEllipse(pix.rect());
+        delete p;
+
+        return pix;
+    }
+
+    QTextCharFormat fmt = formatForColumn(column);
+    if (role == Qt::BackgroundRole)
+        return fmt.background().color();
+    if (role == Qt::ForegroundRole)
+        return fmt.foreground().color();
+    if (role == Qt::FontRole)
+        return fmt.font();
+    if (role == Qt::ToolTipRole)
+        return fmt.toolTip();
+    return QVariant();
+
+    return QVariant();
 }
+
+void CalendarModel::setEvents(const QList<Event> &events)
+{
+    beginResetModel();
+    m_currentEvents = events;
+    endResetModel();
+}
+
+QTextCharFormat CalendarModel::formatForColumn(int column) const
+{
+    QPalette pal;
+    QPalette::ColorGroup cg = QPalette::Active;
+    if (m_view) {
+        pal = m_view->palette();
+        if (!m_view->isEnabled())
+            cg = QPalette::Disabled;
+        else if (!m_view->isActiveWindow())
+            cg = QPalette::Inactive;
+    }
+    QTextCharFormat format;
+    QFont font = m_view->font();
+    if (column == 0) {
+        font.setPointSize(font.pointSize() * 2 / 3);
+    }
+    format.setFont(font);
+    format.setBackground(pal.brush(cg, QPalette::Base));
+    if (column == 0) {
+        format.setForeground(pal.brush(QPalette::Disabled, QPalette::Text));
+    }
+    else {
+        format.setForeground(pal.brush(cg, QPalette::Text));
+    }
+    return format;
+}
+
+} // anonymous namespace
 
 #define CALENDAR_SYNC_PERIOD (2 * 60 * 60 * 1000)
 
@@ -117,16 +169,23 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
     ui->setupUi(this);
 
     utils::ApplyFade(ui->events);
-    ui->events->setItemDelegate(new EventItemDelegate(ui->events));
+
+    CalendarModel *model = new CalendarModel(this);
+
+    ui->events->setModel(model);
+    model->setView(ui->events);
+    ui->events->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    ui->events->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 
     ui->calendar->setFirstDayOfWeek(locale().firstDayOfWeek());
 
     m_timer.setTimerType(Qt::VeryCoarseTimer);
     m_timer.setInterval(CALENDAR_SYNC_PERIOD);
+    m_timer.setSingleShot(false);
     connect(&m_timer, SIGNAL(timeout()), m_source, SLOT(sync()));
 
     connect(m_source, SIGNAL(finished(const QList<Event>&)),
-            this, SLOT(NewEventList(const QList<Event>&)));
+            model, SLOT(setEvents(const QList<Event>&)));
     connect(m_source, SIGNAL(finished(const QList<Event>&)),
             ui->calendar, SLOT(setEvents(const QList<Event>&)));
     m_source->sync();
@@ -144,35 +203,6 @@ void Calendar::changeDay(const QDate &day)
     ui->month_and_year->setDate(day);
 }
 
-void Calendar::NewEventList(const QList<Event> &events)
-{
-    ui->events->clear();
-    ui->calendar->setDateTextFormat(QDate(), QTextCharFormat());
-    foreach (const calendar::Event& e, events) {
-        qDebug() << locale().toString(e.start, QLocale::LongFormat)
-                 << locale().toString(e.stop, QLocale::LongFormat)
-                 << e.summary;
-
-        const QString text = locale().toString(e.start, QLocale::ShortFormat) + " " + e.summary;
-
-        QFontMetrics fm = ui->events->fontMetrics();
-        // Make icon half as big as the available space
-        QPixmap pix(fm.height() / 2, fm.height() / 2);
-        pix.fill(Qt::transparent);
-
-        QPainter *p = new QPainter(&pix);
-        p->setRenderHint(QPainter::Antialiasing);
-        p->setPen(Qt::NoPen);
-        p->setBrush(QBrush(e.color));
-        p->drawEllipse(pix.rect());
-        delete p;
-
-        ui->events->addItem(new QListWidgetItem(QIcon(pix), text));
-    }
-
-    m_timer.start();
-}
-
-}
+} // namespace calendar
 
 #include "calendar.moc"

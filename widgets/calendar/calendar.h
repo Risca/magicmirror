@@ -33,9 +33,6 @@ private:
     Ui::Calendar *ui;
     ISource* m_source;
     QTimer m_timer;
-
-private slots:
-    void NewEventList(const QList<Event>&);
 };
 
 } // namespace calendar
