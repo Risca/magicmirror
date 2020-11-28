@@ -16,6 +16,13 @@ CustomCalendarWidget::CustomCalendarWidget(QWidget *parent) :
 
 }
 
+QSize CustomCalendarWidget::minimumSizeHint() const
+{
+    // Workaround for bug in stylesheet. Without this, the right and bottom
+    // edges gets clipped.
+    return QCalendarWidget::minimumSizeHint() + QSize(2, 2);
+}
+
 void CustomCalendarWidget::setEvents(const QList<Event> &events)
 {
     m_events.clear();

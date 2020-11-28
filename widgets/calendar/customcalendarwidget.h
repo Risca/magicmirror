@@ -6,6 +6,7 @@
 #include <QDate>
 #include <QList>
 #include <QMap>
+#include <QSize>
 
 namespace calendar {
 
@@ -14,6 +15,8 @@ class CustomCalendarWidget : public QCalendarWidget
     Q_OBJECT
 public:
     CustomCalendarWidget(QWidget *parent = 0);
+
+    virtual QSize minimumSizeHint() const;
 
 public slots:
     void setEvents(const QList<Event> &events);
