@@ -163,12 +163,7 @@ void GoogleCalendarSource::sync()
 
     m_retryTimer.stop();
 
-    if (m_o2->linked()) {
-        onLinkingSucceeded();
-    }
-    else {
-        m_o2->link();
-    }
+    m_o2->link();
 }
 
 void GoogleCalendarSource::onLinkedChanged()
