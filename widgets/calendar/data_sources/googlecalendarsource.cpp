@@ -270,11 +270,22 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
 void GoogleCalendarSource::onRefreshFinished(QNetworkReply::NetworkError error)
 {
     qDebug() << __PRETTY_FUNCTION__ << error;
-    if (error == QNetworkReply::NoError) {
+    switch (error) {
+    case QNetworkReply::NoError:
         // this restarts the refresh timer
         isAccessTokenValid();
-    }
-    else {
+        break;
+    case QNetworkReply::InternalServerError:
+    case QNetworkReply::ServiceUnavailableError:
+    case QNetworkReply::HostNotFoundError:
+    case QNetworkReply::UnknownNetworkError:
+    case QNetworkReply::UnknownProxyError:
+    case QNetworkReply::UnknownServerError:
+    case QNetworkReply::ProtocolFailure:
+        // try again later
+        m_retryTimer.start();
+        break;
+    default:
         // refresh failed, try linking instead
         m_o2->link();
     }
