@@ -176,6 +176,7 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
     model->setView(ui->events);
     ui->events->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     ui->events->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->events->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->events->setWordWrap(false);
     ui->events->setTextElideMode(Qt::ElideRight);
 
