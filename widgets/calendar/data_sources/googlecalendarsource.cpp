@@ -132,6 +132,8 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
     connect(o2, SIGNAL(linkingSucceeded()), this, SLOT(onLinkingSucceeded()));
     connect(o2, SIGNAL(showVerificationUriAndCode(QUrl, QString)),
             this, SLOT(onVerificationCodeAndUrl(QUrl, QString)));
+    connect(o2, SIGNAL(refreshFinished(QNetworkReply::NetworkError)),
+            this, SLOT(onRefreshFinished(QNetworkReply::NetworkError)));
 
     // configure requestor
     m_requestor->setAddAccessTokenInQuery(false);
@@ -148,8 +150,6 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
     m_refreshTimer.setTimerType(Qt::VeryCoarseTimer);
     m_refreshTimer.setSingleShot(true);
     connect(&m_refreshTimer, SIGNAL(timeout()), m_o2, SLOT(refresh()));
-    connect(m_o2, SIGNAL(refreshFinished(QNetworkReply::NetworkError)),
-            this, SLOT(onRefreshFinished(QNetworkReply::NetworkError)));
 }
 
 GoogleCalendarSource::~GoogleCalendarSource()
@@ -274,6 +274,10 @@ void GoogleCalendarSource::onRefreshFinished(QNetworkReply::NetworkError error)
         // this restarts the refresh timer
         isAccessTokenValid();
     }
+    else {
+        // refresh failed, try linking instead
+        m_o2->link();
+    }
 }
 
 void GoogleCalendarSource::getColors()
@@ -303,7 +307,13 @@ bool GoogleCalendarSource::isAccessTokenValid()
     int expires = m_o2->expires()*1000 - QDateTime::currentMSecsSinceEpoch();
     if (expires <= 0) {
         qDebug() << __PRETTY_FUNCTION__ << "already expired - refreshing";
-        m_o2->refresh();
+        if (!m_o2->refreshToken().isEmpty()) {
+            m_o2->refresh();
+        }
+        else {
+            qDebug() << __PRETTY_FUNCTION__ << "no refresh token - linking instead";
+            m_o2->link();
+        }
         return false;
     }
     else {
