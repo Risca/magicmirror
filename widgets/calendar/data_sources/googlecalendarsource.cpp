@@ -191,6 +191,8 @@ void GoogleCalendarSource::onLinkingSucceeded()
 
 void GoogleCalendarSource::onVerificationCodeAndUrl(const QUrl &url, const QString &code)
 {
+    qDebug() << __PRETTY_FUNCTION__ << url << code;
+
     utils::QrCodePopup *popup = new utils::QrCodePopup(QSize(300, 300), url.toString());
 
     popup->setAttribute(Qt::WA_DeleteOnClose);
