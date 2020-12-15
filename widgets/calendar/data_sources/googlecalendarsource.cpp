@@ -121,6 +121,7 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
     m_net(net),
     m_o2(o2),
     m_requestor(new O2Requestor(m_net.data(), m_o2, this)),
+    m_linkingInProgress(false),
     m_ids(calendars),
     m_colorRequest(-1),
     m_calendarInfoRequest(-1)
@@ -163,7 +164,9 @@ void GoogleCalendarSource::sync()
 
     m_retryTimer.stop();
 
-    m_o2->link();
+    if (!m_linkingInProgress) {
+        m_o2->link();
+    }
 }
 
 void GoogleCalendarSource::onLinkedChanged()
@@ -178,12 +181,14 @@ void GoogleCalendarSource::onLinkedChanged()
 void GoogleCalendarSource::onLinkingFailed()
 {
     qDebug() << __PRETTY_FUNCTION__;
+    m_linkingInProgress = false;
     m_refreshTimer.stop();
     m_retryTimer.start();
 }
 
 void GoogleCalendarSource::onLinkingSucceeded()
 {
+    m_linkingInProgress = false;
     if (isAccessTokenValid()) {
         getColors();
     }
@@ -197,6 +202,7 @@ void GoogleCalendarSource::onVerificationCodeAndUrl(const QUrl &url, const QStri
 
     popup->setAttribute(Qt::WA_DeleteOnClose);
     connect(m_o2, SIGNAL(closeBrowser()), popup, SLOT(close()));
+    connect(m_o2, SIGNAL(linkingFailed()), popup, SLOT(close()));
 
     popup->show();
     popup->showMessage(QString("%1\n%3").arg("Google calendar code:").arg(code));

@@ -53,6 +53,7 @@ protected:
     QSharedPointer<QNetworkAccessManager> m_net;
     O2GoogleDevice *m_o2;
     O2Requestor *m_requestor;
+    bool m_linkingInProgress;
     QStringList m_ids;
     int m_colorRequest;
     int m_calendarInfoRequest;
