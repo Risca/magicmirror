@@ -1,5 +1,4 @@
-#ifndef SETTINGSFACTORY_H
-#define SETTINGSFACTORY_H
+#pragma once
 
 #include <QMap>
 #include <QSettings>
@@ -16,5 +15,3 @@ public:
 private:
     static QMap<QString, QSharedPointer<QSettings> > g_ObjectCache;
 };
-
-#endif // SETTINGSFACTORY_H

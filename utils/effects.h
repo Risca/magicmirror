@@ -1,5 +1,4 @@
-#ifndef EFFECTS_H
-#define EFFECTS_H
+#pragma once
 
 class QWidget;
 
@@ -9,5 +8,3 @@ namespace utils {
 void ApplyFade(QWidget* widget);
 
 } // namespace utils
-
-#endif // EFFECTS_H

@@ -1,5 +1,4 @@
-#ifndef CALENDAR_EVENT_HPP
-#define CALENDAR_EVENT_HPP
+#pragma once
 
 #include <QColor>
 #include <QDate>
@@ -28,5 +27,3 @@ struct Event {
 };
 
 } // namespace calendar
-
-#endif // CALENDAR_EVENT_HPP

@@ -1,5 +1,4 @@
-#ifndef CURRENTCONDITIONS_H
-#define CURRENTCONDITIONS_H
+#pragma once
 
 #include <QWidget>
 #include <QSharedPointer>
@@ -32,5 +31,3 @@ private slots:
 };
 
 } // namespace weather
-
-#endif // CURRENTCONDITIONS_H

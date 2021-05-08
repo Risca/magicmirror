@@ -1,5 +1,4 @@
-#ifndef CALENDAR_H
-#define CALENDAR_H
+#pragma once
 
 #include <QList>
 #include <QLocale>
@@ -36,5 +35,3 @@ private:
 };
 
 } // namespace calendar
-
-#endif // CALENDAR_H

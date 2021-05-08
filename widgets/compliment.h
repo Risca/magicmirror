@@ -1,5 +1,4 @@
-#ifndef COMPLIMENT_H
-#define COMPLIMENT_H
+#pragma once
 
 #include <QLabel>
 #include <QString>
@@ -32,5 +31,3 @@ private:
 private slots:
     void textFadedOut();
 };
-
-#endif // COMPLIMENT_H

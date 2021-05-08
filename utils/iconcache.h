@@ -1,5 +1,4 @@
-#ifndef ICONCACHE_H
-#define ICONCACHE_H
+#pragma once
 
 #include <QMap>
 #include <QObject>
@@ -45,5 +44,3 @@ private:
 private slots:
     void iconReplyFinished();
 };
-
-#endif // ICONCACHE_H

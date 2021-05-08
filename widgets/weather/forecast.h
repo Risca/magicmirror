@@ -1,5 +1,4 @@
-#ifndef FORECAST_H
-#define FORECAST_H
+#pragma once
 
 #include <QWidget>
 #include <QSharedPointer>
@@ -28,5 +27,3 @@ private:
 };
 
 } // namespace weather
-
-#endif // FORECAST_H

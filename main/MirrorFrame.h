@@ -12,8 +12,7 @@
     along with MagicMirror.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __MIRRORFRAME_H__
-#define __MIRRORFRAME_H__
+#pragma once
 
 #include <QFrame>
 #include <QSharedPointer>
@@ -48,5 +47,3 @@ private:
     QTimer m_clockTimer;
     QSharedPointer<QNetworkAccessManager> m_net;
 };
-
-#endif /* __MIRRORFRAME_H__ */
