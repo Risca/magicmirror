@@ -41,10 +41,11 @@ OpenWeatherMapConditionsDataSource::OpenWeatherMapConditionsDataSource(
     m_timer.setTimerType(Qt::VeryCoarseTimer);
     m_timer.setSingleShot(true);
     m_timer.setInterval(DEFAULT_RETRY_TIMEOUT);
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(requestWeatherConditions()));
+    connect(&m_timer, &QTimer::timeout, this, &OpenWeatherMapConditionsDataSource::requestWeatherConditions);
 
     m_iconCache = new IconCache(net, this);
-    connect(m_iconCache, SIGNAL(iconDownloaded(const QString&)), this, SLOT(iconDownloaded(const QString&)));
+    connect(m_iconCache, &IconCache::iconDownloaded,
+            this, &OpenWeatherMapConditionsDataSource::iconDownloaded);
 
     requestWeatherConditions();
 }
@@ -74,7 +75,8 @@ void OpenWeatherMapConditionsDataSource::requestWeatherConditions()
     u.setQuery(query);
 
     m_reply = m_net->get(QNetworkRequest(u));
-    connect(m_reply, SIGNAL(finished()), this, SLOT(requestFinished()));
+    connect(m_reply, &QNetworkReply::finished,
+            this, &OpenWeatherMapConditionsDataSource::requestFinished);
 }
 
 void OpenWeatherMapConditionsDataSource::requestFinished()

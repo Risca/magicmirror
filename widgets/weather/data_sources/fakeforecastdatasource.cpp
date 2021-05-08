@@ -10,7 +10,7 @@ FakeForecastData::FakeForecastData(QObject *parent)
     : IForecastDataSource(parent)
 {
     generateNewFakeData();
-    QTimer::singleShot(1000, this, SLOT(generateNewFakeData()));
+    QTimer::singleShot(1000, this, &FakeForecastData::generateNewFakeData);
 }
 
 const QList<utils::SensorData> &FakeForecastData::forecast() const

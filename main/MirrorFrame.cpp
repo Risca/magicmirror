@@ -23,7 +23,7 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     ui->versionLabel->setText(QString("Version: %1").arg(QString(VERSION_STRING)));
 
     ui->clock->setDisplayFormat(QLocale().timeFormat(QLocale::LongFormat));
-    connect(&m_clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()));
+    connect(&m_clockTimer, &QTimer::timeout, this, &MirrorFrame::updateClock);
     m_clockTimer.setTimerType(Qt::CoarseTimer);
     m_clockTimer.start(500);
 
@@ -70,7 +70,7 @@ void MirrorFrame::createCalendarSystem()
     if (calendar::Calendar::Create(cal, m_net, this)) {
         qDebug() << "Successfully created a calendar widget";
         ui->topHorizontalLayout->insertWidget(0, cal, 0, Qt::AlignLeft);
-        connect(this, SIGNAL(dayChanged(const QDate&)), cal, SLOT(changeDay(const QDate&)));
+        connect(this, &MirrorFrame::dayChanged, cal, &calendar::Calendar::changeDay);
     }
 }
 

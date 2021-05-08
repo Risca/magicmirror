@@ -28,8 +28,7 @@ SensorModel::SensorModel(ISource *dataSource, QObject *parent) :
 {
     m_source->setParent(this);
 
-    connect(m_source, SIGNAL(sensorDataUpdated(const QList<utils::SensorData>&)),
-            this, SLOT(addData(const QList<utils::SensorData>&)));
+    connect(m_source, &ISource::sensorDataUpdated, this, &SensorModel::addData);
 }
 
 SensorModel::~SensorModel()

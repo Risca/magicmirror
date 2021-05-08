@@ -64,11 +64,16 @@ Compliment::Compliment(QWidget *parent) :
     m_fadeIn->setStartValue(0.0f);
     m_fadeIn->setEndValue(1.0f);
 
-    connect(m_fadeOut, SIGNAL(finished()), this, SLOT(textFadedOut()));
-    connect(m_fadeIn, SIGNAL(finished()), &m_timer, SLOT(start()));
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(changeCompliment()));
+    connect(m_fadeOut, &QAbstractAnimation::finished, this, &Compliment::textFadedOut);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 0))
+    connect(m_fadeIn, &QAbstractAnimation::finished,
+            &m_timer, static_cast<void(QTimer::*)()>(&QTimer::start));
+#else
+    connect(m_fadeIn, &QAbstractAnimation::finished, &m_timer, QOverload<>::of(&QTimer::start));
+#endif
+    connect(&m_timer, &QTimer::timeout, this, &Compliment::changeCompliment);
 
-    QTimer::singleShot(5000, this, SLOT(changeCompliment()));
+    QTimer::singleShot(5000, this, &Compliment::changeCompliment);
 }
 
 void Compliment::setText(const QString &text)

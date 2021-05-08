@@ -45,7 +45,7 @@ public:
     { m_view = view; }
 
 public slots:
-    void setEvents(const QList<Event> &events);
+    void setEvents(const QList<calendar::Event> &events);
 
 private:
     QTableView *m_view;
@@ -185,12 +185,10 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
     m_timer.setTimerType(Qt::VeryCoarseTimer);
     m_timer.setInterval(CALENDAR_SYNC_PERIOD);
     m_timer.setSingleShot(false);
-    connect(&m_timer, SIGNAL(timeout()), m_source, SLOT(sync()));
+    connect(&m_timer, &QTimer::timeout, m_source, &ISource::sync);
 
-    connect(m_source, SIGNAL(finished(const QList<Event>&)),
-            model, SLOT(setEvents(const QList<Event>&)));
-    connect(m_source, SIGNAL(finished(const QList<Event>&)),
-            ui->calendar, SLOT(setEvents(const QList<Event>&)));
+    connect(m_source, &ISource::finished, model, &CalendarModel::setEvents);
+    connect(m_source, &ISource::finished, ui->calendar, &CustomCalendarWidget::setEvents);
     m_source->sync();
 
     m_timer.start();

@@ -6,7 +6,7 @@
 weather::FakeWeatherConditionsDataSource::FakeWeatherConditionsDataSource(QObject *parent) :
     ICurrentConditionsDataSource(parent)
 {
-    QTimer::singleShot(1000, this, SLOT(generateNewFakeData()));
+    QTimer::singleShot(1000, this, &FakeWeatherConditionsDataSource::generateNewFakeData);
 }
 
 void weather::FakeWeatherConditionsDataSource::generateNewFakeData()

@@ -128,29 +128,33 @@ GoogleCalendarSource::GoogleCalendarSource(O2GoogleDevice *o2, const QStringList
 {
     m_o2->setParent(this);
 
-    connect(o2, SIGNAL(linkedChanged()), this, SLOT(onLinkedChanged()));
-    connect(o2, SIGNAL(linkingFailed()), this, SLOT(onLinkingFailed()));
-    connect(o2, SIGNAL(linkingSucceeded()), this, SLOT(onLinkingSucceeded()));
-    connect(o2, SIGNAL(showVerificationUriAndCode(QUrl, QString)),
-            this, SLOT(onVerificationCodeAndUrl(QUrl, QString)));
-    connect(o2, SIGNAL(refreshFinished(QNetworkReply::NetworkError)),
-            this, SLOT(onRefreshFinished(QNetworkReply::NetworkError)));
+    connect(o2, &O2::linkedChanged, this, &GoogleCalendarSource::onLinkedChanged);
+    connect(o2, &O2::linkingFailed, this, &GoogleCalendarSource::onLinkingFailed);
+    connect(o2, &O2::linkingSucceeded, this, &GoogleCalendarSource::onLinkingSucceeded);
+    connect(o2, &O2::showVerificationUriAndCode, this, &GoogleCalendarSource::onVerificationCodeAndUrl);
+    connect(o2, &O2::refreshFinished, this, &GoogleCalendarSource::onRefreshFinished);
 
     // configure requestor
     m_requestor->setAddAccessTokenInQuery(false);
     m_requestor->setAccessTokenInAuthenticationHTTPHeaderFormat("Bearer %1");
 
-    connect(m_requestor, SIGNAL(finished(int, QNetworkReply::NetworkError, QByteArray)),
-        this, SLOT(onFinished(int, QNetworkReply::NetworkError, QByteArray)));
+#if (QT_VERSION < QT_VERSION_CHECK(5, 7, 0))
+    void (O2Requestor::*requestorFinished)(int,QNetworkReply::NetworkError,QByteArray) =
+            &O2Requestor::finished;
+    connect(m_requestor, requestorFinished, this, &GoogleCalendarSource::onFinished);
+#else
+    connect(m_requestor, QOverload<int,QNetworkReply::NetworkError, QByteArray>::of(&O2Requestor::finished),
+        this, &GoogleCalendarSource::onFinished);
+#endif
 
     m_retryTimer.setTimerType(Qt::VeryCoarseTimer);
     m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
     m_retryTimer.setSingleShot(true);
-    connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(sync()));
+    connect(&m_retryTimer, &QTimer::timeout, this, &GoogleCalendarSource::sync);
 
     m_refreshTimer.setTimerType(Qt::VeryCoarseTimer);
     m_refreshTimer.setSingleShot(true);
-    connect(&m_refreshTimer, SIGNAL(timeout()), m_o2, SLOT(refresh()));
+    connect(&m_refreshTimer, &QTimer::timeout, m_o2, &O2::refresh);
 }
 
 GoogleCalendarSource::~GoogleCalendarSource()
@@ -201,8 +205,8 @@ void GoogleCalendarSource::onVerificationCodeAndUrl(const QUrl &url, const QStri
     utils::QrCodePopup *popup = new utils::QrCodePopup(QSize(300, 300), url.toString());
 
     popup->setAttribute(Qt::WA_DeleteOnClose);
-    connect(m_o2, SIGNAL(closeBrowser()), popup, SLOT(close()));
-    connect(m_o2, SIGNAL(linkingFailed()), popup, SLOT(close()));
+    connect(m_o2, &O2::closeBrowser, popup, &QWidget::close);
+    connect(m_o2, &O2::linkingFailed, popup, &QWidget::close);
 
     popup->show();
     popup->showMessage(QString("%1\n%3").arg("Google calendar code:").arg(code));

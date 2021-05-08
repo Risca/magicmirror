@@ -85,7 +85,7 @@ DomoticzSensor::DomoticzSensor(const QNetworkRequest &req, QSharedPointer<QNetwo
     m_retryTimer.setTimerType(Qt::VeryCoarseTimer);
     m_retryTimer.setSingleShot(true);
     m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
-    connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(requestSensorData()));
+    connect(&m_retryTimer, &QTimer::timeout, this, &DomoticzSensor::requestSensorData);
 
     requestSensorData();
 }
@@ -105,9 +105,8 @@ void DomoticzSensor::requestSensorData()
     m_retryTimer.stop();
 
     m_reply = m_net->get(m_request);
-    connect(m_reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
-    connect(m_reply, SIGNAL(sslErrors(const QList<QSslError> &)),
-            this, SLOT(onSslError(const QList<QSslError> &)));
+    connect(m_reply, &QNetworkReply::finished, this, &DomoticzSensor::downloadFinished);
+    connect(m_reply, &QNetworkReply::sslErrors, this, &DomoticzSensor::onSslError);
 }
 
 void DomoticzSensor::downloadFinished()

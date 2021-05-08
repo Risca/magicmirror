@@ -44,7 +44,7 @@ QrCodePopup::QrCodePopup(const QSize &size, const QString &qr, Qt::WindowFlags f
 {
     // Need to set parent for the popup to show in fullscreen app
     this->setParent(QApplication::activeWindow());
-    connect(this, SIGNAL(messageChanged(QString)), this, SLOT(onMessageChanged(QString)));
+    connect(this, &QrCodePopup::messageChanged, this, &QrCodePopup::onMessageChanged);
 }
 
 void QrCodePopup::mousePressEvent(QMouseEvent *event)

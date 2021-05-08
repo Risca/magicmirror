@@ -18,7 +18,8 @@ ForecastDataModel::ForecastDataModel(IForecastDataSource *dataSource, QObject *p
     QAbstractItemModel(parent),
     m_source(dataSource)
 {
-    connect(m_source, SIGNAL(newForecastAvailable()), this, SLOT(UpdateDataModel()));
+    connect(m_source, &IForecastDataSource::newForecastAvailable,
+            this, &ForecastDataModel::UpdateDataModel);
 }
 
 ForecastDataModel::~ForecastDataModel()

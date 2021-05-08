@@ -98,7 +98,7 @@ IcsSource::IcsSource(const QUrl &url, QSharedPointer<QNetworkAccessManager> net,
     m_retryTimer.setTimerType(Qt::VeryCoarseTimer);
     m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
     m_retryTimer.setSingleShot(true);
-    connect(&m_retryTimer, SIGNAL(timeout()), this, SLOT(sync()));
+    connect(&m_retryTimer, &QTimer::timeout, this, &ISource::sync);
     if (!m_url.isLocalFile()) {
         m_retryTimer.start();
     }
@@ -115,7 +115,7 @@ void IcsSource::sync()
 
     QNetworkRequest req(m_url);
     m_reply = m_net->get(req);
-    connect(m_reply, SIGNAL(finished()), this, SLOT(downloadFinished()));
+    connect(m_reply, &QNetworkReply::finished, this, &IcsSource::downloadFinished);
 }
 
 void IcsSource::downloadFinished()

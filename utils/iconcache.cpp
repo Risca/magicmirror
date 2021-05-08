@@ -143,7 +143,7 @@ QNetworkReply *IconCache::FetchNextIcon()
     } while(exists(icon));
 
     QNetworkReply* reply = m_net->get(QNetworkRequest(m_urls[icon]));
-    connect(reply, SIGNAL(finished()), this, SLOT(iconReplyFinished()));
+    connect(reply, &QNetworkReply::finished, this, &IconCache::iconReplyFinished);
     return reply;
 }
 
