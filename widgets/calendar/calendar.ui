@@ -73,7 +73,7 @@
    <item>
     <widget class="QLabel" name="eventLabel">
      <property name="text">
-      <string>Events</string>
+      <string>Upcoming events</string>
      </property>
     </widget>
    </item>

@@ -346,20 +346,23 @@ void GoogleCalendarSource::addEvents(const QJsonDocument &jdoc, const QString &c
     QJsonArray items = jdoc.object()["items"].toArray();
 
     const QDate today = QDate::currentDate();
+    const QDate thisMonth = QDate(today.year(), today.month(), 1);
     foreach (const QJsonValue &i, items) {
         QJsonObject event = i.toObject();
         calendar::Event e;
 
         e.stop = toDate(event["end"]);
-        if (e.stop >= today) {
+        if (e.stop >= thisMonth) {
             e.start = toDate(event["start"]);
             // Google calendar sets end date to the day after last, unless
             // it's a same day event.
             if (e.start != e.stop)
                 e.stop = e.stop.addDays(-1);
-            e.summary = event["summary"].toString();
-            e.color = getEventColor(event, calendarId);
-            m_events.push_back(e);
+            if (e.stop >= thisMonth) {
+                e.summary = event["summary"].toString();
+                e.color = getEventColor(event, calendarId);
+                m_events.push_back(e);
+            }
         }
     }
 }

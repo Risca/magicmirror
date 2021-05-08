@@ -57,8 +57,12 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const
         painter->setPen(Qt::NoPen);
         painter->setRenderHint(QPainter::Antialiasing);
 
+        const QDate today = QDate::currentDate();
         foreach (const calendar::Event &e, events) {
-            painter->setBrush(QBrush(e.color));
+            if (e.stop < today)
+                painter->setBrush(QBrush(Qt::darkGray));
+            else
+                painter->setBrush(QBrush(e.color));
             painter->drawEllipse(p, radii, radii);
 
             p += QPoint(2 * radii + 1, 0);

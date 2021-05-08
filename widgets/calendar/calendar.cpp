@@ -111,8 +111,15 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const
 
 void CalendarModel::setEvents(const QList<Event> &events)
 {
+    const QDate today = QDate::currentDate();
+
     beginResetModel();
-    m_currentEvents = events;
+    m_currentEvents.clear();
+    m_currentEvents.reserve(events.size());
+    for (const Event& e : events) {
+        if (e.stop >= today)
+            m_currentEvents.push_back(e);
+    }
     endResetModel();
 }
 

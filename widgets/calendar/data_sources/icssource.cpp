@@ -71,9 +71,9 @@ QString GetSummary(icalcomponent* c)
     return icalcomponent_get_summary(c);
 }
 
-bool IsFutureEvent(const StartStopDate& dates, const QDate& today)
+bool IsThisMonth(const StartStopDate& dates, const QDate& thisMonth)
 {
-    return dates.first >= today || (dates.second.isValid() && dates.second >= today);
+    return dates.first >= thisMonth || (dates.second.isValid() && dates.second >= thisMonth);
 }
 
 } // anonymous namespace
@@ -127,6 +127,7 @@ void IcsSource::downloadFinished()
     else {
         QList<calendar::Event> events;
         const QDate today = QDate::currentDate();
+        const QDate month = QDate(today.year(), today.month(), 1);
         icalcomponent* comp = icalparser_parse_string(m_reply->readAll().constData());
         if (comp != 0) {
             for (icalcomponent* c = icalcomponent_get_first_component(comp, ICAL_VEVENT_COMPONENT);
@@ -134,7 +135,7 @@ void IcsSource::downloadFinished()
                  c = icalcomponent_get_next_component(comp, ICAL_VEVENT_COMPONENT))
             {
                 const StartStopDate dates = GetEventStartStopDates(c);
-                if (IsFutureEvent(dates, today)) {
+                if (IsThisMonth(dates, month)) {
                     calendar::Event event;
                     event.start = dates.first;
                     event.stop = dates.second.isValid() ? dates.second : dates.first;
