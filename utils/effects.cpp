@@ -3,7 +3,7 @@
 #include <QEvent>
 #include <QGraphicsEffect>
 #include <QLinearGradient>
-#include <QMap>
+#include <QHash>
 #include <QObject>
 #include <QWidget>
 
@@ -48,7 +48,7 @@ private:
 
 void ApplyFade(QWidget *w)
 {
-    static QMap<QWidget*, FadeEventFilter*> installedFilters;
+    static QHash<QWidget*, FadeEventFilter*> installedFilters;
 
     FadeEventFilter* filter = installedFilters[w];
     if (!filter) {

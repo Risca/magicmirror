@@ -128,7 +128,7 @@ QTextCharFormat CalendarModel::formatForColumn(int column) const
             cg = QPalette::Inactive;
     }
     QTextCharFormat format;
-    QFont font = m_view->font();
+    QFont font = m_view ? m_view->font() : QFont();
     if (column == 0) {
         font.setPointSize(font.pointSize() * 2 / 3);
     }

@@ -51,7 +51,7 @@ StartStopDate GetEventStartStopDates(icalcomponent* c)
     StartStopDate dates;
     icalproperty* prop = icalcomponent_get_first_property(c, ICAL_DTSTART_PROPERTY);
     if (prop != 0) {
-        bool isDate;
+        bool isDate = false;
         dates.first = IcalDatePropertyToQDate(prop, isDate);
         prop = icalcomponent_get_first_property(c, ICAL_DTEND_PROPERTY);
         if (prop != 0) {
@@ -127,7 +127,7 @@ void IcsSource::downloadFinished()
     else {
         QList<calendar::Event> events;
         const QDate today = QDate::currentDate();
-        icalcomponent* comp = icalparser_parse_string(m_reply->readAll().data());
+        icalcomponent* comp = icalparser_parse_string(m_reply->readAll().constData());
         if (comp != 0) {
             for (icalcomponent* c = icalcomponent_get_first_component(comp, ICAL_VEVENT_COMPONENT);
                  c != 0;

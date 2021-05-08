@@ -28,7 +28,7 @@ namespace {
 
 #define DEFAULT_RETRY_TIMEOUT (1000 * 30)
 
-const QString BASE_URL = "https://www.googleapis.com/calendar/v3/";
+const char *BASE_URL = "https://www.googleapis.com/calendar/v3/";
 const char *SCOPE = "https://www.googleapis.com/auth/calendar";
 const char *DEFAULT_STORE_ENCRYPTION_KEY = "T;qVL}Ub*A57hhX=";
 
@@ -55,10 +55,10 @@ QMap<int, QColor> toColorMap(const QJsonObject &list)
     for (QJsonObject::const_iterator color = list.constBegin();
          color != list.constEnd(); color ++)
     {
-#if QT_VERSION >= 0x050a00
-        const QString &hex = color.value()["background"].toString();
-#else
+#if (QT_VERSION < QT_VERSION_CHECK(5, 10, 0))
         const QString &hex = color.value().toObject()["background"].toString();
+#else
+        const QString &hex = color.value()["background"].toString();
 #endif
         map[color.key().toInt()] = colorFromHexString(hex);
     }
@@ -300,21 +300,21 @@ void GoogleCalendarSource::onRefreshFinished(QNetworkReply::NetworkError error)
 
 void GoogleCalendarSource::getColors()
 {
-    QUrl url = BASE_URL + "colors";
+    QUrl url = QString(BASE_URL) + "colors";
     QNetworkRequest req(url);
     m_colorRequest = m_requestor->get(req);
 }
 
 void GoogleCalendarSource::getCalendarInfo()
 {
-    QUrl url = BASE_URL + "users/me/calendarList";
+    QUrl url = QString(BASE_URL) + "users/me/calendarList";
     QNetworkRequest req(url);
     m_calendarInfoRequest = m_requestor->get(req);
 }
 
 void GoogleCalendarSource::getEvents(const QString &calendar)
 {
-    QUrl url = BASE_URL + "calendars/" + calendar + "/events";
+    QUrl url = QString(BASE_URL) + "calendars/" + calendar + "/events";
     QNetworkRequest req(url);
     int id = m_requestor->get(req);
     m_currentRequest[id] = calendar;
