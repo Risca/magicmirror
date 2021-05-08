@@ -211,7 +211,7 @@ void GoogleCalendarSource::onVerificationCodeAndUrl(const QUrl &url, const QStri
     connect(m_o2, &O2::linkingFailed, popup, &QWidget::close);
 
     popup->show();
-    popup->showMessage(QString("%1\n%3").arg("Google calendar code:").arg(code));
+    popup->showMessage(QString("%1\n%3").arg("Google calendar code:", code));
 }
 
 void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error, const QByteArray &data)

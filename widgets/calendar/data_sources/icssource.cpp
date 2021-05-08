@@ -14,7 +14,6 @@
 #include <QSettings>
 #include <QString>
 
-#include <algorithm>
 #include <time.h>
 
 namespace calendar {
