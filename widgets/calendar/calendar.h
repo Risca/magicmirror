@@ -17,6 +17,8 @@ namespace calendar {
 class ISource;
 struct Event;
 
+QDate CurrentMonth(const QLocale& locale = QLocale());
+
 class Calendar : public QWidget
 {
     Q_OBJECT

@@ -3,6 +3,7 @@
 #include "event.hpp"
 #include "utils/qrcodepopup.h"
 #include "utils/settingsfactory.h"
+#include "widgets/calendar/calendar.h"
 
 #include "o2/o0settingsstore.h"
 #include "o2/o2requestor.h"
@@ -344,8 +345,7 @@ void GoogleCalendarSource::addEvents(const QJsonDocument &jdoc, const QString &c
 {
     QJsonArray items = jdoc.object()["items"].toArray();
 
-    const QDate today = QDate::currentDate();
-    const QDate thisMonth = QDate(today.year(), today.month(), 1);
+    const QDate thisMonth = CurrentMonth();
     foreach (const QJsonValue &i, items) {
         QJsonObject event = i.toObject();
         calendar::Event e;

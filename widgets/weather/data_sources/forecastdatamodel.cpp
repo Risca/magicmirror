@@ -6,7 +6,6 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QIcon>
-#include <QLocale>
 #include <QModelIndex>
 #include <QString>
 #include <QVariant>

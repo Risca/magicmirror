@@ -24,6 +24,16 @@
 
 namespace calendar {
 
+QDate CurrentMonth(const QLocale &locale)
+{
+    const QDate today = QDate::currentDate();
+    QDate thisMonth = QDate(today.year(), today.month(), 1);
+    while (thisMonth.dayOfWeek() != locale.firstDayOfWeek()) {
+        thisMonth = thisMonth.addDays(-1);
+    }
+    return thisMonth;
+}
+
 namespace {
 
 class CalendarModel : public QAbstractTableModel

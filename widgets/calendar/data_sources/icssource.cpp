@@ -1,5 +1,6 @@
 #include "icssource.h"
 #include "event.hpp"
+#include "widgets/calendar/calendar.h"
 
 #include <libical/ical.h>
 
@@ -126,8 +127,7 @@ void IcsSource::downloadFinished()
     }
     else {
         QList<calendar::Event> events;
-        const QDate today = QDate::currentDate();
-        const QDate month = QDate(today.year(), today.month(), 1);
+        const QDate month = CurrentMonth();
         icalcomponent* comp = icalparser_parse_string(m_reply->readAll().constData());
         if (comp != 0) {
             for (icalcomponent* c = icalcomponent_get_first_component(comp, ICAL_VEVENT_COMPONENT);
