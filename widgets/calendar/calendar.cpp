@@ -158,20 +158,20 @@ bool Calendar::Create(Calendar *&cal, QSharedPointer<QNetworkAccessManager> net,
 {
     QSharedPointer<QSettings> settings = SettingsFactory::Create("Calendar");
 
-    ISource* source;
-    if (ISource::Create(source, settings, net, parent)) {
-        cal = new Calendar(source, parent);
+    QList<ISource*> sources;
+    if (ISource::Create(sources, settings, net, parent)) {
+        cal = new Calendar(sources, parent);
         if (!cal) {
-            delete source;
+            qDeleteAll(sources);
         }
     }
     return (cal == NULL ? false : true);
 }
 
-Calendar::Calendar(ISource *dataSource, QWidget *parent)
+Calendar::Calendar(const QList<ISource *> &dataSources, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Calendar),
-      m_source(dataSource)
+      m_sources(dataSources)
 {
     ui->setupUi(this);
 
@@ -189,20 +189,37 @@ Calendar::Calendar(ISource *dataSource, QWidget *parent)
 
     ui->calendar->setFirstDayOfWeek(locale().firstDayOfWeek());
 
+    connect(this, &Calendar::setEvents, model, &CalendarModel::setEvents);
+    connect(this, &Calendar::setEvents, ui->calendar, &CustomCalendarWidget::setEvents);
+
     m_timer.setTimerType(Qt::VeryCoarseTimer);
     m_timer.setInterval(CALENDAR_SYNC_PERIOD);
     m_timer.setSingleShot(false);
-    connect(&m_timer, &QTimer::timeout, m_source, &ISource::sync);
 
-    connect(m_source, &ISource::finished, model, &CalendarModel::setEvents);
-    connect(m_source, &ISource::finished, ui->calendar, &CustomCalendarWidget::setEvents);
-    m_source->sync();
+    foreach(ISource *source, m_sources) {
+        connect(&m_timer, &QTimer::timeout, source, &ISource::sync);
+        connect(source, &ISource::finished,
+                this, [this, source](const QList<Event>&events) { aggregateEvents(source, events); });
+        source->sync();
+    }
 
     m_timer.start();
 }
 
+void Calendar::aggregateEvents(ISource *source, const QList<Event> &events)
+{
+    QList<Event> allEvents;
+    m_events[source] = events;
+    foreach (const QList<Event>& sourceEvents, m_events) {
+        allEvents.append(sourceEvents);
+    }
+    std::sort(allEvents.begin(), allEvents.end());
+    emit setEvents(allEvents);
+}
+
 Calendar::~Calendar()
 {
+    qDeleteAll(m_sources);
     delete ui;
 }
 

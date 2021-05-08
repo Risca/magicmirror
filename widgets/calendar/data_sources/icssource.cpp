@@ -146,7 +146,6 @@ void IcsSource::downloadFinished()
             }
         }
         icalcomponent_free(comp);
-        std::sort(events.begin(), events.end());
         emit finished(events);
     }
     m_reply->deleteLater();

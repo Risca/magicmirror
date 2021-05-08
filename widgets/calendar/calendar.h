@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QHash>
 #include <QList>
 #include <QLocale>
 #include <QSharedPointer>
@@ -24,13 +25,19 @@ public:
     static bool Create(Calendar*& cal, QSharedPointer<QNetworkAccessManager> net, QWidget *parent = 0);
     virtual ~Calendar();
 
+signals:
+    void setEvents(const QList<Event>&);
+
 public slots:
     void changeDay(const QDate& day);
 
 private:
-    Calendar(ISource* dataSource, QWidget *parent = NULL);
+    Calendar(const QList<ISource*> &dataSources, QWidget *parent = NULL);
+    void aggregateEvents(ISource* source, const QList<Event>& events);
+
     Ui::Calendar *ui;
-    ISource* m_source;
+    QList<ISource*> m_sources;
+    QHash<ISource*, QList<Event> > m_events;
     QTimer m_timer;
 };
 

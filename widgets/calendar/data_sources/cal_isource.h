@@ -21,7 +21,7 @@ class ISource : public QObject
     Q_OBJECT
 
 public:
-    static bool Create(ISource*& obj, QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject* parent = 0);
+    static bool Create(QList<ISource*> &objs, QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject* parent = 0);
     virtual ~ISource() = 0;
 
 public slots:

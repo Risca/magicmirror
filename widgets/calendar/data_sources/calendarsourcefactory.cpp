@@ -4,31 +4,39 @@
 #include "cal_nosource.h"
 
 #include <QDebug>
+#include <QList>
 #include <QSettings>
 
 namespace calendar {
 
-bool ISource::Create(ISource *&obj, QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject *parent)
+bool ISource::Create(QList<ISource*> &objs, QSharedPointer<QSettings> settings, QSharedPointer<QNetworkAccessManager> net, QObject *parent)
 {
     bool objectCreated;
+    ISource* obj;
 
     settings->beginGroup("ICS");
     objectCreated = IcsSource::Create(obj, settings, net, parent);
     settings->endGroup();
     if (objectCreated) {
-        return true;
+        objs.push_back(obj);
     }
 
     settings->beginGroup("Google");
     objectCreated = GoogleCalendarSource::Create(obj, settings, net, parent);
     settings->endGroup();
     if (objectCreated) {
-        return true;
+        objs.push_back(obj);
     }
 
-    qWarning() << "No calendar data source found";
+    if (objs.empty()) {
+        qWarning() << "No calendar data source found";
 
-    return NoSource::Create(obj, parent);
+        if (NoSource::Create(obj, parent)) {
+            objs.push_back(obj);
+        }
+    }
+
+    return !objs.empty();
 }
 
 } // namespace calendar

@@ -263,7 +263,6 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
         const int nextCalendarIndex = m_ids.indexOf(calendar) + 1;
         if (nextCalendarIndex == m_ids.size()) {
             // Fetched all events, time to publish
-            std::sort(m_events.begin(), m_events.end());
             emit finished(m_events);
             m_events.clear();
         }
