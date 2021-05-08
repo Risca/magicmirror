@@ -10,6 +10,7 @@
 #include "o2/o2googledevice.h"
 
 #include <QDate>
+#include <QDateTime>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -20,8 +21,8 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTextStream>
-
-#include <algorithm>
+#include <QUrl>
+#include <QUrlQuery>
 
 namespace calendar {
 
@@ -314,7 +315,17 @@ void GoogleCalendarSource::getCalendarInfo()
 
 void GoogleCalendarSource::getEvents(const QString &calendar)
 {
+    QDateTime const thisMonth = CurrentMonth().startOfDay().toOffsetFromUtc(0);
+    QDateTime const nextMonth = thisMonth.addDays(31);
     QUrl url = QString(BASE_URL) + "calendars/" + calendar + "/events";
+
+    QUrlQuery query;
+    // convert recurring events to single events
+    query.addQueryItem("singleEvents", "true");
+    query.addQueryItem("timeMin", thisMonth.toString(Qt::ISODate));
+    query.addQueryItem("timeMax", nextMonth.toString(Qt::ISODate));
+    url.setQuery(query);
+
     QNetworkRequest req(url);
     int id = m_requestor->get(req);
     m_currentRequest[id] = calendar;
