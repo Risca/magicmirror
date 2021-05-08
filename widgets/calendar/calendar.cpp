@@ -116,7 +116,7 @@ void CalendarModel::setEvents(const QList<Event> &events)
     beginResetModel();
     m_currentEvents.clear();
     m_currentEvents.reserve(events.size());
-    for (const Event& e : events) {
+    foreach (const Event& e, events) {
         if (e.stop >= today)
             m_currentEvents.push_back(e);
     }
