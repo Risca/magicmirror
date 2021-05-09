@@ -86,6 +86,9 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
             if (d.timestamp < yesterday) {
                 return QIcon(":/sensors/icons/low_battery.svg");
             }
+            else if (!d.icon.isNull()) {
+                return d.icon;
+            }
         }
         break;
 

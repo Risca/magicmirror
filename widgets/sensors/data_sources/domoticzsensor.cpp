@@ -4,6 +4,7 @@
 
 #include <QByteArray>
 #include <QDebug>
+#include <QIcon>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -19,6 +20,7 @@
 #include <QUrl>
 #include <QUrlQuery>
 
+#define LOW_BATTERY_THRESHOLD   (20)
 #define DEFAULT_RETRY_TIMEOUT   (1000 * 30)
 #define DEFAULT_UPDATE_INTERVAL (4 * 60 * 60 * 1000)
 
@@ -124,11 +126,20 @@ void DomoticzSensor::downloadFinished()
             utils::SensorData d;
             const QJsonObject s = sensor.toObject();
             d.source = s["Name"].toString();
+            if (s["Type"].toString() == "Thermostat") {
+                bool ok;
+                double const value = s["Data"].toString().toDouble(&ok);
+                if (ok)
+                    d.values[utils::TEMPERATURE] = value;
+            }
             if (s.contains("Temp")) {
                 d.values[utils::TEMPERATURE] = s["Temp"].toDouble();
             }
             if (s.contains("Humidity")) {
                 d.values[utils::HUMIDITY] = s["Humidity"].toDouble();
+            }
+            if (s["BatteryLevel"].toInt(255) < LOW_BATTERY_THRESHOLD) {
+                d.icon = QIcon(":/sensors/icons/low_battery.svg");
             }
             d.timestamp = QDateTime::fromString(s["LastUpdate"].toString(), Qt::ISODate);
             if (!d.source.isEmpty() && !d.values.isEmpty()) {
