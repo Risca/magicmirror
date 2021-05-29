@@ -3,6 +3,7 @@
 
 #include "utils/settingsfactory.h"
 #include "widgets/calendar/calendar.h"
+#include "widgets/schedule/schedule.h"
 #include "widgets/weather/currentconditions.h"
 #include "widgets/weather/forecast.h"
 #include "widgets/sensors/sensors.h"
@@ -71,6 +72,12 @@ void MirrorFrame::createCalendarSystem()
         qDebug() << "Successfully created a calendar widget";
         ui->topHorizontalLayout->insertWidget(0, cal, 0, Qt::AlignLeft);
         connect(this, &MirrorFrame::dayChanged, cal, &calendar::Calendar::changeDay);
+    }
+
+    schedule::Schedule* schedule;
+    if (schedule::Schedule::Create(schedule, m_net, this)) {
+        qDebug() << "Successfully created a schedule widget";
+        ui->bottomHorizontalLayout->insertWidget(0, schedule, 0, Qt::AlignLeft);
     }
 }
 
