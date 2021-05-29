@@ -2,10 +2,10 @@
 
 #include "cal_isource.h"
 
+#include <QNetworkRequest>
 #include <QObject>
 #include <QSharedPointer>
 #include <QTimer>
-#include <QUrl>
 
 class QNetworkReply;
 class QNetworkAccessManager;
@@ -26,11 +26,11 @@ public slots:
 
 protected:
     Q_DISABLE_COPY(IcsSource)
-    IcsSource(const QUrl& url, QSharedPointer<QNetworkAccessManager> net, QObject* parent);
+    IcsSource(const QNetworkRequest &req, QSharedPointer<QNetworkAccessManager> net, QObject* parent);
 
     QSharedPointer<QNetworkAccessManager> m_net;
     QNetworkReply* m_reply;
-    const QUrl m_url;
+    const QNetworkRequest m_request;
     QTimer m_retryTimer;
 
 protected slots:

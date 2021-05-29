@@ -112,24 +112,31 @@ bool IcsSource::Create(calendar::ISource *&obj, const QSharedPointer<QSettings> 
 {
     const QUrl url = settings->value("url").toUrl();
     if (url.isValid()) {
-        obj = new IcsSource(url, net, parent);
+        QNetworkRequest req(url);
+        if (!settings->value("verify_peer", true).toBool()) {
+            qWarning() << __PRETTY_FUNCTION__ << "Not verifying remote peer!";
+            QSslConfiguration conf = req.sslConfiguration();
+            conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+            req.setSslConfiguration(conf);
+        }
+        obj = new IcsSource(req, net, parent);
         return !!obj;
     }
     return false;
 }
 
-IcsSource::IcsSource(const QUrl &url, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
+IcsSource::IcsSource(const QNetworkRequest &req, QSharedPointer<QNetworkAccessManager> net, QObject *parent) :
     ISource(parent),
     m_net(net),
     m_reply(0),
-    m_url(url)
+    m_request(req)
 {
-    qDebug() << "Using ICS source:" << m_url.toString();
+    qDebug() << "Using ICS source:" << m_request.url().toString();
     m_retryTimer.setTimerType(Qt::VeryCoarseTimer);
     m_retryTimer.setInterval(DEFAULT_RETRY_TIMEOUT);
     m_retryTimer.setSingleShot(true);
     connect(&m_retryTimer, &QTimer::timeout, this, &ISource::sync);
-    if (!m_url.isLocalFile()) {
+    if (!m_request.url().isLocalFile()) {
         m_retryTimer.start();
     }
 }
@@ -143,8 +150,7 @@ void IcsSource::sync()
 
     m_retryTimer.stop();
 
-    QNetworkRequest req(m_url);
-    m_reply = m_net->get(req);
+    m_reply = m_net->get(m_request);
     connect(m_reply, &QNetworkReply::finished, this, &IcsSource::downloadFinished);
 }
 
