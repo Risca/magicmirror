@@ -86,23 +86,24 @@ bool IsThisMonthOrLater(const StartStopDate& dates, const QDate& thisMonth)
     return dates.first >= thisMonth || (dates.second.isValid() && dates.second >= thisMonth);
 }
 
+void AddEventCallback(icalcomponent *e, struct icaltime_span *span, void *data)
+{
+    QList<calendar::Event> &events = *reinterpret_cast<QList<calendar::Event>*>(data);
+
+    calendar::Event event;
+    event.start = DateFromTime_t(span->start, Qt::UTC);
+    event.stop = DateFromTime_t(span->end, Qt::UTC).addDays(-1);
+    event.summary = GetSummary(e);
+    event.color = Qt::gray;
+    events << event;
+}
+
 void AddRecurringEvent(icalcomponent *e, QList<calendar::Event> &events, const QDate& month)
 {
     struct icaltimetype start = icaltime_from_string(month.toString(Qt::ISODate).toLocal8Bit().data());
     struct icaltimetype end = icaltime_from_string(NextMonth(month).toString(Qt::ISODate).toLocal8Bit().data());
 
-    icalcomponent_foreach_recurrence(e, start, end,
-        [] (icalcomponent *e, struct icaltime_span *span, void *data) -> void {
-            QList<calendar::Event> *events = reinterpret_cast<QList<calendar::Event>*>(data);;
-
-            calendar::Event event;
-            event.start = DateFromTime_t(span->start, Qt::UTC);
-            event.stop = DateFromTime_t(span->end, Qt::UTC).addDays(-1);
-            event.summary = GetSummary(e);
-            event.color = Qt::gray;
-            *events << event;
-        },
-        &events);
+    icalcomponent_foreach_recurrence(e, start, end, AddEventCallback, &events);
 }
 
 } // anonymous namespace
