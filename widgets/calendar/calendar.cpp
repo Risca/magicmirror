@@ -34,6 +34,15 @@ QDate CurrentMonth(const QLocale &locale)
     return thisMonth;
 }
 
+QDate NextMonth(const QDate &thisMonth, const QLocale &locale)
+{
+    QDate nextMonth = thisMonth.addMonths(1);
+    while (nextMonth.dayOfWeek() != locale.firstDayOfWeek()) {
+        nextMonth = nextMonth.addDays(1);
+    }
+    return nextMonth;
+}
+
 namespace {
 
 class CalendarModel : public QAbstractTableModel

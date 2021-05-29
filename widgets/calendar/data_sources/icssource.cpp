@@ -6,6 +6,7 @@
 
 #include <QDate>
 #include <QDateTime>
+#include <QDebug>
 #include <QList>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -71,9 +72,28 @@ QString GetSummary(icalcomponent* c)
     return icalcomponent_get_summary(c);
 }
 
-bool IsThisMonth(const StartStopDate& dates, const QDate& thisMonth)
+bool IsThisMonthOrLater(const StartStopDate& dates, const QDate& thisMonth)
 {
     return dates.first >= thisMonth || (dates.second.isValid() && dates.second >= thisMonth);
+}
+
+void AddRecurringEvent(icalcomponent *e, QList<calendar::Event> &events, const QDate& month)
+{
+    struct icaltimetype start = icaltime_from_string(month.toString(Qt::ISODate).toLocal8Bit().data());
+    struct icaltimetype end = icaltime_from_string(NextMonth(month).toString(Qt::ISODate).toLocal8Bit().data());
+
+    icalcomponent_foreach_recurrence(e, start, end,
+        [] (icalcomponent *e, struct icaltime_span *span, void *data) -> void {
+            QList<calendar::Event> *events = reinterpret_cast<QList<calendar::Event>*>(data);;
+
+            calendar::Event event;
+            event.start = QDateTime::fromTime_t(span->start, Qt::UTC).date();
+            event.stop = QDateTime::fromTime_t(span->end, Qt::UTC).date().addDays(-1);
+            event.summary = GetSummary(e);
+            event.color = Qt::gray;
+            *events << event;
+        },
+        &events);
 }
 
 } // anonymous namespace
@@ -126,21 +146,27 @@ void IcsSource::downloadFinished()
     }
     else {
         QList<calendar::Event> events;
-        const QDate month = CurrentMonth();
         icalcomponent* comp = icalparser_parse_string(m_reply->readAll().constData());
         if (comp != 0) {
+            const QDate month = CurrentMonth();
+
             for (icalcomponent* c = icalcomponent_get_first_component(comp, ICAL_VEVENT_COMPONENT);
                  c != 0;
                  c = icalcomponent_get_next_component(comp, ICAL_VEVENT_COMPONENT))
             {
-                const StartStopDate dates = GetEventStartStopDates(c);
-                if (IsThisMonth(dates, month)) {
-                    calendar::Event event;
-                    event.start = dates.first;
-                    event.stop = dates.second.isValid() ? dates.second : dates.first;
-                    event.summary = GetSummary(c);
-                    event.color = Qt::gray;
-                    events << event;
+                if (icalcomponent_get_first_property(c, ICAL_RRULE_PROPERTY) != 0) {
+                    AddRecurringEvent(c, events, month);
+                }
+                else {
+                    StartStopDate dates = GetEventStartStopDates(c);
+                    if (IsThisMonthOrLater(dates, month)) {
+                        calendar::Event event;
+                        event.start = dates.first;
+                        event.stop = dates.second.isValid() ? dates.second : dates.first;
+                        event.summary = GetSummary(c);
+                        event.color = Qt::gray;
+                        events << event;
+                    }
                 }
             }
         }
