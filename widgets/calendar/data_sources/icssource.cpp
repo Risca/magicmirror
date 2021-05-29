@@ -25,6 +25,15 @@ typedef QPair<QDate, QDate> StartStopDate;
 
 namespace {
 
+QDate DateFromTime_t(const time_t &t, const Qt::TimeSpec spec = Qt::LocalTime, int offsetSeconds = 0)
+{
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
+    return QDateTime::fromTime_t(t, spec, offsetSeconds).date();
+#else
+    return QDateTime::fromSecsSinceEpoch(t, spec, offsetSeconds).date();
+#endif
+}
+
 QDate IcalDatePropertyToQDate(icalproperty* prop, bool& isDate)
 {
     const struct icaltimetype t = icalproperty_get_dtstart(prop);
@@ -44,7 +53,7 @@ QDate IcalDatePropertyToQDate(icalproperty* prop, bool& isDate)
         }
     }
 
-    return QDateTime::fromTime_t(icaltime_as_timet(t)).date();
+    return DateFromTime_t(icaltime_as_timet(t));
 }
 
 StartStopDate GetEventStartStopDates(icalcomponent* c)
@@ -87,8 +96,8 @@ void AddRecurringEvent(icalcomponent *e, QList<calendar::Event> &events, const Q
             QList<calendar::Event> *events = reinterpret_cast<QList<calendar::Event>*>(data);;
 
             calendar::Event event;
-            event.start = QDateTime::fromTime_t(span->start, Qt::UTC).date();
-            event.stop = QDateTime::fromTime_t(span->end, Qt::UTC).date().addDays(-1);
+            event.start = DateFromTime_t(span->start, Qt::UTC);
+            event.stop = DateFromTime_t(span->end, Qt::UTC).addDays(-1);
             event.summary = GetSummary(e);
             event.color = Qt::gray;
             *events << event;
