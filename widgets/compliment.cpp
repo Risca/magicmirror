@@ -19,10 +19,17 @@ void LoadComplimentsFromFile(const QString& path, QStringList& compliments)
         return;
 
     QTextStream in(&file);
+#if QT_VERSION < QT_VERSION_CHECK(5,5,0)
     while (!in.atEnd()) {
         QString line = in.readLine();
         compliments.push_back(line);
     }
+#else
+    QString line;
+    while (in.readLineInto(&line)) {
+        compliments.push_back(line);
+    }
+#endif
 }
 
 } // anonymous namespace
