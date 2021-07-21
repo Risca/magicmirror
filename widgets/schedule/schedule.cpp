@@ -43,13 +43,19 @@ Schedule::Schedule(calendar::ISource *source, const QString &title, QWidget *par
 
 void Schedule::syncFinished(const QList<calendar::Event> &events)
 {
+    QString text;
+    QDate deadline;
+
     const QDate today = QDate::currentDate();
     foreach (const calendar::Event& e, events) {
         if (e.start <= today && today <= e.stop) {
-            ui->current->setText(e.summary);
-            break;
+            if (deadline.isNull() || e.stop < deadline) {
+                text = e.summary;
+                deadline = e.stop;
+            }
         }
     }
+    ui->current->setText(text);
 }
 
 Schedule::~Schedule()
