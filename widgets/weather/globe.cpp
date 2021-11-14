@@ -62,11 +62,9 @@ void sendDataToOpenGL(GLuint& bufferID, GLuint textureID[], GLint& numIndices, G
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
-    glEnableVertexAttribArray(3);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, shape.vertexStride(), 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, shape.vertexStride(), (void*)(sizeof(GLfloat) * 3));
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, shape.vertexStride(), (void*)(sizeof(GLfloat) * 6));
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, shape.vertexStride(), (void*)(sizeof(GLfloat) * 9));
 
     numIndices = shape.indices.count();
     indexOffset = shape.vertexBufferSize();
@@ -191,9 +189,8 @@ void installShaders(GLuint& programID)
 
     // Need to bind attributes before linking
     glBindAttribLocation(programID, 0, "vertexPositionModel");
-    glBindAttribLocation(programID, 1, "vertexColor");
-    glBindAttribLocation(programID, 2, "normalModel");
-    glBindAttribLocation(programID, 3, "textureCoordinateAttribute");
+    glBindAttribLocation(programID, 1, "normalModel");
+    glBindAttribLocation(programID, 2, "textureCoordinateAttribute");
 
     glLinkProgram(programID);
 

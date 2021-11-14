@@ -12,15 +12,6 @@ namespace weather {
 
 namespace {
 
-glm::vec3 randomColor()
-{
-    glm::vec3 ret;
-    ret.x = rand() / (float)RAND_MAX;
-    ret.y = rand() / (float)RAND_MAX;
-    ret.z = rand() / (float)RAND_MAX;
-    return ret;
-}
-
 ShapeData makePlaneVerts(uint dimensions)
 {
     ShapeData ret;
@@ -35,7 +26,6 @@ ShapeData makePlaneVerts(uint dimensions)
             thisVert.position.z = i - half;
             thisVert.position.y = 0;
             thisVert.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-            thisVert.color = randomColor();
             thisVert.textureCoordinate = vec2((float)i / dimensions, (float)j / dimensions);
         }
     }
