@@ -124,6 +124,19 @@
    <item row="1" column="2" rowspan="3">
     <layout class="QVBoxLayout" name="rightVerticalLayout">
      <item>
+      <spacer name="rightVerticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>200</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QLabel" name="versionLabel">
        <property name="font">
         <font>

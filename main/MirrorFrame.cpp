@@ -66,7 +66,7 @@ void MirrorFrame::createClimateSystem()
     ui->topHorizontalLayout->addLayout(layout);
 
     weather::Globe* globe = new weather::Globe(this);
-    ui->rightVerticalLayout->insertWidget(0, globe, 0, Qt::AlignRight);
+    ui->rightVerticalLayout->insertWidget(1, globe, 0, Qt::AlignRight);
     connect(this, SIGNAL(minuteChanged()), globe, SLOT(repaint()));
 }
 
