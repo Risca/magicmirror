@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/shaders">
+        <file>globe.vsh</file>
+        <file>globe.fsh</file>
+    </qresource>
+</RCC>

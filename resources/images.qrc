@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/img">
+        <file alias="black_marble.jpg">earthlights4k.jpg</file>
+        <file alias="blue_marble.jpg">earthmap4k.jpg</file>
+    </qresource>
+</RCC>

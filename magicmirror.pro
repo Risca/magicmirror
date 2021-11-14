@@ -17,7 +17,9 @@ OBJECTS_DIR = .obj
 MOC_DIR = .moc
 
 VERSION = 1.12.2
-DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
+DEFINES += VERSION_STRING=\\\"$${VERSION}\\\" \
+    GL_GLEXT_PROTOTYPES \
+    GLM_FORCE_RADIANS
 
 *-g++ {
     GCC_VERSION = $$system("$${QMAKE_CXX} -dumpversion")
@@ -58,7 +60,9 @@ SOURCES = main/MirrorFrame.cpp \
     widgets/weather/data_sources/openweathermapconditionsdatasource.cpp \
     widgets/weather/data_sources/openweathermapforecastdatasource.cpp \
     widgets/weather/data_sources/weathersourcefactory.cpp \
-    widgets/weather/forecast.cpp
+    widgets/weather/forecast.cpp \
+    widgets/weather/globe.cpp \
+    widgets/weather/primitives/shapegenerator.cpp
 
 HEADERS = main/MirrorFrame.h \
     utils/effects.h \
@@ -89,7 +93,11 @@ HEADERS = main/MirrorFrame.h \
     widgets/weather/data_sources/iforecastdatasource.h \
     widgets/weather/data_sources/openweathermapconditionsdatasource.h \
     widgets/weather/data_sources/openweathermapforecastdatasource.h \
-    widgets/weather/forecast.h
+    widgets/weather/forecast.h \
+    widgets/weather/globe.h \
+    widgets/weather/primitives/shapedata.h \
+    widgets/weather/primitives/shapegenerator.h \
+    widgets/weather/primitives/vertex.h
 
 
 FORMS += \
@@ -104,4 +112,10 @@ unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += libical o2 libqrencode
 
 RESOURCES += main/stylesheets/breeze.qrc \
-    resources/icons.qrc
+    resources/icons.qrc \
+    resources/images.qrc \
+    widgets/weather/shaders.qrc
+
+DISTFILES += \
+    widgets/weather/frag.fsh \
+    widgets/weather/vert.vsh
