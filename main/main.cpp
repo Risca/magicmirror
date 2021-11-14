@@ -13,6 +13,7 @@ along with MythClock.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <QApplication>
+#include <QSurfaceFormat>
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
@@ -43,6 +44,10 @@ static void printFonts()
 
 int main(int argc, char **argv)
 {
+    QSurfaceFormat fmt;
+    fmt.setRenderableType(QSurfaceFormat::OpenGLES);
+    QSurfaceFormat::setDefaultFormat(fmt);
+
     QApplication app (argc, argv);
     MirrorFrame *frame = NULL;
 

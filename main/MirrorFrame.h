@@ -33,6 +33,7 @@ public:
     virtual ~MirrorFrame();
 
 signals:
+    void minuteChanged();
     void dayChanged(const QDate&);
 
 public slots:

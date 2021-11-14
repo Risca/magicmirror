@@ -6,6 +6,7 @@
 #include "widgets/schedule/schedule.h"
 #include "widgets/weather/currentconditions.h"
 #include "widgets/weather/forecast.h"
+#include "widgets/weather/globe.h"
 #include "widgets/sensors/sensors.h"
 
 #include <QDate>
@@ -51,7 +52,7 @@ void MirrorFrame::createClimateSystem()
     QVBoxLayout* layout = new QVBoxLayout;
 
     weather::CurrentConditions* weather = new weather::CurrentConditions(m_net, this);
-    layout->addWidget(weather, 0);
+    layout->addWidget(weather);
 
     sensors::Sensors *sensorWidget;
     if (sensors::Sensors::Create(sensorWidget, m_net, this)) {
@@ -60,9 +61,13 @@ void MirrorFrame::createClimateSystem()
     }
 
     weather::Forecast* forecast = new weather::Forecast(m_net, this);
-    layout->addWidget(forecast, 1, Qt::AlignRight);
+    layout->addWidget(forecast, 1);
 
     ui->topHorizontalLayout->addLayout(layout);
+
+    weather::Globe* globe = new weather::Globe(this);
+    ui->rightVerticalLayout->insertWidget(0, globe, 0, Qt::AlignRight);
+    connect(this, SIGNAL(minuteChanged()), globe, SLOT(repaint()));
 }
 
 void MirrorFrame::createCalendarSystem()
@@ -77,18 +82,22 @@ void MirrorFrame::createCalendarSystem()
     schedule::Schedule* schedule;
     if (schedule::Schedule::Create(schedule, m_net, this)) {
         qDebug() << "Successfully created a schedule widget";
-        ui->bottomHorizontalLayout->insertWidget(0, schedule, 0, Qt::AlignLeft);
+        ui->leftVerticalLayout->addWidget(schedule, 0, Qt::AlignLeft);
     }
 }
 
 void MirrorFrame::updateClock()
 {
+    const QTime time = ui->clock->time();
     const QDate day = ui->clock->date();
     const QDateTime now = QDateTime::currentDateTime();
     const QDate today = now.date();
 
     ui->clock->setDateTime(now);
-    if (today > day) {
+    if (now.time().minute() != time.minute()) {
+        emit minuteChanged();
+    }
+    if (today != day) {
         emit dayChanged(today);
     }
 }
