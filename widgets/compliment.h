@@ -1,13 +1,11 @@
 #pragma once
 
-#include <QLabel>
+#include "fadingqlabel.h"
 #include <QString>
 #include <QStringList>
 #include <QTimer>
 
-class QPropertyAnimation;
-
-class Compliment : public QLabel
+class Compliment : public FadingQLabel
 {
     Q_OBJECT
 
@@ -21,13 +19,6 @@ public slots:
     void changeCompliment();
 
 private:
-    QPropertyAnimation *m_fadeIn;
-    QPropertyAnimation *m_fadeOut;
-
-    QTimer m_timer;
     QString m_newText;
     QStringList m_compliments;
-
-private slots:
-    void textFadedOut();
 };
