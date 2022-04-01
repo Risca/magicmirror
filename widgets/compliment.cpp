@@ -2,6 +2,7 @@
 
 #include "utils/settingsfactory.h"
 
+#include <algorithm>
 #include <QDebug>
 #include <QFile>
 #include <QGraphicsOpacityEffect>
