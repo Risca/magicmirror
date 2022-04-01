@@ -2,6 +2,7 @@
 #include "ui_MirrorFrame.h"
 
 #include "utils/settingsfactory.h"
+#include "widgets/slideshow.h"
 #include "widgets/calendar/calendar.h"
 #include "widgets/schedule/schedule.h"
 #include "widgets/weather/currentconditions.h"
@@ -77,6 +78,12 @@ void MirrorFrame::createCalendarSystem()
         qDebug() << "Successfully created a calendar widget";
         ui->topHorizontalLayout->insertWidget(0, cal, 0, Qt::AlignLeft);
         connect(this, &MirrorFrame::dayChanged, cal, &calendar::Calendar::changeDay);
+    }
+
+    Slideshow *slideshow;
+    if (Slideshow::Create(slideshow, this)) {
+        qDebug() << "Successfully created a picture slideshow";
+        ui->leftVerticalLayout->addWidget(slideshow, 0);
     }
 
     schedule::Schedule* schedule;

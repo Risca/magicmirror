@@ -59,6 +59,7 @@ SOURCES = main/MirrorFrame.cpp \
     widgets/sensors/data_sources/sensormodel.cpp \
     widgets/sensors/data_sources/sensorsourcefactory.cpp \
     widgets/sensors/sensors.cpp \
+    widgets/slideshow.cpp \
     widgets/weather/currentconditions.cpp \
     widgets/weather/data_sources/fakeforecastdatasource.cpp \
     widgets/weather/data_sources/fakeweatherconditionsdatasource.cpp \
@@ -92,6 +93,7 @@ HEADERS = main/MirrorFrame.h \
     widgets/sensors/data_sources/sensor_nosource.h \
     widgets/sensors/data_sources/sensormodel.h \
     widgets/sensors/sensors.h \
+    widgets/slideshow.h \
     widgets/weather/currentconditions.h \
     widgets/weather/data_sources/fakeforecastdatasource.h \
     widgets/weather/data_sources/fakeweatherconditionsdatasource.h \
