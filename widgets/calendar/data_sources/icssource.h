@@ -2,8 +2,10 @@
 
 #include "cal_isource.h"
 
+#include <QList>
 #include <QNetworkRequest>
 #include <QObject>
+#include <QSslError>
 #include <QSharedPointer>
 #include <QTimer>
 
@@ -35,6 +37,7 @@ protected:
 
 protected slots:
     void downloadFinished();
+    void onSslErrors(const QList<QSslError> &errors);
 };
 
 } // namespace calendar

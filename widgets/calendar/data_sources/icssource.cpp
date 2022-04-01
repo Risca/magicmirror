@@ -152,6 +152,7 @@ void IcsSource::sync()
 
     m_reply = m_net->get(m_request);
     connect(m_reply, &QNetworkReply::finished, this, &IcsSource::downloadFinished);
+    connect(m_reply, &QNetworkReply::sslErrors, this, &IcsSource::onSslErrors);
 }
 
 void IcsSource::downloadFinished()
@@ -191,6 +192,13 @@ void IcsSource::downloadFinished()
     }
     m_reply->deleteLater();
     m_reply = 0;
+}
+
+void IcsSource::onSslErrors(const QList<QSslError> &errors)
+{
+    foreach (const QSslError &e, errors) {
+        qWarning() << e;
+    }
 }
 
 } // namespace calendar
