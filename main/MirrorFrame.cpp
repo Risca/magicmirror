@@ -93,7 +93,7 @@ void MirrorFrame::createCalendarSystem()
     Slideshow *slideshow;
     if (Slideshow::Create(slideshow, this)) {
         qDebug() << "Successfully created a picture slideshow";
-        ui->leftVerticalLayout->addWidget(slideshow, 0);
+        ui->leftVerticalLayout->addWidget(slideshow, 0, Qt::AlignLeft | Qt::AlignBottom);
         m_slideshow = slideshow;
     }
 
