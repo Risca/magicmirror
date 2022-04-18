@@ -25,12 +25,19 @@ namespace Ui {
 class MirrorFrame;
 }
 
+namespace calendar {
+class Calendar;
+}
+class Slideshow;
+
 class MirrorFrame : public QFrame {
     Q_OBJECT
 
 public:
     static MirrorFrame* Create();
     virtual ~MirrorFrame();
+
+    void resizeEvent(QResizeEvent *e);
 
 signals:
     void minuteChanged();
@@ -45,6 +52,8 @@ private:
     void createCalendarSystem();
 
     Ui::MirrorFrame *ui;
+    calendar::Calendar* m_calendar;
+    Slideshow *m_slideshow;
     QTimer m_clockTimer;
     QSharedPointer<QNetworkAccessManager> m_net;
 };

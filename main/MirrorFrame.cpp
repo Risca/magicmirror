@@ -19,6 +19,8 @@
 MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     QFrame(0),
     ui(new Ui::MirrorFrame),
+    m_calendar(0),
+    m_slideshow(0),
     m_net(net)
 {
     QSharedPointer<QSettings> settings = SettingsFactory::Create();
@@ -46,6 +48,13 @@ MirrorFrame *MirrorFrame::Create()
 MirrorFrame::~MirrorFrame()
 {
     delete ui;
+}
+
+void MirrorFrame::resizeEvent(QResizeEvent *)
+{
+    if (m_calendar && m_slideshow) {
+        m_slideshow->setMinimumWidth(m_calendar->width());
+    }
 }
 
 void MirrorFrame::createClimateSystem()
@@ -78,12 +87,14 @@ void MirrorFrame::createCalendarSystem()
         qDebug() << "Successfully created a calendar widget";
         ui->topHorizontalLayout->insertWidget(0, cal, 0, Qt::AlignLeft);
         connect(this, &MirrorFrame::dayChanged, cal, &calendar::Calendar::changeDay);
+        m_calendar = cal;
     }
 
     Slideshow *slideshow;
     if (Slideshow::Create(slideshow, this)) {
         qDebug() << "Successfully created a picture slideshow";
         ui->leftVerticalLayout->addWidget(slideshow, 0);
+        m_slideshow = slideshow;
     }
 
     schedule::Schedule* schedule;
