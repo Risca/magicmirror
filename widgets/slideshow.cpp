@@ -56,10 +56,10 @@ void Slideshow::resizeEvent(QResizeEvent *e)
 
             if (img.transformation() & QImageIOHandler::TransformationRotate90) {
                 QSize const realImgSize = imgSize.transposed();
-                scaledSize = realImgSize.scaled(QSize(e->size().width(), realImgSize.height()), Qt::KeepAspectRatio).transposed();
+                scaledSize = realImgSize.scaled(e->size(), Qt::KeepAspectRatio).transposed();
             }
             else {
-                scaledSize = imgSize.scaled(QSize(e->size().width(), imgSize.height()), Qt::KeepAspectRatio);
+                scaledSize = imgSize.scaled(e->size(), Qt::KeepAspectRatio);
             }
 
             img.setScaledSize(scaledSize);
