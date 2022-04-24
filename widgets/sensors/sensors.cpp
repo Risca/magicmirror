@@ -4,6 +4,7 @@
 #include "data_sources/sensor_isource.h"
 #include "data_sources/sensormodel.h"
 
+#include "utils/effects.h"
 #include "utils/settingsfactory.h"
 
 #include <QDebug>
@@ -38,6 +39,7 @@ Sensors::Sensors(SensorModel *model, QWidget *parent) :
     ui->sensorList->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->sensorList->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->sensorList->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    utils::ApplyFade(ui->sensorList);
 }
 
 Sensors::~Sensors()

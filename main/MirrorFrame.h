@@ -25,8 +25,8 @@ namespace Ui {
 class MirrorFrame;
 }
 
-namespace calendar {
-class Calendar;
+namespace weather {
+class CurrentConditions;
 }
 class Slideshow;
 
@@ -45,6 +45,7 @@ signals:
 
 public slots:
     void updateClock();
+    void cycleWidgets();
 
 private:
     MirrorFrame(QSharedPointer<QNetworkAccessManager> net);
@@ -52,8 +53,8 @@ private:
     void createLeftPanel();
 
     Ui::MirrorFrame *ui;
-    calendar::Calendar* m_calendar;
+    weather::CurrentConditions* m_weatherWidget;
     Slideshow *m_slideshow;
-    QTimer m_clockTimer;
+    QTimer m_clockTimer, m_cycleTimer;
     QSharedPointer<QNetworkAccessManager> m_net;
 };

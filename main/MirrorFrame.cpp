@@ -16,10 +16,12 @@
 #include <QNetworkAccessManager>
 #include <QVBoxLayout>
 
+#define WIDGET_CYCLE_INTERVAL (3000)
+
 MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     QFrame(0),
     ui(new Ui::MirrorFrame),
-    m_calendar(0),
+    m_weatherWidget(0),
     m_slideshow(0),
     m_net(net)
 {
@@ -31,6 +33,10 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     connect(&m_clockTimer, &QTimer::timeout, this, &MirrorFrame::updateClock);
     m_clockTimer.setTimerType(Qt::CoarseTimer);
     m_clockTimer.start(500);
+
+    connect(&m_cycleTimer, &QTimer::timeout, this, &MirrorFrame::cycleWidgets);
+    m_cycleTimer.setTimerType(Qt::VeryCoarseTimer);
+    m_cycleTimer.setInterval(WIDGET_CYCLE_INTERVAL);
 
     createLeftPanel();
     createRightPanel();
@@ -52,32 +58,37 @@ MirrorFrame::~MirrorFrame()
 
 void MirrorFrame::resizeEvent(QResizeEvent *)
 {
-    if (m_calendar && m_slideshow) {
-        m_slideshow->setMinimumWidth(m_calendar->width());
+    if (m_weatherWidget && m_slideshow) {
+        m_slideshow->setMinimumWidth(m_weatherWidget->width());
     }
 }
 
 void MirrorFrame::createRightPanel()
 {
-    QVBoxLayout* layout = new QVBoxLayout;
-
-    weather::CurrentConditions* weather = new weather::CurrentConditions(m_net, this);
-    layout->addWidget(weather);
+    m_weatherWidget = new weather::CurrentConditions(m_net, this);
+    ui->topRightLayout->insertWidget(ui->topRightLayout->indexOf(ui->readingsWidget), m_weatherWidget);
 
     sensors::Sensors *sensorWidget;
     if (sensors::Sensors::Create(sensorWidget, m_net, this)) {
         qDebug() << __PRETTY_FUNCTION__ << "adding sensor widget";
-        layout->addWidget(sensorWidget, 0);
+        ui->readingsWidget->addWidget(sensorWidget);
     }
 
     weather::Forecast* forecast = new weather::Forecast(m_net, this);
-    layout->addWidget(forecast, 1);
+    ui->readingsWidget->addWidget(forecast);
 
-    ui->topHorizontalLayout->addLayout(layout);
+    if (ui->readingsWidget->count() > 1) {
+        m_cycleTimer.start();
+    }
 
-    weather::Globe* globe = new weather::Globe(this);
-    ui->rightVerticalLayout->insertWidget(1, globe, 0, Qt::AlignRight);
-    connect(this, SIGNAL(minuteChanged()), globe, SLOT(repaint()));
+    Slideshow *slideshow;
+    if (Slideshow::Create(slideshow, this)) {
+        qDebug() << "Successfully created a picture slideshow";
+        slideshow->setAlignment(Qt::AlignRight);
+        ui->bottomRightLayout->insertWidget(1, slideshow, 0, Qt::AlignRight | Qt::AlignBottom);
+        m_slideshow = slideshow;
+    }
+    connect(this, SIGNAL(minuteChanged()), ui->globe, SLOT(repaint()));
 }
 
 void MirrorFrame::createLeftPanel()
@@ -85,16 +96,8 @@ void MirrorFrame::createLeftPanel()
     calendar::Calendar* cal;
     if (calendar::Calendar::Create(cal, m_net, this)) {
         qDebug() << "Successfully created a calendar widget";
-        ui->topHorizontalLayout->insertWidget(0, cal, 0, Qt::AlignLeft);
+        ui->leftVerticalLayout->insertWidget(0, cal, 0, Qt::AlignLeft);
         connect(this, &MirrorFrame::dayChanged, cal, &calendar::Calendar::changeDay);
-        m_calendar = cal;
-    }
-
-    Slideshow *slideshow;
-    if (Slideshow::Create(slideshow, this)) {
-        qDebug() << "Successfully created a picture slideshow";
-        ui->leftVerticalLayout->addWidget(slideshow, 0, Qt::AlignLeft | Qt::AlignBottom);
-        m_slideshow = slideshow;
     }
 
     schedule::Schedule* schedule;
@@ -117,5 +120,14 @@ void MirrorFrame::updateClock()
     }
     if (today != day) {
         emit dayChanged(today);
+    }
+}
+
+void MirrorFrame::cycleWidgets()
+{
+    if (ui->readingsWidget->count() > 1) {
+        int idx = ui->readingsWidget->currentIndex();
+        idx = (idx + 1) % ui->readingsWidget->count();
+        ui->readingsWidget->setCurrentIndex(idx);
     }
 }
