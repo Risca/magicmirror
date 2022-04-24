@@ -48,8 +48,8 @@ public slots:
 
 private:
     MirrorFrame(QSharedPointer<QNetworkAccessManager> net);
-    void createClimateSystem();
-    void createCalendarSystem();
+    void createRightPanel();
+    void createLeftPanel();
 
     Ui::MirrorFrame *ui;
     calendar::Calendar* m_calendar;

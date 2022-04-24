@@ -32,8 +32,8 @@ MirrorFrame::MirrorFrame(QSharedPointer<QNetworkAccessManager> net) :
     m_clockTimer.setTimerType(Qt::CoarseTimer);
     m_clockTimer.start(500);
 
-    createClimateSystem();
-    createCalendarSystem();
+    createLeftPanel();
+    createRightPanel();
 }
 
 MirrorFrame *MirrorFrame::Create()
@@ -57,7 +57,7 @@ void MirrorFrame::resizeEvent(QResizeEvent *)
     }
 }
 
-void MirrorFrame::createClimateSystem()
+void MirrorFrame::createRightPanel()
 {
     QVBoxLayout* layout = new QVBoxLayout;
 
@@ -80,7 +80,7 @@ void MirrorFrame::createClimateSystem()
     connect(this, SIGNAL(minuteChanged()), globe, SLOT(repaint()));
 }
 
-void MirrorFrame::createCalendarSystem()
+void MirrorFrame::createLeftPanel()
 {
     calendar::Calendar* cal;
     if (calendar::Calendar::Create(cal, m_net, this)) {
