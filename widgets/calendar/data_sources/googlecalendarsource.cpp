@@ -275,6 +275,7 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
             emit finished(m_events);
             m_events.clear();
         }
+        m_currentRequest.remove(id);
     }
 }
 
