@@ -60,7 +60,7 @@ protected:
     QMap<int, QColor> m_calendarColorsByColorId;
     QMap<QString, QColor> m_calendarColorsByCalendarId;
     QMap<int, QColor> m_eventColors;
-    QMap<int, QString> m_currentRequest;
+    QMap<int, QString> m_currentRequests;
     QList<calendar::Event> m_events;
     QTimer m_retryTimer;
     QTimer m_refreshTimer;

@@ -216,12 +216,12 @@ void GoogleCalendarSource::onVerificationCodeAndUrl(const QUrl &url, const QStri
 
 void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error, const QByteArray &data)
 {
-    if (id != m_colorRequest && id != m_calendarInfoRequest && !m_currentRequest.contains(id)) {
+    if (id != m_colorRequest && id != m_calendarInfoRequest && !m_currentRequests.contains(id)) {
         qWarning() << __PRETTY_FUNCTION__ << "invalid request id:" << id << m_colorRequest;
         return;
     }
 
-    const QString &calendar = m_currentRequest.value(id);
+    const QString &calendar = m_currentRequests.value(id);
     qDebug() << __PRETTY_FUNCTION__ << id << (id == m_colorRequest ? "colors" :
                                              (id == m_calendarInfoRequest ? "calendar info" :
                                              calendar));
@@ -275,7 +275,7 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
             emit finished(m_events);
             m_events.clear();
         }
-        m_currentRequest.remove(id);
+        m_currentRequests.remove(id);
     }
 }
 
@@ -332,7 +332,7 @@ void GoogleCalendarSource::getEvents(const QString &calendar)
 
     QNetworkRequest req(url);
     int id = m_requestor->get(req);
-    m_currentRequest[id] = calendar;
+    m_currentRequests[id] = calendar;
 }
 
 bool GoogleCalendarSource::isAccessTokenValid()
