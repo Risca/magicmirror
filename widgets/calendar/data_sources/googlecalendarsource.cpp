@@ -263,14 +263,17 @@ void GoogleCalendarSource::onFinished(int id, QNetworkReply::NetworkError error,
 
     if (!calendar.isNull()) {
         const int nextCalendarIndex = m_ids.indexOf(calendar) + 1;
-        if (nextCalendarIndex == m_ids.size()) {
-            // Fetched all events, time to publish
-            emit finished(m_events);
-            m_events.clear();
-        }
-        else {
+        if (0 < nextCalendarIndex && nextCalendarIndex < m_ids.size()) {
             // Fetch next calendar's events
             getEvents(m_ids[nextCalendarIndex]);
+        }
+        else {
+            if (nextCalendarIndex == 0) {  // indexOf() returned -1
+                qWarning() << __PRETTY_FUNCTION__ << calendar << "not found!";
+            }
+            // Fetched all events we could find, time to publish
+            emit finished(m_events);
+            m_events.clear();
         }
     }
 }
