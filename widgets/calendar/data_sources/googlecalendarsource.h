@@ -54,7 +54,7 @@ protected:
     O2GoogleDevice *m_o2;
     O2Requestor *m_requestor;
     bool m_linkingInProgress;
-    QStringList m_ids;
+    const QStringList m_ids;
     int m_colorRequest;
     int m_calendarInfoRequest;
     QMap<int, QColor> m_calendarColorsByColorId;
