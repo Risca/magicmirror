@@ -19,6 +19,7 @@ struct Event;
 
 QDate CurrentMonth(const QLocale& locale = QLocale());
 QDate NextMonth(const QDate &thisMonth, const QLocale &locale = QLocale());
+QDateTime ToDateTime(const QDate& date);
 
 class Calendar : public QWidget
 {

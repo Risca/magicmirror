@@ -315,14 +315,8 @@ void GoogleCalendarSource::getCalendarInfo()
 
 void GoogleCalendarSource::getEvents(const QString &calendar)
 {
-    QDateTime const thisMonth =
-#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
-            QDateTime(CurrentMonth())
-#else
-            CurrentMonth().startOfDay()
-#endif
-            .toTimeSpec(Qt::OffsetFromUTC);
-    QDateTime const nextMonth = thisMonth.addDays(31);
+    QDateTime const thisMonth = ToDateTime(CurrentMonth()).toTimeSpec(Qt::OffsetFromUTC);
+    QDateTime const nextMonth = ToDateTime(NextMonth(thisMonth.date())).toTimeSpec(Qt::OffsetFromUTC);
     QUrl url = QString(BASE_URL) + "calendars/" + calendar + "/events";
 
     QUrlQuery query;

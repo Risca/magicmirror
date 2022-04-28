@@ -43,6 +43,15 @@ QDate NextMonth(const QDate &thisMonth, const QLocale &locale)
     return nextMonth;
 }
 
+QDateTime ToDateTime(const QDate &date)
+{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+    return QDateTime(date);
+#else
+    return date.startOfDay();
+#endif
+}
+
 namespace {
 
 class CalendarModel : public QAbstractTableModel
