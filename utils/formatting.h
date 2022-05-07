@@ -23,7 +23,7 @@ inline QString Precipitation(double p)
 
 inline QString Capitalized(const QString& str, const QLocale& locale = QLocale())
 {
-    QString firstLetter = str.left(1);
+    QString firstLetter = str.at(0);
     return locale.toUpper(firstLetter) + str.right(str.size() - 1);
 }
 
