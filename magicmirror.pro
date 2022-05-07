@@ -53,6 +53,9 @@ SOURCES = main/MirrorFrame.cpp \
     widgets/calendar/data_sources/icssource.cpp \
     widgets/calendar/calendar.cpp \
     widgets/compliment.cpp \
+    widgets/departures/data_sources/resrobotdepartures.cpp \
+    widgets/departures/departurewidget.cpp \
+    widgets/departures/singledeparturewidget.cpp \
     widgets/fadingqlabel.cpp \
     widgets/schedule/schedule.cpp \
     widgets/sensors/data_sources/domoticzsensor.cpp \
@@ -86,6 +89,11 @@ HEADERS = main/MirrorFrame.h \
     widgets/calendar/data_sources/googlecalendarsource.h \
     widgets/calendar/data_sources/icssource.h \
     widgets/compliment.h \
+    widgets/departures/data_sources/departure.h \
+    widgets/departures/data_sources/departure_isource.h \
+    widgets/departures/data_sources/resrobotdepartures.h \
+    widgets/departures/departurewidget.h \
+    widgets/departures/singledeparturewidget.h \
     widgets/fadingqlabel.h \
     widgets/schedule/schedule.h \
     widgets/sensors/data_sources/domoticzsensor.h \
@@ -112,6 +120,7 @@ HEADERS = main/MirrorFrame.h \
 FORMS += \
     main/MirrorFrame.ui \
     widgets/calendar/calendar.ui \
+    widgets/departures/singledeparturewidget.ui \
     widgets/schedule/schedule.ui \
     widgets/sensors/sensors.ui \
     widgets/weather/currentconditions.ui \

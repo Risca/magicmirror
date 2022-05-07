@@ -4,6 +4,7 @@
 #include "utils/settingsfactory.h"
 #include "widgets/slideshow.h"
 #include "widgets/calendar/calendar.h"
+#include "widgets/departures/departurewidget.h"
 #include "widgets/schedule/schedule.h"
 #include "widgets/weather/currentconditions.h"
 #include "widgets/weather/forecast.h"
@@ -100,6 +101,11 @@ void MirrorFrame::createLeftPanel()
         connect(this, &MirrorFrame::dayChanged, cal, &calendar::Calendar::changeDay);
     }
 
+    departure::DepartureWidget* departures;
+    if (departure::DepartureWidget::Create(departures, m_net, this)) {
+        qDebug() << "Successfully created a departure widget";
+        ui->leftVerticalLayout->addWidget(departures);
+    }
     schedule::Schedule* schedule;
     if (schedule::Schedule::Create(schedule, m_net, this)) {
         qDebug() << "Successfully created a schedule widget";
