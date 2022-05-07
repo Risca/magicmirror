@@ -30,7 +30,7 @@ public:
     virtual ~Calendar();
 
 signals:
-    void setEvents(const QList<Event>&);
+    void setEvents(const QList<calendar::Event>&);
 
 public slots:
     void changeDay(const QDate& day);

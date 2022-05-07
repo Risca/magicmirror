@@ -19,7 +19,7 @@ public:
     virtual QSize minimumSizeHint() const;
 
 public slots:
-    void setEvents(const QList<Event> &events);
+    void setEvents(const QList<calendar::Event> &events);
 
 protected:
     void paintCell(QPainter *painter, const QRect &rect, const QDate &date) const;

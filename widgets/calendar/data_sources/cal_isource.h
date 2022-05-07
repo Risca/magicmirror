@@ -28,7 +28,7 @@ public slots:
     virtual void sync() = 0;
 
 signals:
-    void finished(const QList<Event>&);
+    void finished(const QList<calendar::Event>&);
     void error(const QString&);
 
 protected:
