@@ -1,6 +1,5 @@
 #include "sensor_isource.h"
 
-#include "sensor_nosource.h"
 #include "domoticzsensor.h"
 
 #include <QDebug>
@@ -23,7 +22,7 @@ bool ISource::Create(ISource*& obj, QSharedPointer<QSettings>& settings, QShared
 
     qWarning() << "No sensor sources";
 
-    return NoSource::Create(obj, parent);
+    return false;
 }
 
 } // namespace sensors
