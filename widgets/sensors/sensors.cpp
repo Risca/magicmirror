@@ -23,7 +23,7 @@ bool Sensors::Create(Sensors *&obj, QSharedPointer<QNetworkAccessManager> &net, 
         obj = new Sensors(new SensorModel(src), parent);
     }
     else {
-        obj = nullptr;
+        obj = 0;
     }
 
     return !!obj;
