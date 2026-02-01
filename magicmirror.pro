@@ -17,6 +17,7 @@ unix {
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += GLM_ENABLE_EXPERIMENTAL
 
 OBJECTS_DIR = .obj
 MOC_DIR = .moc
