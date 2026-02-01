@@ -6,8 +6,6 @@
 #include <QRect>
 #include <QString>
 
-#include <algorithm>
-
 namespace calendar {
 
 CustomCalendarWidget::CustomCalendarWidget(QWidget *parent) :

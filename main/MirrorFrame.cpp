@@ -8,7 +8,6 @@
 #include "widgets/schedule/schedule.h"
 #include "widgets/weather/currentconditions.h"
 #include "widgets/weather/forecast.h"
-#include "widgets/weather/globe.h"
 #include "widgets/sensors/sensors.h"
 
 #include <QDate>

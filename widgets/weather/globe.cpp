@@ -2,7 +2,6 @@
 #include "primitives/shapedata.h"
 #include "primitives/shapegenerator.h"
 
-#include <algorithm>
 #include <cmath>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/transform.hpp>
