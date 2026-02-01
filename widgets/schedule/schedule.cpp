@@ -20,6 +20,9 @@ bool Schedule::Create(Schedule *&obj, QSharedPointer<QNetworkAccessManager> &net
     if (ok) {
         obj = new Schedule(source, settings->value("title").toString(), parent);
     }
+    else {
+        obj = nullptr;
+    }
 
     return !!obj;
 }

@@ -22,6 +22,9 @@ bool Sensors::Create(Sensors *&obj, QSharedPointer<QNetworkAccessManager> &net, 
     if (ISource::Create(src, settings, net)) {
         obj = new Sensors(new SensorModel(src), parent);
     }
+    else {
+        obj = nullptr;
+    }
 
     return !!obj;
 }
